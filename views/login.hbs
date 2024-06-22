@@ -1,0 +1,45 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HR Online | <%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="loginbox">
+      <img src="/img/ml-logo.png" class="avatar" alt="">
+      <h4 class="hrmd">Human Resources Management Division</h2>
+      <h1 class="login_here">Login</h1>
+        <form action="/home" id="mainform" method="POST">
+          <div id="message"></div>
+            <div>
+            <input type="text" name="username" class="username" placeholder="Username" id="username">
+            <input type="password" name="password" class="password" placeholder="Password" id="password">
+            <input type="submit" name="" value="Login" class="submit_button" id="login-button">
+          </div>
+        </form>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/login.js"></script>
+
+    {{#if error}}
+      <script> 
+        alert("{{error}}"); // Display error message as a pop-up
+      </script>
+    {{/if}}
+    
+  </body>
+</html>
