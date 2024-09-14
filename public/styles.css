@@ -1,25 +1,101 @@
 /* public/styles.css */
 body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #e9ecef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 90%;
+  max-width: 1000px;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-  color: #333;
-}
-
-form {
+  color: #343a40;
+  text-align: center;
+  font-size: 2.2rem;
   margin-bottom: 20px;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
 }
 
-li {
-  background: #f4f4f4;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 5px;
+input[type="date"],
+button,
+select {
+  padding: 12px 15px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  margin-right: 10px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input[type="date"]:focus,
+select:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+button {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+table th,
+table td {
+  border: 1px solid #dee2e6;
+  padding: 15px;
+  text-align: left;
+}
+
+table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #f1f3f5;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+select {
+  background-color: #ffffff;
+  cursor: pointer;
 }
