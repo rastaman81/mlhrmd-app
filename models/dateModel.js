@@ -1,12 +1,96 @@
 // models/dateModel.js
 const { setDefaultAutoSelectFamilyAttemptTimeout } = require("net");
-const db = require("../config/db");
+const connectDB = require("../config/db");
 const fs = require("fs");
 
-const getDateData = async (date) => {
+// ----------------------------------------- GETTING OFFICE VALUES FOR DB CONNECTION AND FOR TABLE NAME -----------------------------------------
+const getDBForOffice = (office) => {
+  if (office.toLowerCase().includes("luzon")) {
+    return {
+      dbName: "luzon",
+      tableName: "luzpayroll",
+    };
+  } else if (office.toLowerCase().includes("vismin")) {
+    return {
+      dbName: "vismin",
+      tableName: "payroll",
+    };
+  } else if (office.toLowerCase().includes("ml group")) {
+    return {
+      dbName: "mlgroup",
+      tableName: "mlpayroll",
+    };
+  } else {
+    throw new Error("Unknown office.");
+  }
+};
+// ----------------------------------------- GETTING OFFICE VALUES FOR DB CONNECTION AND FOR TABLE NAME -----------------------------------------
+
+// ----------------------------------------- GETTING DB OFFICE VALUES FROM DB FOR DROPBOX  -----------------------------------------
+const getOffices = async () => {
+  const query = "SELECT office_name FROM main_office ORDER BY office_name";
+  const db = connectDB("vismin");
+  //console.log(db);
+  return new Promise((resolve, reject) => {
+    db.query(query, (err, results) => {
+      if (err) return reject(err);
+
+      // Map over the results and capitalize the first letter of each office_name
+      const capitalizedResults = results.map((office) => {
+        return {
+          ...office,
+          office_name: capitalizeFirstLetter(office.office_name),
+        };
+      });
+
+      resolve(capitalizedResults);
+    });
+  });
+};
+// ----------------------------------------- GETTING DB OFFICE VALUES FROM DB FOR DROPBOX  -----------------------------------------
+
+// ----------------------------------------- GETTING DB REPORT TYPE VALUES FROM DB FOR DROPBOX  -----------------------------------------
+const getReports = async () => {
+  const query = "SELECT report_name FROM main_reports ORDER BY report_name";
+  const db = connectDB("vismin");
+  //console.log(db);
+  return new Promise((resolve, reject) => {
+    db.query(query, (err, results) => {
+      if (err) return reject(err);
+
+      // Map over the results and capitalize the first letter of each office_name
+      const capitalizedResults = results.map((report) => {
+        return {
+          ...report,
+          report_name: capitalizeFirstLetter(report.report_name),
+        };
+      });
+
+      resolve(capitalizedResults);
+    });
+  });
+};
+// ----------------------------------------- GETTING DB REPORT TYPE VALUES FROM DB FOR DROPBOX  -----------------------------------------
+
+// ----------------------------------------- CAPITALIZING THE FIRST LETTER  -----------------------------------------
+function capitalizeFirstLetter(string) {
+  return string
+    .split(" ") // Split the string into an array of words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+    .join(" "); // Join the words back into a single string
+}
+// ----------------------------------------- CAPITALIZING THE FIRST LETTER  -----------------------------------------
+
+// ----------------------------------------- FUNCTION FOR EDI REPORT -----------------------------------------
+const getDateData = async (date, office, report) => {
   try {
+    console.log(report);
+    const dbName = getDBForOffice(office.toLowerCase());
+
+    const db = connectDB(dbName.dbName);
+
     const year = payrollYear(date);
-    const query = `SELECT * FROM payroll_${year} WHERE enddate = ? and region not in ('mancomm', 'mancomml', 'support', 'supportl') ORDER BY region, branch`;
+    const query = `SELECT * FROM ${dbName.tableName}_${year} WHERE enddate = ? and region not in ('mancomm', 'mancomml', 'support', 'supportl') ORDER BY region, branch`;
     //const query = `SELECT * FROM payroll_${year} WHERE enddate = ? and region in ('bohol') ORDER BY region, branch`;
 
     // GET PAYROLL TRANSACTION FROM DB -----------------------------------------
@@ -49,22 +133,7 @@ const getDateData = async (date) => {
     // Output the result
 
     const ediData = mergeStaffAndAreaData(staffPayroll, areaPayroll);
-    //ediData = removeZeroValues(ediData);
 
-    //console.log(processAreaData(areaPayroll));
-    // const testing = processAreaData(areaPayroll);
-    // ediData = mergingStaffAndArea(
-    //   removeZeroValues(ediData),
-    //   processAreaData(areaPayroll)
-    // );
-
-    // ediData = mergeEmployeeAndRegion(ediData, processRegionData(regionPayroll));
-
-    //console.log(results);
-    //const test = regionData(results);
-    // const test2 = areaData(results);
-    // //console.log(test2);
-    // console.log(countEmployeesByBranch(test2));
     // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
     const jsonString = JSON.stringify(
       mergeStaffAndRegionData(staffPayroll, regionPayroll),
@@ -77,19 +146,16 @@ const getDateData = async (date) => {
     });
     // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
 
-    // //const test = computeBranchNetDivision(results);
-    // const test3 = processAreaData(test2);
-    // //console.log(test3);
-
-    // const merging = mergeEmployeeAndAreas(test2, regionData(results));
-    //console.log(merging);
-    // Return both results and regions
-    //return { results: groupedByArea(results), regions };
     return { results: ediData, regions };
   } catch (err) {
     throw err;
   }
 };
+// ----------------------------------------- FUNCTION FOR EDI REPORT -----------------------------------------
+
+// ----------------------------------------- NEW FUNCTION FOR EDI REPORT -----------------------------------------
+const generateEDIPayroll = () => {};
+// ----------------------------------------- NEW FUNCTION FOR EDI REPORT -----------------------------------------
 
 // ----------------------------------------- GETTING BRANCH COUNT -----------------------------------------
 const getBranchCounts = (data) => {
@@ -175,63 +241,6 @@ const removeZeroValues = (employees) => {
   });
 };
 // ----------------------------------------- GETTING RID OF ZEROS & NULL VALUES -----------------------------------------
-
-// ----------------------------------------- GETTING STAFF DATA -----------------------------------------
-// const staffData = (data) => {
-//   const filteredData = data.filter(
-//     (item) =>
-//       !item.designation.toLowerCase().includes("driver") &&
-//       !item.designation.toLowerCase().includes("opec") &&
-//       !item.designation.toLowerCase().includes("lptl") &&
-//       !item.designation.toLowerCase().includes("reliever") &&
-//       !item.designation.toLowerCase().includes("auditor") &&
-//       !item.designation.toLowerCase().includes("ispd") &&
-//       !item.designation.toLowerCase().includes("sales") &&
-//       item.designation.toLowerCase() !== "fa" &&
-//       item.designation.toLowerCase() !== "rst" &&
-//       item.designation.toLowerCase() !== "rt" &&
-//       item.designation.toLowerCase() !== "ram" &&
-//       item.designation.toLowerCase() !== "am" &&
-//       item.designation.toLowerCase() !== "rm"
-//   );
-
-//   // To store employee count by branch
-//   const branchEmployeeCount = {};
-//   // To store distinct branches by region
-//   const regionBranchCount = {};
-
-//   filteredData.forEach((item) => {
-//     const { region, branch } = item;
-
-//     // Count employees per branch
-//     if (!branchEmployeeCount[branch]) {
-//       branchEmployeeCount[branch] = 0;
-//     }
-//     branchEmployeeCount[branch]++;
-
-//     // Count distinct branches per region
-//     if (!regionBranchCount[region]) {
-//       regionBranchCount[region] = new Set(); // Using Set to avoid duplicates
-//     }
-//     regionBranchCount[region].add(branch);
-//   });
-
-//   // Convert the Set of branches to the branch count per region
-//   // const branchesPerRegion = {};
-//   // for (let region in regionBranchCount) {
-//   //   branchesPerRegion[region] = regionBranchCount[region].size;
-//   // }
-
-//   // Add the calculated counts to the data objects
-//   const updatedData = filteredData.map((item) => ({
-//     ...item,
-//     employeeCountInBranch: branchEmployeeCount[item.branch],
-//     //branchCountInRegion: branchesPerRegion[item.region],
-//   }));
-
-//   return updatedData;
-// };
-// ----------------------------------------- GETTING STAFF DATA -----------------------------------------
 
 // ----------------------------------------- GETTING STAFF DATA -----------------------------------------
 const staffData = (data) => {
@@ -785,7 +794,7 @@ const mergeAreaAndCalculate = (department, branchcount) => {
 };
 // ----------------------------------------- MERGE & CALCULATE AREA DATA -----------------------------------------
 
-//merge region and calculate
+// ----------------------------------------- MERGE & CALCULATE REGION DATA -----------------------------------------
 const mergeRegionAndCalculate = (regionData, branchCountData) => {
   // Create a mapping of regions to branch counts
   const branchCountMap = branchCountData.reduce((acc, item) => {
@@ -816,10 +825,9 @@ const mergeRegionAndCalculate = (regionData, branchCountData) => {
     };
   });
 };
+// ----------------------------------------- MERGE & CALCULATE REGION DATA -----------------------------------------
 
-//merge and calculate region
-
-//merge staff and region
+// ----------------------------------------- MERGE STAFF & REGION DATA -----------------------------------------
 const mergeStaffAndRegionData = (staffdata, region) => {
   // Create a result array to store the merged and calculated data
   const result = [];
@@ -879,10 +887,9 @@ const mergeStaffAndRegionData = (staffdata, region) => {
 
   return result;
 };
+// ----------------------------------------- MERGE STAFF & REGION DATA -----------------------------------------
 
-//merge staff and region
-
-//merge staff and area
+// ----------------------------------------- MERGE STAFF & AREA DATA -----------------------------------------
 const mergeStaffAndAreaData = (staffData, area) => {
   // Create a result array to store the merged and calculated data
   const result = [];
@@ -964,112 +971,9 @@ const mergeStaffAndAreaData = (staffData, area) => {
 
   return result;
 };
+// ----------------------------------------- MERGE STAFF & AREA DATA -----------------------------------------
 
-//merge staff and area
-
-// ----------------------------------------- MERGE STAFF DATA AND AREA ALLOCATION -----------------------------------------
-const mergingStaffAndArea = (employeeData, areaData) => {
-  return employeeData.map((emp) => {
-    const matchingArea = areaData.find(
-      (areaItem) =>
-        areaItem.region === emp.region && areaItem.department === emp.department
-    );
-    return matchingArea ? { ...emp, ...matchingArea } : emp;
-  });
-};
-// ----------------------------------------- MERGE STAFF DATA AND AREA ALLOCATION -----------------------------------------
-
-function mergeEmployeeAndRegion(employeeData, regionData) {
-  return employeeData.map((emp) => {
-    const matchingRegion = regionData.find((reg) => reg.region === emp.region);
-
-    if (matchingRegion) {
-      return {
-        ...emp,
-        ...matchingRegion,
-      };
-    }
-
-    // Return employee as is if no matching region found
-    return emp;
-  });
-}
-
-function computeNewBasicPay(employees) {
-  // Create an object to store the sums of newBasicPay grouped by region and branch
-  const groupedData = {};
-
-  employees.forEach((employee) => {
-    const {
-      employmentStatus,
-      basicPay,
-      regionRegularBasicPay,
-      regionTraineeBasicPay,
-      areaRegularBasicPay,
-      areaTraineeBasicPay,
-      regionBranchCount,
-      areaBranchCount,
-      region,
-      branch,
-    } = employee;
-
-    let newBasicPay;
-
-    // Calculate newBasicPay based on employment status
-    if (employmentStatus === "REGULAR") {
-      newBasicPay =
-        regionRegularBasicPay / regionBranchCount +
-        areaRegularBasicPay / areaBranchCount +
-        basicPay;
-    } else {
-      newBasicPay =
-        regionTraineeBasicPay / regionBranchCount +
-        areaTraineeBasicPay / areaBranchCount +
-        basicPay;
-    }
-
-    // Check if the region exists, if not create it
-    if (!groupedData[region]) {
-      groupedData[region] = {};
-    }
-
-    // Check if the branch exists under the region, if not initialize newBasicPay for that branch
-    if (!groupedData[region][branch]) {
-      groupedData[region][branch] = 0;
-    }
-
-    // Sum newBasicPay for the branch
-    groupedData[region][branch] += newBasicPay;
-  });
-
-  // Convert groupedData into the desired array format
-  const result = [];
-
-  // Iterate over regions and branches to push the final data into the result array
-  for (const region in groupedData) {
-    for (const branch in groupedData[region]) {
-      result.push({
-        region: region,
-        branch: branch,
-        newBasicPay: groupedData[region][branch],
-      });
-    }
-  }
-
-  return result;
-}
-
-// // COUNT THE EMPLOYEES BY BRANCH
-// function countEmployeesByBranch(data) {
-//   const filteredData = staffData(data);
-//   const branchCount = filteredData.reduce((acc, item) => {
-//     acc[item.branch] = (acc[item.branch] || 0) + 1;
-//     return acc;
-//   }, {});
-//   return branchCount;
-// }
-// COUNT THE EMPLOYEES BY BRANCH
-
+// ----------------------------------------- PROCESS REGION DATA -----------------------------------------
 const processRegionData = (data) => {
   // Initialize accumulators
   const regionData = {};
@@ -1185,190 +1089,6 @@ const processRegionData = (data) => {
   // Sort the results by region
   return sortedResults.sort((a, b) => a.region.localeCompare(b.region));
 };
+// ----------------------------------------- PROCESS REGION DATA -----------------------------------------
 
-//console.log(countEmployeesByBranch(data));
-
-function groupedByArea(data) {
-  // Filter the data based on designation
-  //TESTING FOR AM AND RELIEVERS
-  const filteredData = data.filter(
-    (item) =>
-      item.designation.toLowerCase() === "am" ||
-      item.designation.toLowerCase().includes("reliever")
-  );
-
-  const groupedData = {};
-
-  filteredData.forEach((item) => {
-    const branch = item.branch;
-
-    if (!groupedData[branch]) {
-      groupedData[branch] = {
-        region: item.region,
-        branch: item.branch,
-        basicRegular: 0,
-        basicTrainee: 0,
-        allowance: 0,
-        bmAllowance: 0,
-        otRegular: 0,
-        otTrainee: 0,
-        incomeOne: 0,
-        incomeTwo: 0,
-        graveyard: 0,
-        lateRegular: 0,
-        lateTrainee: 0,
-        leaveRegular: 0,
-        leaveTrainee: 0,
-        totalDeduction: 0,
-        totalNet: 0,
-      };
-    }
-
-    if (item.employmentStatus.toLowerCase() === "regular") {
-      groupedData[branch].basicRegular += item.basicPay;
-      groupedData[branch].otRegular += item.totalOT - item.nightpremium;
-      groupedData[branch].lateRegular += item.lates;
-      groupedData[branch].leaveRegular += item.leaves;
-    } else {
-      groupedData[branch].basicTrainee += item.basicPay;
-      groupedData[branch].otTrainee += item.totalOT - item.nightpremium;
-      groupedData[branch].lateTrainee += item.lates;
-      groupedData[branch].leaveTrainee += item.leaves;
-    }
-
-    groupedData[branch].allowance += item.totalAllow - item.bmAllow;
-    groupedData[branch].bmAllowance += item.bmAllow;
-    groupedData[branch].incomeOne += item.incomeAmount1;
-    groupedData[branch].incomeTwo += item.incomeAmount2;
-    groupedData[branch].graveyard += item.nightpremium * 1;
-    groupedData[branch].totalDeduction += item.deductionwoLateLeave * 1;
-    groupedData[branch].totalNet += item.totalNet;
-  });
-
-  //console.log(groupedData);
-  // Convert the groupedData object into an array of objects
-  return Object.values(groupedData);
-}
-
-//testing start
-// const dataS = [
-//   {
-//     startDate: "2024-07-31T16:00:00.000Z",
-//     endDate: "2024-08-14T16:00:00.000Z",
-//     lastName: "VIRTUDAZO",
-//     firstName: "REYDEN",
-//     designation: "ABM",
-//     branch: "GUINDULMAN",
-//     totalNet: 5000.0,
-//     region: "BOHOL",
-//     idno: "11056926",
-//     department: "BOHOL AREA A",
-//   },
-//   {
-//     startDate: "2024-07-31T16:00:00.000Z",
-//     endDate: "2024-08-14T16:00:00.000Z",
-//     lastName: "CUTANDA",
-//     firstName: "REYNALYN",
-//     designation: "TELLER/RELIEVER",
-//     branch: "GUINDULMAN",
-//     totalNet: 2000.0,
-//     region: "BOHOL",
-//     idno: "20237640",
-//     department: "BOHOL AREA B",
-//   },
-//   {
-//     startDate: "2024-07-31T16:00:00.000Z",
-//     endDate: "2024-08-14T16:00:00.000Z",
-//     lastName: "DUQUILLA",
-//     firstName: "GERALDINE",
-//     designation: "RT/LPTL",
-//     branch: "ICM",
-//     totalNet: 2000.0,
-//     region: "BOHOL",
-//     department: "BOHOL AREA B",
-//   },
-//   {
-//     startDate: "2024-07-31T16:00:00.000Z",
-//     endDate: "2024-08-14T16:00:00.000Z",
-//     lastName: "GOLOSO",
-//     firstName: "MARIA LORINA",
-//     designation: "BM",
-//     branch: "TAGBILARAN 1",
-//     totalNet: 1000.01,
-//     region: "BOHOL",
-//     department: "BOHOL AREA C",
-//   },
-//   {
-//     startDate: "2024-07-31T16:00:00.000Z",
-//     endDate: "2024-08-14T16:00:00.000Z",
-//     lastName: "MENDEZ",
-//     firstName: "FRANCIS",
-//     designation: "ABM",
-//     branch: "CHOCOLATE HILLS",
-//     totalNet: 1000.02,
-//     region: "BOHOL",
-//     department: "BOHOL AREA C",
-//   },
-//   {
-//     startDate: "2024-07-31T16:00:00.000Z",
-//     endDate: "2024-08-14T16:00:00.000Z",
-//     lastName: "MENDEZ",
-//     firstName: "FRANCIS",
-//     designation: "ABM",
-//     branch: "BOHOL CEBU",
-//     totalNet: 1000.03,
-//     region: "BOHOL",
-//     department: "BOHOL AREA C",
-//   },
-// ];
-
-// GETTING AREA/RELIEVER
-// Function to compute branch count and divided totalNet
-function computeBranchNetDivision(data) {
-  // Initialize objects to hold total net and branch counts per department
-  const departmentTotals = {};
-  const departmentOvertime = {};
-  const departmentBranches = {};
-
-  // Iterate over data to populate departmentTotals and departmentBranches
-  data.forEach((item) => {
-    const department = item.department;
-    const branch = item.branch;
-    const totalNet = item.totalNet;
-    const overtime = item.totalOT;
-
-    if (department && branch !== undefined) {
-      if (!departmentTotals[department]) {
-        departmentTotals[department] = 0;
-        departmentOvertime[department] = 0;
-        departmentBranches[department] = new Set();
-      }
-
-      departmentTotals[department] += totalNet;
-      departmentOvertime[department] += overtime;
-      departmentBranches[department].add(branch);
-    }
-  });
-
-  // Compute the result
-  const result = {};
-  for (const [department, totalNet] of Object.entries(departmentTotals)) {
-    const branchesCount = departmentBranches[department].size;
-    result[department] = {
-      numberOfBranches: branchesCount,
-      totalNet: totalNet,
-      netPerBranch: totalNet / branchesCount,
-      totalOvertime: departmentOvertime[department],
-      overtimePerBranch: departmentOvertime[department] / branchesCount,
-    };
-  }
-
-  return result;
-}
-
-//const result = computeBranchNetDivision(dataS);
-//console.log(result);
-
-//testing end
-
-module.exports = { getDateData };
+module.exports = { getDateData, getOffices, getReports };

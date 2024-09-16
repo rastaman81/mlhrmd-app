@@ -1,4 +1,4 @@
-/* public/styles.css */
+/* Global Styles */
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
@@ -6,10 +6,69 @@ body {
   background-color: #e9ecef;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
 }
 
+/* Navigation Bar */
+.navbar {
+  width: 100%;
+  background-color: #343a40;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.navbar ul.left {
+  margin-right: auto;
+}
+
+/* Adjust the right list to control positioning better */
+.navbar ul.right {
+  margin-left: auto;
+  margin-right: 30px; /* Add some margin to prevent it from being too far right */
+  padding-right: 0; /* Ensure there's no excessive padding */
+}
+.navbar ul li {
+  margin-left: 20px;
+}
+
+.navbar ul li:first-child {
+  margin-left: 0; /* Remove left margin for the first link */
+}
+
+.navbar ul li a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 8px 12px;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+}
+
+.navbar ul li a:hover {
+  background-color: #007bff;
+}
+
+.navbar ul li a.active {
+  background-color: #007bff;
+  color: #ffffff;
+}
+
+/* Container Styles */
 .container {
   width: 90%;
   max-width: 1000px;
@@ -17,8 +76,10 @@ body {
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-top: 80px; /* Adds space to prevent overlapping with the navbar */
 }
 
+/* Header */
 h1 {
   color: #343a40;
   text-align: center;
@@ -26,6 +87,7 @@ h1 {
   margin-bottom: 20px;
 }
 
+/* Form Styles */
 form {
   display: flex;
   justify-content: center;
@@ -62,6 +124,7 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* Table Styles */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -98,4 +161,14 @@ table tbody tr:hover {
 select {
   background-color: #ffffff;
   cursor: pointer;
+}
+
+/* Loading Icon */
+#loading {
+  display: none; /* Hide loading GIF initially */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }

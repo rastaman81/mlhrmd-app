@@ -22,8 +22,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public"))); // Serve static files from 'public' folder
 
 // Routes
-app.get("/date", dateController.getDatePage);
-app.post("/date", dateController.postDate);
+app.get("/reports", dateController.getDatePage);
+app.post("/reports", dateController.postDate);
 
 // Start the server
 app.listen(PORT, () => {

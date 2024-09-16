@@ -3,236 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Date Query | <%= title %></title>
+    <title>Payroll Reports | <%= title %></title>
     <link rel="stylesheet" href="/styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   </head>
   <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <ul class="left">
+        <li><a href="/">Home</a></li>
+        <li><a href="/reports" class="active">Reports</a></li>
+      </ul>
+      <ul class="right">
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
     <div class="container">
-      <h1>Query Data by Date</h1>
-      <form action="/date" method="POST">
+      <h1>Payroll Reports</h1>
+      <form id="dateForm" method="POST">
+        <select name="office" id="officeSelect" required>
+          <option value="" disabled selected>Select Office</option>
+          <% offices.forEach(office => { %>
+          <option value="<%= office.office_name %>">
+            <%= office.office_name %>
+          </option>
+          <% }); %>
+        </select>
+
+        <select name="report" id="reportSelect" required>
+          <option value="" disabled selected>Select Report</option>
+          <% reports.forEach(report => { %>
+          <option value="<%= report.report_name %>">
+            <%= report.report_name %>
+          </option>
+          <% }); %>
+        </select>
+
         <input type="date" name="date" id="myDateInput" required />
-        <button type="submit">Submit</button>
+        <button type="button" id="downloadButton">
+          Download Payroll Report
+        </button>
       </form>
 
-      <% if (data && data.length > 0) { %>
-
-      <select id="myDropdown">
-        <% regions.forEach(region => { %>
-        <option value="<%= region.sourcename %>">
-          <%= region.sourcename %>
-        </option>
-        <% }); %>
-      </select>
-
-      <h2>Results:</h2>
-      <table id="dataTable">
-        <thead>
-          <tr>
-            <th>REGION</th>
-            <th>BRANCH</th>
-            <th>BASIC PAY REGULAR</th>
-            <th>BASIC PAY TRAINEE</th>
-            <th>ALLOWANCES</th>
-            <th>BM ALLOWANCE</th>
-            <th>OT REGULAR</th>
-            <th>OT TRAINEE</th>
-            <th>COLA</th>
-            <th>OTHER INCOME 1</th>
-            <th>OTHER INCOME 2</th>
-            <th>GRAVEYARD</th>
-            <th>LATE REGULAR</th>
-            <th>LATE TRAINEE</th>
-            <th>LEAVE REGULAR</th>
-            <th>LEAVE TRAINEE</th>
-            <th>TOTAL DEDUCTION</th>
-            <th>TOTAL NET</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% data.forEach(item => { %>
-          <tr>
-            <td><%= item.region %></td>
-            <td><%= item.branch %></td>
-            <td>
-              <%= item.branchRegularBasicPay.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchTraineeBasicPay.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchAllowances.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchBmAllowance.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchRegularOT.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchTraineeOT.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td><%= 0.00 %></td>
-            <td>
-              <%= item.branchIncome1.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchIncome2.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchNightpremium.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchRegularLate.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchTraineeLate.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchRegularLeave.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchTraineeLeave.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchOtherDeductions.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-            <td>
-              <%= item.branchtotalNet.toLocaleString('en-US', {
-              minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-
-      <button id="exportButton">Export to Excel</button>
-
-      <% } else if (data && data.length === 0) { %>
-      <h2>No results found for the selected date.</h2>
-      <% } %> <% if (error) { %>
+      <div id="message"></div>
+      <img id="loading" src="/loading.gif" alt="Loading..." />
+      <% if (error) { %>
       <p style="color: red"><%= error %></p>
       <% } %>
     </div>
 
-    <script>
-      // Convert the EJS `data` array to a JSON object and make it available to JavaScript
-      const data = <%- JSON.stringify(data) %>;
-
-      document
-        .getElementById("exportButton")
-        .addEventListener("click", function () {
-          console.log("Button clicked!"); // Debugging line
-
-          const selectedDate = "<%= date %>"; // Using the passed date variable
-
-          var wb = XLSX.utils.book_new();
-
-          // Group data by region
-          const groupedData = {};
-          data.forEach((item) => {
-            if (!groupedData[item.region]) {
-              groupedData[item.region] = [];
-            }
-            groupedData[item.region].push(item);
-          });
-
-          // Create a sheet for each region
-          Object.keys(groupedData).forEach((region) => {
-            // Create a worksheet with custom headers starting at row 5
-            const ws_data = [
-              // Row 1: Custom headers
-              [
-                "", "PAYROLL DATE", "BASIC PAY REGULAR", "BASIC PAY TRAINEE",
-                "ALLOWANCE", "BM ALLOWANCE", "OVERTIME REGULAR", "OVERTIME TRAINEE",
-                "COLA", "OTHER INCOME 1", "OTHER INCOME 2", "GRAVEYARD",
-                "LATE REGULAR", "LATE TRAINEE", "LEAVE REGULAR", "LEAVE TRAINEE",
-                "ALL OTHER DEDUCTIONS", "TOTAL", "NO. OF EMPLOYEE IN BRANCH",
-                "NO. OF EMPLOYEES ALLOCATED"
-              ],
-              // Row 2: Debit and Credit Labels
-              [
-                "", "", "debit", "debit", "debit", "debit", "debit", "debit",
-                "debit", "debit", "debit", "debit", "credit", "credit", "credit",
-                "credit", "credit", "", ""
-              ],
-              // Row 3: BOS CODE, BRANCH NAME, and account numbers
-              [
-                "BOS CODE", "BRANCH NAME", "5100001", "5100002", "5100001",
-                "5212001", "5100003", "5100002", "5210001", "5220002", "5220001",
-                "5212001", "5100001", "5100002", "5100001", "5100002", "3100001",
-                "3100001", "", ""
-              ],
-              // Row 4: Blank row
-              [],
-              // Row 5 onwards: Data from grouped region
-              // [
-              //   "BOSCODE",
-              //   "BRANCH",
-              //   "BASIC PAY REGULAR",
-              //   "BASIC PAY TRAINEE",
-              //   "ALLOWANCES",
-              //   "BM ALLOWANCE",
-              //   "OT REGULAR",
-              //   "OT TRAINEE",
-              //   "COLA",
-              //   "OTHER INCOME 1",
-              //   "OTHER INCOME 2",
-              //   "GRAVEYARD",
-              //   "LATE REGULAR",
-              //   "LATE TRAINEE",
-              //   "LEAVE REGULAR",
-              //   "LEAVE TRAINEE",
-              //   "TOTAL DEDUCTION",
-              //   "TOTAL NET",
-              //   "NO. OF BRANCH EMPLOYEE",
-              //   "NO. OF EMPLOYEES ALLOCATED"
-              // ],
-              ...groupedData[region].map(item => [
-                item.boscode,
-                item.branch,
-                item.branchRegularBasicPay,
-                item.branchTraineeBasicPay,
-                item.branchAllowances,
-                item.branchBmAllowance,
-                item.branchRegularOT,
-                item.branchTraineeOT,
-                0.00, // COLA (no data, just a placeholder)
-                item.branchIncome1,
-                item.branchIncome2,
-                item.branchNightpremium,
-                item.branchRegularLate,
-                item.branchTraineeLate,
-                item.branchRegularLeave,
-                item.branchTraineeLeave,
-                item.branchOtherDeductions,
-                item.branchtotalNet,
-                item.employeeBranchCount,
-                item.regionEmployeeCount
-              ])
-            ];
-
-            var ws = XLSX.utils.aoa_to_sheet(ws_data);
-            XLSX.utils.book_append_sheet(wb, ws, region);
-          });
-
-          // Write the Excel file with the formatted date in the filename
-          XLSX.writeFile(wb, `Payroll_EDI_${selectedDate}.xlsx`);
-        });
-    </script>
+    <!-- Link to the external script -->
+    <script src="/js/ediPayrollScript.js"></script>
   </body>
 </html>
