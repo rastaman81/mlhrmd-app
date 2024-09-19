@@ -39,7 +39,7 @@ const getOffices = async () => {
       const capitalizedResults = results.map((office) => {
         return {
           ...office,
-          office_name: capitalizeFirstLetter(office.office_name),
+          office_name: capitalizeShortWords(office.office_name),
         };
       });
 
@@ -62,7 +62,7 @@ const getReports = async () => {
       const capitalizedResults = results.map((report) => {
         return {
           ...report,
-          report_name: capitalizeFirstLetter(report.report_name),
+          report_name: capitalizeShortWords(report.report_name),
         };
       });
 
@@ -73,80 +73,101 @@ const getReports = async () => {
 // ----------------------------------------- GETTING DB REPORT TYPE VALUES FROM DB FOR DROPBOX  -----------------------------------------
 
 // ----------------------------------------- CAPITALIZING THE FIRST LETTER  -----------------------------------------
-function capitalizeFirstLetter(string) {
+// function capitalizeFirstLetter(string) {
+//   return string
+//     .split(" ") // Split the string into an array of words
+//     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+//     .join(" "); // Join the words back into a single string
+// }
+function capitalizeShortWords(string) {
   return string
     .split(" ") // Split the string into an array of words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
-    .join(" "); // Join the words back into a single string
+    .map((word) => {
+      if (word.length <= 3) {
+        return word.toUpperCase();
+      } else {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+    })
+    .join(" ");
 }
 // ----------------------------------------- CAPITALIZING THE FIRST LETTER  -----------------------------------------
 
 // ----------------------------------------- FUNCTION FOR EDI REPORT -----------------------------------------
-const getDateData = async (date, office, report) => {
+const generateReport = async (date, office, report) => {
   try {
-    console.log(report);
     const dbName = getDBForOffice(office.toLowerCase());
-
     const db = connectDB(dbName.dbName);
-
     const year = payrollYear(date);
-    const query = `SELECT * FROM ${dbName.tableName}_${year} WHERE enddate = ? and region not in ('mancomm', 'mancomml', 'support', 'supportl') ORDER BY region, branch`;
+
+    let results, regions;
+
+    if (report.toLowerCase() === "edi payroll") {
+      ({ results, regions } = await generateEDIPayroll(db, date, year, dbName));
+    } else if (report.toLowerCase() === "edi deduction details") {
+      ({ results } = await generateEDIDeductionDetails(db, date, year, dbName));
+    } else {
+      throw new Error("Unknown report type.");
+    }
+
+    // const query = `SELECT * FROM ${dbName.tableName}_${year} WHERE enddate = ? and region not in ('mancomm', 'mancomml', 'support', 'supportl') ORDER BY region, branch`;
     //const query = `SELECT * FROM payroll_${year} WHERE enddate = ? and region in ('bohol') ORDER BY region, branch`;
 
     // GET PAYROLL TRANSACTION FROM DB -----------------------------------------
-    const results = await new Promise((resolve, reject) => {
-      db.query(query, [date], (err, results) => {
-        if (err) return reject(err);
-        resolve(results);
-      });
-    });
+    // const results = await new Promise((resolve, reject) => {
+    //   db.query(query, [date], (err, results) => {
+    //     if (err) return reject(err);
+    //     resolve(results);
+    //   });
+    // });
     // GET PAYROLL TRANSACTION FROM DB -----------------------------------------
 
+    // // GET REGIONS FROM DB -----------------------------------------
+    // regions = await new Promise((resolve, reject) => {
+    //   db.query(`SELECT * FROM SOURCES`, (err, regions) => {
+    //     if (err) return reject(err);
+    //     resolve(regions);
+    //   });
+    // });
     // GET REGIONS FROM DB -----------------------------------------
-    const regions = await new Promise((resolve, reject) => {
-      db.query(`SELECT * FROM SOURCES`, (err, regions) => {
-        if (err) return reject(err);
-        resolve(regions);
-      });
-    });
-    // GET REGIONS FROM DB -----------------------------------------
 
-    let staffPayroll = staffData(results); //Staff
-    staffPayroll = processStaffData(staffPayroll);
+    // let staffPayroll = staffData(results); //Staff
+    // staffPayroll = processStaffData(staffPayroll);
 
-    const branchCount = getBranchCounts(staffPayroll);
+    // const branchCount = getBranchCounts(staffPayroll);
 
-    let areaRegionPayroll = areaRegionData(results);
-    areaRegionPayroll = processAreaRegionData(areaRegionPayroll);
+    // let areaRegionPayroll = areaRegionData(results);
+    // areaRegionPayroll = processAreaRegionData(areaRegionPayroll);
 
-    staffPayroll = mergeStaffAreaRegionData(staffPayroll, areaRegionPayroll);
+    // staffPayroll = mergeStaffAreaRegionData(staffPayroll, areaRegionPayroll);
 
-    let areaPayroll = areaData(results); //AM & Relievers
-    areaPayroll = processAreaData(areaPayroll);
-    areaPayroll = mergeAreaAndCalculate(areaPayroll, branchCount);
+    // let areaPayroll = areaData(results); //AM & Relievers
+    // areaPayroll = processAreaData(areaPayroll);
+    // areaPayroll = mergeAreaAndCalculate(areaPayroll, branchCount);
 
-    let regionPayroll = regionData(results); //RM & Others
-    regionPayroll = processRegionData(regionPayroll);
-    regionPayroll = mergeRegionAndCalculate(regionPayroll, branchCount);
+    // let regionPayroll = regionData(results); //RM & Others
+    // regionPayroll = processRegionData(regionPayroll);
+    // regionPayroll = mergeRegionAndCalculate(regionPayroll, branchCount);
 
-    staffPayroll = mergeStaffAndRegionData(staffPayroll, regionPayroll);
-    // Output the result
+    // staffPayroll = mergeStaffAndRegionData(staffPayroll, regionPayroll);
+    // // Output the result
 
-    const ediData = mergeStaffAndAreaData(staffPayroll, areaPayroll);
+    // const ediData = mergeStaffAndAreaData(staffPayroll, areaPayroll);
 
-    // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
-    const jsonString = JSON.stringify(
-      mergeStaffAndRegionData(staffPayroll, regionPayroll),
-      null,
-      2
-    );
-    fs.writeFile("myobject.txt", jsonString, (err) => {
-      if (err) throw err;
-      console.log("Data written to myobject.txt");
-    });
-    // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
+    // // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
+    // const jsonString = JSON.stringify(
+    //   mergeStaffAndRegionData(staffPayroll, regionPayroll),
+    //   null,
+    //   2
+    // );
+    // fs.writeFile("myobject.txt", jsonString, (err) => {
+    //   if (err) throw err;
+    //   console.log("Data written to myobject.txt");
+    // });
+    // // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
 
-    return { results: ediData, regions };
+    // return { results: ediData, regions };
+    return { results, regions };
   } catch (err) {
     throw err;
   }
@@ -154,8 +175,71 @@ const getDateData = async (date, office, report) => {
 // ----------------------------------------- FUNCTION FOR EDI REPORT -----------------------------------------
 
 // ----------------------------------------- NEW FUNCTION FOR EDI REPORT -----------------------------------------
-const generateEDIPayroll = () => {};
+const generateEDIPayroll = async (db, date, year, dbName) => {
+  const query = `SELECT * FROM ${dbName.tableName}_${year} WHERE enddate = ? and region not in ('mancomm', 'mancomml', 'support', 'supportl') ORDER BY region, branch`;
+
+  const results = await new Promise((resolve, reject) => {
+    db.query(query, [date], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+
+  // GET REGIONS FROM DB -----------------------------------------
+  regions = await new Promise((resolve, reject) => {
+    db.query(`SELECT * FROM SOURCES`, (err, regions) => {
+      if (err) return reject(err);
+      resolve(regions);
+    });
+  });
+
+  let staffPayroll = staffData(results); //Staff
+  staffPayroll = processStaffData(staffPayroll);
+
+  const branchCount = getBranchCounts(staffPayroll);
+
+  // let areaRegionPayroll = areaRegionData(results);
+  // areaRegionPayroll = processAreaRegionData(areaRegionPayroll);
+
+  // staffPayroll = mergeStaffAreaRegionData(staffPayroll, areaRegionPayroll);
+
+  let areaPayroll = areaData(results); //AM & Relievers
+  areaPayroll = processAreaData(areaPayroll);
+  areaPayroll = mergeAreaAndCalculate(areaPayroll, branchCount);
+
+  let regionPayroll = regionData(results); //RM & Others
+  regionPayroll = processRegionData(regionPayroll);
+  regionPayroll = mergeRegionAndCalculate(regionPayroll, branchCount);
+
+  staffPayroll = mergeStaffAndRegionData(staffPayroll, regionPayroll);
+  // Output the result
+
+  const ediData = mergeStaffAndAreaData(staffPayroll, areaPayroll);
+
+  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
+  const jsonString = JSON.stringify(areaPayroll, null, 2);
+  fs.writeFile("myobject.txt", jsonString, (err) => {
+    if (err) throw err;
+    console.log("Data written to myobject.txt");
+  });
+  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
+
+  return { results: ediData, regions };
+};
 // ----------------------------------------- NEW FUNCTION FOR EDI REPORT -----------------------------------------
+
+const generateEDIDeductionDetails = async (db, date, year, dbName) => {
+  const query = `select region, sum(incometax) as tax, sum(ssscontri) as ssscontri, sum(sssloan) as sssloan, sum(pagibigcontri) as pagibigcontri, sum(pagibigloan) as pagibigloan, sum(filmalending) as philhealth, sum(coated) as coated, sum(c_hmo) as hmo, sum(canteen) as canteen, sum(deductionamount1) deduction1, sum(deductionamount2) deduction2, sum(mlfund) as mlfund, sum(opec) as opec, sum(overappraisal) as over, sum(cooprecla) as vpo, sum(installaccount) as install, sum(ticket) as ticket, sum(mobilebill) as bill, sum(sakoprovi + sakocommodity + sakoprime + sakoemergency + sakopettycash + sakocbu) as sako1, sum(sakosavings) as sakosavings from ${dbName.tableName}_${year} where enddate = ? AND region NOT IN ('support', 'supportl', 'mancomm', 'mancomml', 'managers', 'managerl') group by region;`;
+
+  const results = await new Promise((resolve, reject) => {
+    db.query(query, [date], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+  //console.log(results);
+  return { results };
+};
 
 // ----------------------------------------- GETTING BRANCH COUNT -----------------------------------------
 const getBranchCounts = (data) => {
@@ -443,8 +527,8 @@ const processAreaRegionData = (data) => {
       employmentStatus,
       lates,
       leaves,
-      //deductionwoLateLeave,
-      //totalNet,
+      deductionwoLateLeave,
+      totalNet,
       branch, // Group by branch
       region,
       department, // Include department
@@ -459,8 +543,8 @@ const processAreaRegionData = (data) => {
           branchTraineeLate: 0,
           branchRegularLeave: 0,
           branchTraineeLeave: 0,
-          //branchOtherDeductions: 0,
-          //branchtotalNet: 0,
+          branchOtherDeductions: 0,
+          branchtotalNet: 0,
         };
       }
 
@@ -476,9 +560,9 @@ const processAreaRegionData = (data) => {
         branchData[region][branch].branchTraineeLeave += leaves || 0;
       }
 
-      // branchData[region][branch].branchOtherDeductions +=
-      //   Number(deductionwoLateLeave) || 0;
-      //branchData[region][branch].branchtotalNet += totalNet || 0;
+      branchData[region][branch].branchOtherDeductions +=
+        Number(deductionwoLateLeave) || 0;
+      branchData[region][branch].branchtotalNet += totalNet || 0;
     }
   );
 
@@ -494,8 +578,8 @@ const processAreaRegionData = (data) => {
         branchTraineeLate,
         branchRegularLeave,
         branchTraineeLeave,
-        //branchOtherDeductions,
-        //branchtotalNet,
+        branchOtherDeductions,
+        branchtotalNet,
       },
     ] of Object.entries(branches)) {
       sortedResults.push({
@@ -506,8 +590,8 @@ const processAreaRegionData = (data) => {
         branchTraineeLate,
         branchRegularLeave,
         branchTraineeLeave,
-        //branchOtherDeductions,
-        //branchtotalNet,
+        branchOtherDeductions,
+        branchtotalNet,
       });
     }
   }
@@ -525,28 +609,28 @@ const processAreaRegionData = (data) => {
 };
 // ----------------------------------------- PROCESS AREA & REGION -----------------------------------------
 
-//MERGE STAFF DATA AREA REGION
-const mergeStaffAreaRegionData = (staffData, areaRegionData) => {
-  //console.log(staffData);
-  return staffData.map((staff) => {
-    const matchingArea = areaRegionData.find(
-      (area) => area.region === staff.region && area.branch === staff.branch
-    );
+// //MERGE STAFF DATA AREA REGION
+// const mergeStaffAreaRegionData = (staffData, areaRegionData) => {
+//   //console.log(staffData);
+//   return staffData.map((staff) => {
+//     const matchingArea = areaRegionData.find(
+//       (area) => area.region === staff.region && area.branch === staff.branch
+//     );
 
-    // Return a new object that retains all staff properties and adds/merges specific ones
-    return {
-      ...staff, // Retain all original staffData properties
-      branchRegularLate:
-        staff.branchRegularLate + (matchingArea?.branchRegularLate || 0),
-      branchTraineeLate:
-        staff.branchTraineeLate + (matchingArea?.branchTraineeLate || 0),
-      branchRegularLeave:
-        staff.branchRegularLeave + (matchingArea?.branchRegularLeave || 0),
-      branchTraineeLeave:
-        staff.branchTraineeLeave + (matchingArea?.branchTraineeLeave || 0),
-    };
-  });
-};
+//     // Return a new object that retains all staff properties and adds/merges specific ones
+//     return {
+//       ...staff, // Retain all original staffData properties
+//       branchRegularLate:
+//         staff.branchRegularLate + (matchingArea?.branchRegularLate || 0),
+//       branchTraineeLate:
+//         staff.branchTraineeLate + (matchingArea?.branchTraineeLate || 0),
+//       branchRegularLeave:
+//         staff.branchRegularLeave + (matchingArea?.branchRegularLeave || 0),
+//       branchTraineeLeave:
+//         staff.branchTraineeLeave + (matchingArea?.branchTraineeLeave || 0),
+//     };
+//   });
+// };
 
 // ----------------------------------------- MERGING STAFF DATA & AREA DATA -----------------------------------------
 //merging staffdata and area data - start
@@ -593,8 +677,9 @@ const regionData = (data) => {
 const areaData = (data) => {
   const filteredData = data.filter(
     (item) =>
-      item.designation.toLowerCase().includes("reliever") ||
-      item.designation.toLowerCase() === "am"
+      (item.designation.toLowerCase().includes("reliever") ||
+        item.designation.toLowerCase() === "am") &&
+      !item.designation.toLowerCase().includes("sale")
   );
   return filteredData;
 };
@@ -656,14 +741,14 @@ const processAreaData = (data) => {
         departmentData[region][department].areaRegularBasicPay += basicPay || 0;
         departmentData[region][department].areaRegularOT +=
           totalOT - nightpremium || 0;
-        //departmentData[region][department].areaRegularLate += lates || 0;
-        //departmentData[region][department].areaRegularLeave += leaves || 0;
+        departmentData[region][department].areaRegularLate += lates || 0;
+        departmentData[region][department].areaRegularLeave += leaves || 0;
       } else {
         departmentData[region][department].areaTraineeBasicPay += basicPay || 0;
         departmentData[region][department].areaTraineeOT +=
           totalOT - nightpremium || 0;
-        //departmentData[region][department].areaTraineeLate += lates || 0;
-        //departmentData[region][department].areaTraineeLeave += leaves || 0;
+        departmentData[region][department].areaTraineeLate += lates || 0;
+        departmentData[region][department].areaTraineeLeave += leaves || 0;
       }
 
       departmentData[region][department].areaAllowances +=
@@ -696,10 +781,10 @@ const processAreaData = (data) => {
         areaIncome1,
         areaIncome2,
         areaNightpremium,
-        //areaRegularLate,
-        //areaTraineeLate,
-        //areaRegularLeave,
-        //areaTraineeLeave,
+        areaRegularLate,
+        areaTraineeLate,
+        areaRegularLeave,
+        areaTraineeLeave,
         areaOtherDeductions,
         areaTotalNet,
       },
@@ -717,10 +802,10 @@ const processAreaData = (data) => {
         areaIncome1,
         areaIncome2,
         areaNightpremium,
-        //areaRegularLate,
-        //areaTraineeLate,
-        //areaRegularLeave,
-        //areaTraineeLeave,
+        areaRegularLate,
+        areaTraineeLate,
+        areaRegularLeave,
+        areaTraineeLeave,
         areaOtherDeductions,
         areaTotalNet,
       });
@@ -775,10 +860,10 @@ const mergeAreaAndCalculate = (department, branchcount) => {
           areaIncome1: dept.areaIncome1 / branchCountForDepartment,
           areaIncome2: dept.areaIncome2 / branchCountForDepartment,
           areaNightpremium: dept.areaNightpremium / branchCountForDepartment,
-          //areaRegularLate: dept.areaRegularLate,
-          // areaTraineeLate: dept.areaTraineeLate,
-          // areaRegularLeave: dept.areaRegularLeave,
-          // areaTraineeLeave: dept.areaTraineeLeave,
+          areaRegularLate: dept.areaRegularLate / branchCountForDepartment,
+          areaTraineeLate: dept.areaTraineeLate / branchCountForDepartment,
+          areaRegularLeave: dept.areaRegularLeave / branchCountForDepartment,
+          areaTraineeLeave: dept.areaTraineeLeave / branchCountForDepartment,
           areaTotalNet: dept.areaTotalNet / branchCountForDepartment,
           areaOtherDeductions:
             dept.areaOtherDeductions / branchCountForDepartment,
@@ -816,10 +901,10 @@ const mergeRegionAndCalculate = (regionData, branchCountData) => {
       regionIncome1: region.regionIncome1 / branchCount,
       regionIncome2: region.regionIncome2 / branchCount,
       regionNightpremium: region.regionNightpremium / branchCount,
-      // regionRegularLate: region.regionRegularLate,
-      // regionTraineeLate: region.regionTraineeLate,
-      // regionRegularLeave: region.regionRegularLeave,
-      // regionTraineeLeave: region.regionTraineeLeave,
+      regionRegularLate: region.regionRegularLate / branchCount,
+      regionTraineeLate: region.regionTraineeLate / branchCount,
+      regionRegularLeave: region.regionRegularLeave / branchCount,
+      regionTraineeLeave: region.regionTraineeLeave / branchCount,
       regionTotalNet: region.regionTotalNet / branchCount,
       regionOtherDeductions: region.regionOtherDeductions / branchCount,
     };
@@ -870,14 +955,14 @@ const mergeStaffAndRegionData = (staffdata, region) => {
           branchData.branchOtherDeductions + regionData.regionOtherDeductions,
 
         // Uncomment if you need these fields as well
-        // branchRegularLate:
-        //   branchData.branchRegularLate + regionData.regionRegularLate,
-        // branchTraineeLate:
-        //   branchData.branchTraineeLate + (regionData.regionTraineeLate || 0),
-        // branchRegularLeave:
-        //   branchData.branchRegularLeave + regionData.regionRegularLeave,
-        // branchTraineeLeave:
-        //   branchData.branchTraineeLeave + (regionData.regionTraineeLeave || 0),
+        branchRegularLate:
+          branchData.branchRegularLate + regionData.regionRegularLate,
+        branchTraineeLate:
+          branchData.branchTraineeLate + (regionData.regionTraineeLate || 0),
+        branchRegularLeave:
+          branchData.branchRegularLeave + regionData.regionRegularLeave,
+        branchTraineeLeave:
+          branchData.branchTraineeLeave + (regionData.regionTraineeLeave || 0),
       };
 
       // Push the merged data to the result array
@@ -926,42 +1011,47 @@ const mergeStaffAndAreaData = (staffData, area) => {
         branchIncome2: staff.branchIncome2 + matchingArea.areaIncome2,
         branchNightpremium:
           staff.branchNightpremium + matchingArea.areaNightpremium,
-        // branchRegularLate:
-        //   staff.branchRegularLate + matchingArea.areaRegularLate,
-        // branchTraineeLate:
-        //   staff.branchTraineeLate + matchingArea.areaTraineeLate,
-        // branchRegularLeave:
-        //   staff.branchRegularLeave + matchingArea.areaRegularLeave,
-        // branchTraineeLeave:
-        //   staff.branchTraineeLeave + matchingArea.areaTraineeLeave,
+        branchRegularLate:
+          staff.branchRegularLate + matchingArea.areaRegularLate,
+        branchTraineeLate:
+          staff.branchTraineeLate + matchingArea.areaTraineeLate,
+        branchRegularLeave:
+          staff.branchRegularLeave + matchingArea.areaRegularLeave,
+        branchTraineeLeave:
+          staff.branchTraineeLeave + matchingArea.areaTraineeLeave,
         branchOtherDeductions:
           staff.branchOtherDeductions + matchingArea.areaOtherDeductions,
-        //original code for branch totalnet ->branchtotalNet: staff.branchtotalNet + matchingArea.areaTotalNet,
-        branchtotalNet:
-          staff.branchRegularBasicPay +
-          staff.branchTraineeBasicPay +
-          staff.branchAllowances +
-          staff.branchBmAllowance +
-          staff.branchRegularOT +
-          staff.branchTraineeOT +
-          staff.branchIncome1 +
-          staff.branchIncome2 +
-          staff.branchNightpremium +
-          matchingArea.areaRegularBasicPay + // Including matching area data
-          matchingArea.areaTraineeBasicPay +
-          matchingArea.areaAllowances +
-          matchingArea.areaBmAllowance +
-          matchingArea.areaRegularOT +
-          matchingArea.areaTraineeOT +
-          matchingArea.areaIncome1 +
-          matchingArea.areaIncome2 +
-          matchingArea.areaNightpremium -
-          (staff.branchRegularLate +
-            staff.branchTraineeLate +
-            staff.branchRegularLeave +
-            staff.branchTraineeLeave +
-            staff.branchOtherDeductions +
-            matchingArea.areaOtherDeductions),
+        //original code for branch totalnet ->
+        branchtotalNet: staff.branchtotalNet + matchingArea.areaTotalNet,
+        // branchtotalNet:
+        //   staff.branchRegularBasicPay +
+        //   staff.branchTraineeBasicPay +
+        //   staff.branchAllowances +
+        //   staff.branchBmAllowance +
+        //   staff.branchRegularOT +
+        //   staff.branchTraineeOT +
+        //   staff.branchIncome1 +
+        //   staff.branchIncome2 +
+        //   staff.branchNightpremium +
+        //   matchingArea.areaRegularBasicPay + // Including matching area data
+        //   matchingArea.areaTraineeBasicPay +
+        //   matchingArea.areaAllowances +
+        //   matchingArea.areaBmAllowance +
+        //   matchingArea.areaRegularOT +
+        //   matchingArea.areaTraineeOT +
+        //   matchingArea.areaIncome1 +
+        //   matchingArea.areaIncome2 +
+        //   matchingArea.areaNightpremium -
+        //   (staff.branchRegularLate +
+        //     staff.branchTraineeLate +
+        //     staff.branchRegularLeave +
+        //     staff.branchTraineeLeave +
+        //     staff.branchOtherDeductions +
+        //     matchingArea.areaRegularLate +
+        //     matchingArea.areaTraineeLate +
+        //     matchingArea.areaRegularLeave +
+        //     matchingArea.areaTraineeLeave +
+        //     matchingArea.areaOtherDeductions),
       };
 
       // Push the merged data to the result array
@@ -1007,10 +1097,10 @@ const processRegionData = (data) => {
           regionIncome1: 0,
           regionIncome2: 0,
           regionNightpremium: 0,
-          //regionRegularLate: 0,
-          //regionTraineeLate: 0,
-          //regionRegularLeave: 0,
-          //regionTraineeLeave: 0,
+          regionRegularLate: 0,
+          regionTraineeLate: 0,
+          regionRegularLeave: 0,
+          regionTraineeLeave: 0,
           regionOtherDeductions: 0,
           regionTotalNet: 0,
           regionEmployeeCount: 0, // Initialize employee count
@@ -1021,13 +1111,13 @@ const processRegionData = (data) => {
       if (employmentStatus === "REGULAR") {
         regionData[region].regionRegularBasicPay += basicPay || 0;
         regionData[region].regionRegularOT += totalOT - nightpremium || 0;
-        //regionData[region].regionRegularLate += lates || 0;
-        //regionData[region].regionRegularLeave += leaves || 0;
+        regionData[region].regionRegularLate += lates || 0;
+        regionData[region].regionRegularLeave += leaves || 0;
       } else {
         regionData[region].regionTraineeBasicPay += basicPay || 0;
         regionData[region].regionTraineeOT += totalOT - nightpremium || 0;
-        //regionData[region].regionTraineeLate += lates || 0;
-        //regionData[region].regionTraineeLeave += leaves || 0;
+        regionData[region].regionTraineeLate += lates || 0;
+        regionData[region].regionTraineeLeave += leaves || 0;
       }
 
       regionData[region].regionAllowances += totalAllow - bmAllow || 0;
@@ -1057,10 +1147,10 @@ const processRegionData = (data) => {
         regionIncome1,
         regionIncome2,
         regionNightpremium,
-        //regionRegularLate,
-        //regionTraineeLate,
-        //regionRegularLeave,
-        //regionTraineeLeave,
+        regionRegularLate,
+        regionTraineeLate,
+        regionRegularLeave,
+        regionTraineeLeave,
         regionOtherDeductions,
         regionEmployeeCount,
         regionTotalNet,
@@ -1076,10 +1166,10 @@ const processRegionData = (data) => {
       regionIncome1,
       regionIncome2,
       regionNightpremium,
-      //regionRegularLate,
-      //regionTraineeLate,
-      //regionRegularLeave,
-      //regionTraineeLeave,
+      regionRegularLate,
+      regionTraineeLate,
+      regionRegularLeave,
+      regionTraineeLeave,
       regionOtherDeductions,
       regionEmployeeCount, // Include employee count in results
       regionTotalNet,
@@ -1091,4 +1181,4 @@ const processRegionData = (data) => {
 };
 // ----------------------------------------- PROCESS REGION DATA -----------------------------------------
 
-module.exports = { getDateData, getOffices, getReports };
+module.exports = { generateReport, getOffices, getReports };

@@ -71,7 +71,7 @@ const getDatePage = async (req, res) => {
 const postDate = async (req, res) => {
   try {
     const { date, office, report } = req.body;
-    const { results, regions } = await dateModel.getDateData(
+    const { results, regions } = await dateModel.generateReport(
       date,
       office,
       report
