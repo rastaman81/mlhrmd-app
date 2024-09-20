@@ -31,9 +31,17 @@ document
     // Show loading GIF
     loadingElement.style.display = "block";
 
-    console.log(selectedReport);
+    const supportedReports = [
+      "NET PAY",
+      "ML Fund",
+      "Sako",
+      "GPA",
+      "Income TAX",
+    ]; // Add more as needed
+
     // Check if selected report is for PDF generation
-    if (selectedReport === "Generate PDF") {
+    if (supportedReports.includes(selectedReport)) {
+      console.log(supportedReports.includes(selectedReport));
       try {
         const response = await fetch("/generate-pdf", {
           method: "POST",
@@ -52,7 +60,7 @@ document
           const url = window.URL.createObjectURL(blob); // Create a URL for the blob
           const a = document.createElement("a"); // Create an anchor element
           a.href = url; // Set the href to the blob URL
-          a.download = `Report_${selectedOffice}_${selectedDate}.pdf`; // Set the desired filename
+          a.download = `${selectedReport}_${selectedOffice}_${selectedDate}.pdf`; // Set the desired filename
           document.body.appendChild(a); // Append to the document
           a.click(); // Trigger download
           a.remove(); // Clean up
@@ -87,8 +95,8 @@ document
         if (result.error) {
           messageElement.innerHTML = `<p style='color: red;'>${result.error}</p>`;
         } else {
-          messageElement.innerHTML =
-            "<p style='color: green;'>${selectedReport} Report has been exported successfully!</p>";
+          console.log(selectedReport);
+          messageElement.innerHTML = `<p style='color: green;'>${selectedReport} Report has been exported successfully!</p>`;
 
           // Group data by region
           const groupedData = {};

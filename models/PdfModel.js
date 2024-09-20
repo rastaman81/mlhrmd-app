@@ -34,14 +34,59 @@ const payrollYear = (dateString) => {
 
 // Query to get report data based on date
 exports.getReportData = async (date, office, report) => {
-  console.log("+++++++++++ ", date);
   try {
     const dbName = getDBForOffice(office.toLowerCase());
     const db = connectDB(dbName.dbName);
     const year = payrollYear(date);
-    console.log(report, typeof report);
-    if (report.toLowerCase() === "generate pdf") {
-      ({ results, regions } = await createPDF(db, date, year, dbName));
+
+    console.log(dbName.dbName, dbName.tableName, year);
+    if (report.toLowerCase() === "net pay") {
+      console.log("net pay");
+      const query = `
+      SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, totalnet 
+      FROM ${dbName.tableName}_${year}
+      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')
+      ORDER BY region, lastname, firstname
+    `;
+
+      ({ results, regions } = await createPDF(db, date, year, dbName, query));
+    } else if (report.toLowerCase() === "ml fund") {
+      const query = `
+      SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, mlfund as totalnet 
+      FROM ${dbName.tableName}_${year}
+      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea') 
+      and mlfund > 0
+      ORDER BY region, lastname, firstname
+    `;
+      ({ results, regions } = await createPDF(db, date, year, dbName, query));
+      console.log(query);
+    } else if (report.toLowerCase() === "gpa") {
+      const query = `
+      SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, if(deductiondesc1 like '%gpa%', deductionamount1, if(deductiondesc2 like '%gpa%', deductionamount2, 0)) as totalnet 
+      FROM ${dbName.tableName}_${year}
+      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')  
+      AND if(deductiondesc1 like '%gpa%', deductionamount1, if(deductiondesc2 like '%gpa%', deductionamount2, 0)) > 0
+      ORDER BY region, lastname, firstname
+    `;
+      ({ results, regions } = await createPDF(db, date, year, dbName, query));
+    } else if (report.toLowerCase() === "sako") {
+      const query = `
+      SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, (sakoprovi + sakocommodity + sakoprime + sakoemergency + sakopettycash + sakocbu) as totalnet 
+      FROM ${dbName.tableName}_${year}
+      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')  
+      AND (sakoprovi + sakocommodity + sakoprime + sakoemergency + sakopettycash + sakocbu) > 0
+      ORDER BY region, lastname, firstname
+    `;
+      ({ results, regions } = await createPDF(db, date, year, dbName, query));
+    } else if (report.toLowerCase() === "income tax") {
+      const query = `
+      SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, incomeTax as totalnet 
+      FROM ${dbName.tableName}_${year}
+      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')  
+      AND incomeTax > 0
+      ORDER BY region, lastname, firstname
+    `;
+      ({ results, regions } = await createPDF(db, date, year, dbName, query));
     } else {
       throw new Error("Unknown report type.");
     }
@@ -55,13 +100,7 @@ exports.getReportData = async (date, office, report) => {
   }
 };
 
-const createPDF = async (db, date, year, dbName) => {
-  const query = `
-      SELECT region, lastname, firstname, totalnet 
-      FROM ${dbName.tableName}_${year}
-      WHERE enddate = ? and region in ('bohol', 'leyteb', 'leytea')
-      ORDER BY region, lastname, firstname
-    `;
+const createPDF = async (db, date, year, dbName, query) => {
   const results = await new Promise((resolve, reject) => {
     db.query(query, [date], (err, results) => {
       if (err) return reject(err);

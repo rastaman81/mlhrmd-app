@@ -204,7 +204,16 @@ const generateEDIPayroll = async (db, date, year, dbName) => {
   // staffPayroll = mergeStaffAreaRegionData(staffPayroll, areaRegionPayroll);
 
   let areaPayroll = areaData(results); //AM & Relievers
+
   areaPayroll = processAreaData(areaPayroll);
+  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
+  const jsonString = JSON.stringify(areaPayroll, null, 2);
+  fs.writeFile("myobject.txt", jsonString, (err) => {
+    if (err) throw err;
+    console.log("Data written to myobject.txt");
+  });
+  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
+
   areaPayroll = mergeAreaAndCalculate(areaPayroll, branchCount);
 
   let regionPayroll = regionData(results); //RM & Others
@@ -215,14 +224,6 @@ const generateEDIPayroll = async (db, date, year, dbName) => {
   // Output the result
 
   const ediData = mergeStaffAndAreaData(staffPayroll, areaPayroll);
-
-  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
-  const jsonString = JSON.stringify(areaPayroll, null, 2);
-  fs.writeFile("myobject.txt", jsonString, (err) => {
-    if (err) throw err;
-    console.log("Data written to myobject.txt");
-  });
-  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
 
   return { results: ediData, regions };
 };
@@ -703,7 +704,7 @@ const processAreaData = (data) => {
       nightpremium,
       lates,
       leaves,
-      deductionwoLateLeave,
+      deductionwolateleave,
       totalNet,
       department,
       branch,
@@ -758,9 +759,9 @@ const processAreaData = (data) => {
       departmentData[region][department].areaIncome2 += incomeAmount2 || 0;
       departmentData[region][department].areaTotalNet += totalNet || 0;
       departmentData[region][department].areaNightpremium +=
-        Number(nightpremium) || 0;
+        nightpremium * 1 || 0;
       departmentData[region][department].areaOtherDeductions +=
-        Number(deductionwoLateLeave) || 0;
+        deductionwolateleave * 1 || 0;
     }
   );
 
