@@ -3,16 +3,27 @@ const path = require("path");
 const { getReportData } = require("../models/PdfModel.js");
 
 exports.generatePDF = async (req, res) => {
-  const { date, office, report } = req.body;
+  const { date, office, report, selectedRegion } = req.body;
+  console.log("selected region:", selectedRegion);
 
   try {
-    const payrollData = await getReportData(date, office, report);
+    const payrollData = await getReportData(
+      date,
+      office,
+      report,
+      selectedRegion
+    );
     if (!payrollData.length) {
       return res.status(404).json({ error: "No payroll data found" });
     }
 
+    let filename;
+    if (selectedRegion === "") {
+      filename = `${report}_${office}_${date}.pdf`;
+    } else {
+      filename = `${report}_${office}__${selectedRegion}_${date}.pdf`;
+    }
     const doc = new PDFDocument();
-    const filename = `${report}_${office}_${date}.pdf`;
 
     // Set headers for the response to prompt download
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);

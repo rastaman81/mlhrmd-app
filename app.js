@@ -5,6 +5,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const path = require("path");
+const session = require("express-session"); // Import express-session
 const routes = require("./routes/routes");
 
 dotenv.config();
@@ -20,6 +21,16 @@ app.use(bodyParser.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public"))); // Serve static files from 'public' folder
+
+// Add session middleware
+app.use(
+  session({
+    secret: "spoon", // Replace with your secret key
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Set to true if using HTTPS
+  })
+);
 
 // Use Routes
 app.use("/", routes);

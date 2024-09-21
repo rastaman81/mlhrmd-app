@@ -33,19 +33,25 @@ const payrollYear = (dateString) => {
 // ----------------------------------------- GETTING THE PAYROLL YEAR -----------------------------------------
 
 // Query to get report data based on date
-exports.getReportData = async (date, office, report) => {
+exports.getReportData = async (date, office, report, selectedRegion) => {
   try {
     const dbName = getDBForOffice(office.toLowerCase());
     const db = connectDB(dbName.dbName);
     const year = payrollYear(date);
 
     console.log(dbName.dbName, dbName.tableName, year);
+    let regionFilter;
+    if (selectedRegion === "") {
+      regionFilter = "";
+    } else {
+      regionFilter = `AND REGION = '${selectedRegion}'`;
+    }
     if (report.toLowerCase() === "net pay") {
       console.log("net pay");
       const query = `
       SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, totalnet 
       FROM ${dbName.tableName}_${year}
-      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')
+      WHERE enddate = ? ${regionFilter}
       ORDER BY region, lastname, firstname
     `;
 
@@ -54,7 +60,7 @@ exports.getReportData = async (date, office, report) => {
       const query = `
       SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, mlfund as totalnet 
       FROM ${dbName.tableName}_${year}
-      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea') 
+      WHERE enddate = ? ${regionFilter}
       and mlfund > 0
       ORDER BY region, lastname, firstname
     `;
@@ -64,7 +70,7 @@ exports.getReportData = async (date, office, report) => {
       const query = `
       SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, if(deductiondesc1 like '%gpa%', deductionamount1, if(deductiondesc2 like '%gpa%', deductionamount2, 0)) as totalnet 
       FROM ${dbName.tableName}_${year}
-      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')  
+      WHERE enddate = ? ${regionFilter}
       AND if(deductiondesc1 like '%gpa%', deductionamount1, if(deductiondesc2 like '%gpa%', deductionamount2, 0)) > 0
       ORDER BY region, lastname, firstname
     `;
@@ -73,7 +79,7 @@ exports.getReportData = async (date, office, report) => {
       const query = `
       SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, (sakoprovi + sakocommodity + sakoprime + sakoemergency + sakopettycash + sakocbu) as totalnet 
       FROM ${dbName.tableName}_${year}
-      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')  
+      WHERE enddate = ? ${regionFilter}
       AND (sakoprovi + sakocommodity + sakoprime + sakoemergency + sakopettycash + sakocbu) > 0
       ORDER BY region, lastname, firstname
     `;
@@ -82,7 +88,7 @@ exports.getReportData = async (date, office, report) => {
       const query = `
       SELECT region, idno, concat(lastname, ', ', firstname) as employeeName, incomeTax as totalnet 
       FROM ${dbName.tableName}_${year}
-      WHERE enddate = ? -- and region in ('bohol', 'leyteb', 'leytea')  
+      WHERE enddate = ? ${regionFilter}
       AND incomeTax > 0
       ORDER BY region, lastname, firstname
     `;

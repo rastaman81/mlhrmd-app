@@ -49,6 +49,29 @@ const getOffices = async () => {
 };
 // ----------------------------------------- GETTING DB OFFICE VALUES FROM DB FOR DROPBOX  -----------------------------------------
 
+// ----------------------------------------- GETTING DB REGION VALUES FROM DB FOR DROPBOX  -----------------------------------------
+const getRegions = async () => {
+  const query = "SELECT region_name FROM main_vm_regions ORDER BY region_name";
+  const db = connectDB("vismin");
+  //console.log(db);
+  return new Promise((resolve, reject) => {
+    db.query(query, (err, results) => {
+      if (err) return reject(err);
+
+      // Map over the results and capitalize the first letter of each office_name
+      const capitalizedResults = results.map((regionList) => {
+        return {
+          ...regionList,
+          region_name: capitalizeShortWords(regionList.region_name),
+        };
+      });
+
+      resolve(capitalizedResults);
+    });
+  });
+};
+// ----------------------------------------- GETTING DB OFFICE VALUES FROM DB FOR DROPBOX  -----------------------------------------
+
 // ----------------------------------------- GETTING DB REPORT TYPE VALUES FROM DB FOR DROPBOX  -----------------------------------------
 const getReports = async () => {
   const query = "SELECT report_name FROM main_reports ORDER BY report_name";
@@ -83,7 +106,7 @@ function capitalizeShortWords(string) {
   return string
     .split(" ") // Split the string into an array of words
     .map((word) => {
-      if (word.length <= 3) {
+      if (word.length <= 2) {
         return word.toUpperCase();
       } else {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
@@ -1182,4 +1205,4 @@ const processRegionData = (data) => {
 };
 // ----------------------------------------- PROCESS REGION DATA -----------------------------------------
 
-module.exports = { generateReport, getOffices, getReports };
+module.exports = { generateReport, getOffices, getReports, getRegions };

@@ -1,3 +1,24 @@
+document.getElementById("reportSelect").addEventListener("change", function () {
+  const reportSelect = document.getElementById("reportSelect");
+  const selectedReport = reportSelect.value;
+  const regionSelect = document.getElementById("regionSelect");
+
+  // Define reports that should show the region combo box
+  const reportsRequiringRegion = [
+    "gpa",
+    "income tax",
+    "ml fund",
+    "net pay",
+    "sako",
+  ];
+
+  if (reportsRequiringRegion.includes(selectedReport.toLowerCase())) {
+    regionSelect.style.display = "block"; // Show region combo box
+  } else {
+    regionSelect.style.display = "none"; // Hide region combo box
+  }
+});
+
 document
   .getElementById("downloadButton")
   .addEventListener("click", async function () {
@@ -5,6 +26,8 @@ document
     const selectedOffice = officeSelect.value;
     const reportSelect = document.getElementById("reportSelect");
     const selectedReport = reportSelect.value;
+    const regionSelect = document.getElementById("regionSelect");
+    const selectedRegion = regionSelect.value;
 
     const selectedDate = document.getElementById("myDateInput").value;
     const messageElement = document.getElementById("message");
@@ -32,15 +55,15 @@ document
     loadingElement.style.display = "block";
 
     const supportedReports = [
-      "NET PAY",
-      "ML Fund",
-      "Sako",
-      "GPA",
-      "Income TAX",
+      "net pay",
+      "ml fund",
+      "sako",
+      "gpa",
+      "income tax",
     ]; // Add more as needed
 
     // Check if selected report is for PDF generation
-    if (supportedReports.includes(selectedReport)) {
+    if (supportedReports.includes(selectedReport.toLowerCase())) {
       console.log(supportedReports.includes(selectedReport));
       try {
         const response = await fetch("/generate-pdf", {
@@ -52,15 +75,21 @@ document
             date: selectedDate,
             office: selectedOffice,
             report: selectedReport,
+            selectedRegion,
           }),
         });
-
+        let pdfFilename;
+        if (selectedRegion === "") {
+          pdfFilename = `${selectedReport}_${selectedOffice}_${selectedDate}.pdf`;
+        } else {
+          pdfFilename = `${selectedReport}_${selectedOffice}_${selectedRegion}_${selectedDate}.pdf`;
+        }
         if (response.ok) {
           const blob = await response.blob(); // Get the PDF blob
           const url = window.URL.createObjectURL(blob); // Create a URL for the blob
           const a = document.createElement("a"); // Create an anchor element
           a.href = url; // Set the href to the blob URL
-          a.download = `${selectedReport}_${selectedOffice}_${selectedDate}.pdf`; // Set the desired filename
+          a.download = pdfFilename; // Set the desired filename
           document.body.appendChild(a); // Append to the document
           a.click(); // Trigger download
           a.remove(); // Clean up
@@ -127,7 +156,7 @@ document
             cell.z = "#,##0.00"; // Comma as thousand separator and 2 decimal places
           }
 
-          if (selectedReport === "EDI Payroll") {
+          if (selectedReport.toLowerCase() === "edi payroll") {
             // Payroll Report Logic
             Object.keys(groupedData).forEach((region) => {
               const ws_data = [
@@ -261,7 +290,7 @@ document
               wb,
               `Payroll Report (E.D.I.) ${selectedOffice} ${selectedDate}.xlsx`
             );
-          } else if (selectedReport === "EDI Deduction Details") {
+          } else if (selectedReport.toLowerCase() === "edi deduction details") {
             // Initialize an array to hold all the data across regions
             let combinedData = [];
 
@@ -407,8 +436,156 @@ document
               wb,
               `Operation Deduction ${selectedOffice} ${selectedDate}.xlsx`
             );
-          }
+            // } else if (selectedReport === "Payroll Details") {
+            //   // Initialize an array to hold all the data across regions
+            //   let combinedData = [];
 
+            //   // Add header rows
+            //   const ws_data = [
+            //     ["M. LHUILLIER FINANCIAL SERVICES INC. - PAYROLL REPORT"],
+            //     ["DEPARTMENT"],
+            //     [`PAYROLL DATE: ${selectedDate}`],
+            //     [
+            //       "LAST NAME",
+            //       "FIRST NAME",
+            //       "SSS CONTRIBUTION",
+            //       "SSS LOAN",
+            //       "PAGIBIG CONTRIBUTION",
+            //       "PAGIBIG LOAN",
+            //       "PHILHEALTH",
+            //       "COATED",
+            //       "HMO",
+            //       "CANTEEN",
+            //       "DEDUCTION 1",
+            //       "DEDUCTION 2",
+            //       "ML FUND",
+            //       "OPEC",
+            //       "OVER APPRAISAL",
+            //       "VPO COLLECTION",
+            //       "INSTALLMENT ACCOUNT",
+            //       "TICKET",
+            //       "MOBILE BILL",
+            //       "SAKO",
+            //       "SAKO SAVINGS",
+            //     ],
+            //     [
+            //       "",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //       "credit",
+            //     ],
+            //     [
+            //       "REGION",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //       "3100001",
+            //     ],
+            //     [], // Add an empty row between header and data
+            //   ];
+
+            //   // Merge data from all regions into one array
+            //   Object.keys(groupedData).forEach((region) => {
+            //     groupedData[region].forEach((item) => {
+            //       combinedData.push([
+            //         item.region,
+            //         item.tax,
+            //         item.ssscontri,
+            //         item.sssloan,
+            //         item.pagibigcontri,
+            //         item.pagibigloan,
+            //         item.philhealth,
+            //         item.coated,
+            //         item.hmo,
+            //         item.canteen,
+            //         item.deduction1,
+            //         item.deduction2,
+            //         item.mlfund,
+            //         item.opec,
+            //         item.over,
+            //         item.vpo,
+            //         item.install,
+            //         item.ticket,
+            //         item.bill,
+            //         item.sako1,
+            //         item.sakosavings,
+            //       ]);
+            //     });
+            //   });
+
+            //   // Append the combined data to ws_data
+            //   ws_data.push(...combinedData);
+
+            //   // Create the worksheet
+            //   const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+            //   // Apply formatting for numbers and adjust column widths
+            //   ws_data.forEach((row, rIndex) => {
+            //     row.forEach((cell, cIndex) => {
+            //       if (typeof cell === "number") {
+            //         const cellRef = XLSX.utils.encode_cell({
+            //           c: cIndex,
+            //           r: rIndex,
+            //         });
+            //         if (!ws[cellRef]) ws[cellRef] = {};
+            //         formatNumberCell(ws[cellRef], cell);
+            //       }
+            //     });
+            //   });
+
+            //   ws["!cols"] = autoFitColumns(ws_data);
+
+            //   // Bold and center-align the first 3 rows
+            //   for (let i = 0; i < 3; i++) {
+            //     for (let j = 0; j < ws_data[i].length; j++) {
+            //       const cell = ws[XLSX.utils.encode_cell({ c: j, r: i })];
+            //       if (cell) {
+            //         cell.s = {
+            //           font: { bold: true },
+            //           alignment: { horizontal: "center" },
+            //         };
+            //       }
+            //     }
+            //   }
+
+            //   // Append the worksheet to the workbook and write the file
+            //   XLSX.utils.book_append_sheet(wb, ws, "Deduction Details");
+            //   XLSX.writeFile(
+            //     wb,
+            //     `Operation Deduction ${selectedOffice} ${selectedDate}.xlsx`
+            //   );
+          }
           // Create a sheet for each region
         }
       } catch (error) {

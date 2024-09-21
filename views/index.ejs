@@ -41,6 +41,17 @@
           <% }); %>
         </select>
 
+        <!-- Combo Box for Regions, hidden by default -->
+        <select name="region" id="regionSelect" style="display: none">
+          <option value="" disabled selected>Select Region</option>
+          <option value="">All Regions</option>
+          <% regions.forEach(region => { %>
+          <option value="<%= region.region_name %>">
+            <%= region.region_name %>
+          </option>
+          <% }); %>
+        </select>
+
         <input type="date" name="date" id="myDateInput" required />
         <button type="button" id="downloadButton">
           Download Payroll Report

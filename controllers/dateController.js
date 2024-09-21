@@ -5,12 +5,13 @@ const getDatePage = async (req, res) => {
   try {
     const offices = await dateModel.getOffices();
     const reports = await dateModel.getReports();
+    const regions = await dateModel.getRegions();
 
     res.render("index", {
       data: null,
       offices: offices,
       reports: reports,
-      regions: null,
+      regions: regions,
       error: null,
       title: "home",
       date: null,
@@ -22,7 +23,7 @@ const getDatePage = async (req, res) => {
       data: null,
       offices: [],
       reports: [],
-      regions: null,
+      regions: [],
       error: "Error loading offices or reports",
       title: "home",
       date: null,
