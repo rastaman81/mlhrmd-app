@@ -3,6 +3,7 @@ const express = require("express");
 const dateController = require("../controllers/dateController");
 const pdfController = require("../controllers/pdfController");
 const authController = require("../controllers/authController");
+const employeeController = require("../controllers/employeeController");
 
 const router = express.Router();
 
@@ -21,6 +22,16 @@ function isAuthenticated(req, res, next) {
     res.redirect("/login"); // If not authenticated, redirect to login page
   }
 }
+
+// Search page
+router.get("/search", employeeController.searchPage);
+
+// Search for employees
+router.post("/employees/search", employeeController.searchEmployees);
+router.get("/employees/search", employeeController.searchEmployees); // Add this line
+
+// Get employee details by ID
+router.get("/employees/:id", employeeController.getEmployeeDetails);
 
 // Protected routes that require authentication
 router.get("/reports", isAuthenticated, dateController.getDatePage);

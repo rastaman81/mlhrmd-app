@@ -32,7 +32,7 @@ const payrollYear = (dateString) => {
 };
 // ----------------------------------------- GETTING THE PAYROLL YEAR -----------------------------------------
 
-// Query to get report data based on date
+// ----------------------------------------- GETTING REPORT DATA BY DATE ----------------------------------------- //
 exports.getReportData = async (date, office, report, selectedRegion) => {
   try {
     const dbName = getDBForOffice(office.toLowerCase());
@@ -105,7 +105,9 @@ exports.getReportData = async (date, office, report, selectedRegion) => {
     throw error;
   }
 };
+// ----------------------------------------- GETTING REPORT DATA BY DATE ----------------------------------------- //
 
+// CREATING THE PDF FUNCTION
 const createPDF = async (db, date, year, dbName, query) => {
   const results = await new Promise((resolve, reject) => {
     db.query(query, [date], (err, results) => {
@@ -115,3 +117,4 @@ const createPDF = async (db, date, year, dbName, query) => {
   });
   return { results };
 };
+// CREATING THE PDF FUNCTION

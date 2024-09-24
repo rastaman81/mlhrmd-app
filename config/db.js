@@ -25,6 +25,13 @@ const mlGroupConnection = mysql.createConnection({
   database: process.env.MLGROUP_DB_NAME,
 });
 
+const visminRecordsConnection = mysql.createConnection({
+  host: process.env.VISMIN_REC_DB_HOST,
+  user: process.env.VISMIN_REC_DB_USER, // use lowercase `user`
+  password: process.env.VISMIN_REC_DB_PASSWORD,
+  database: process.env.VISMIN_REC_DB_NAME,
+});
+
 const connectDB = (dbName) => {
   switch (dbName) {
     case "luzon":
@@ -38,7 +45,21 @@ const connectDB = (dbName) => {
   }
 };
 
-module.exports = connectDB;
+const connectDBRecords = (dbName) => {
+  console.log(dbName);
+  switch (dbName) {
+    case "luzon":
+      return luzonConnection;
+    case "vismin":
+      return visminRecordsConnection;
+    case "mlgroup":
+      return mlGroupConnection;
+    default:
+      throw new Error("Invalid database name.");
+  }
+};
+
+module.exports = { connectDB, connectDBRecords };
 
 //-------------------------------- ORIGINAL CONNECTION CODE
 // const connection = mysql.createConnection({

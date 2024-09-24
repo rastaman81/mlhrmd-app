@@ -1,6 +1,7 @@
 // controllers/dateController.js
 const dateModel = require("../models/dateModel");
 
+// ----------------------------------------- LOAD REPORTS PAGE ----------------------------------------- //
 const getDatePage = async (req, res) => {
   try {
     const offices = await dateModel.getOffices();
@@ -30,6 +31,7 @@ const getDatePage = async (req, res) => {
     });
   }
 };
+// ----------------------------------------- LOAD REPORTS PAGE ----------------------------------------- //
 
 // const postDate = async (req, res) => {
 //   try {
@@ -69,6 +71,7 @@ const getDatePage = async (req, res) => {
 //   }
 // };
 
+// ----------------------------------------- GENERATE REPORTS ----------------------------------------- //
 const postDate = async (req, res) => {
   try {
     const { date, office, report } = req.body;
@@ -85,5 +88,6 @@ const postDate = async (req, res) => {
     res.json({ data: null, error: "Error fetching data" });
   }
 };
+// ----------------------------------------- GENERATE REPORTS ----------------------------------------- //
 
 module.exports = { getDatePage, postDate };

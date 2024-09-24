@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 //const connectDB = require("../models/db"); // Your database connection
 const connectDB = require("../config/db");
 
+// ----------------------------------------- REGISTER NEW USER ----------------------------------------- //
 exports.registerUser = async (req, res) => {
   const { username, password, email } = req.body;
   const db = connectDB("vismin"); // Replace with your actual database name
@@ -25,13 +26,15 @@ exports.registerUser = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
+// ----------------------------------------- REGISTER NEW USER ----------------------------------------- //
 
-// Render the login page
+// ----------------------------------------- RENDER LOGIN PAGE ----------------------------------------- //
 exports.getLoginPage = (req, res) => {
   res.render("login", { error: null });
 };
+// ----------------------------------------- REGISTER NEW USER ----------------------------------------- //
 
-// Authenticate user from MySQL database
+// ----------------------------------------- AUTHENTICATE USER FROM MYSQL DATABASE ----------------------------------------- //
 exports.postLogin = async (req, res) => {
   const { username, password } = req.body;
   const db = connectDB("vismin");
@@ -66,8 +69,9 @@ exports.postLogin = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+// ----------------------------------------- AUTHENTICATE USER FROM MYSQL DATABASE ----------------------------------------- //
 
-// Logout
+// ----------------------------------------- LOGOUT FROM THE APP ----------------------------------------- //
 exports.logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -76,6 +80,7 @@ exports.logout = (req, res) => {
     res.redirect("/login");
   });
 };
+// ----------------------------------------- LOGOUT FROM THE APP ----------------------------------------- //
 
 // // controllers/authController.js
 // const users = [

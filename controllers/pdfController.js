@@ -2,6 +2,7 @@ const PDFDocument = require("pdfkit");
 const path = require("path");
 const { getReportData } = require("../models/PdfModel.js");
 
+// ----------------------------------------- GENERATE PDF ----------------------------------------- //
 exports.generatePDF = async (req, res) => {
   const { date, office, report, selectedRegion } = req.body;
   console.log("selected region:", selectedRegion);
@@ -73,7 +74,9 @@ exports.generatePDF = async (req, res) => {
     res.status(500).json({ error: "Failed to generate PDF" });
   }
 };
+// ----------------------------------------- GENERATE PDF ----------------------------------------- //
 
+// ADDING HEADER TO PDF
 const addHeader = (doc, logoPath, office, region, date, report) => {
   const logoWidth = 200;
   const xPosition = (doc.page.width - logoWidth) / 2;
@@ -110,7 +113,9 @@ const addHeader = (doc, logoPath, office, region, date, report) => {
     .text(`Payroll Date: ${formattedDate}`, { align: "left" });
   doc.moveDown(0.8);
 };
+// ADDING HEADER TO PDF
 
+// ADDING THE EMPLOYEE DATA
 const addEmployeeData = (
   doc,
   logoPath,
@@ -209,7 +214,9 @@ const addEmployeeData = (
   // Add the date at the end, centered below the employee data
   doc.fontSize(6).text(`Date: ${new Date()}`, { align: "right" });
 };
+// ADDING THE EMPLOYEE DATA
 
+// ADDING THE EMPLOYEE TABLE HEADER
 const addEmployeeTableHeader = (doc, report) => {
   const headerY = doc.y;
 
@@ -231,9 +238,12 @@ const addEmployeeTableHeader = (doc, report) => {
     .stroke();
   doc.moveDown(0.5);
 };
+// ADDING THE EMPLOYEE TABLE HEADER
 
+// FORMATTING STRING TO DATE
 const formatDateString = (dateString) => {
   const date = new Date(dateString);
   const options = { year: "numeric", month: "long", day: "2-digit" };
   return date.toLocaleDateString("en-US", options);
 };
+// FORMATTING STRING TO DATE

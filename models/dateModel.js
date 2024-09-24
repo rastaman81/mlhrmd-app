@@ -29,7 +29,7 @@ const getDBForOffice = (office) => {
 // ----------------------------------------- GETTING DB OFFICE VALUES FROM DB FOR DROPBOX  -----------------------------------------
 const getOffices = async () => {
   const query = "SELECT office_name FROM main_office ORDER BY office_name";
-  const db = connectDB("vismin");
+  const db = connectDB.connectDB("vismin");
   //console.log(db);
   return new Promise((resolve, reject) => {
     db.query(query, (err, results) => {
@@ -208,7 +208,7 @@ const generateEDIPayroll = async (db, date, year, dbName) => {
     });
   });
 
-  // GET REGIONS FROM DB -----------------------------------------
+  // GET REGIONS FROM DB //
   regions = await new Promise((resolve, reject) => {
     db.query(`SELECT * FROM SOURCES`, (err, regions) => {
       if (err) return reject(err);
@@ -218,6 +218,13 @@ const generateEDIPayroll = async (db, date, year, dbName) => {
 
   let staffPayroll = staffData(results); //Staff
   staffPayroll = processStaffData(staffPayroll);
+  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
+  const jsonString = JSON.stringify(staffPayroll, null, 2);
+  fs.writeFile("myobject.txt", jsonString, (err) => {
+    if (err) throw err;
+    console.log("Data written to myobject.txt");
+  });
+  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
 
   const branchCount = getBranchCounts(staffPayroll);
 
@@ -229,13 +236,6 @@ const generateEDIPayroll = async (db, date, year, dbName) => {
   let areaPayroll = areaData(results); //AM & Relievers
 
   areaPayroll = processAreaData(areaPayroll);
-  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
-  const jsonString = JSON.stringify(areaPayroll, null, 2);
-  fs.writeFile("myobject.txt", jsonString, (err) => {
-    if (err) throw err;
-    console.log("Data written to myobject.txt");
-  });
-  // WRITING THE DATA INTO A TEXT FILE -----------------------------------------
 
   areaPayroll = mergeAreaAndCalculate(areaPayroll, branchCount);
 
@@ -396,6 +396,7 @@ const processStaffData = (data) => {
       region,
       department, // Include department
       boscode,
+      costCenter,
     }) => {
       if (!branchData[region]) {
         branchData[region] = {};
@@ -420,6 +421,7 @@ const processStaffData = (data) => {
           branchTraineeLeave: 0,
           branchOtherDeductions: 0,
           branchtotalNet: 0,
+          costCenter,
         };
       }
 
@@ -478,6 +480,7 @@ const processStaffData = (data) => {
         branchTraineeLeave,
         branchOtherDeductions,
         branchtotalNet,
+        costCenter,
       },
     ] of Object.entries(branches)) {
       sortedResults.push({
@@ -501,6 +504,7 @@ const processStaffData = (data) => {
         branchTraineeLeave,
         branchOtherDeductions,
         branchtotalNet,
+        costCenter,
       });
     }
   }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/employee.css" />
+    <title>Employee Search</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Search Employee</h1>
+      <form action="/employees/search" method="POST">
+        <select name="office" id="officeSelect" required>
+          <option value="" disabled selected>Select Office</option>
+          <% offices.forEach(office => { %>
+          <option value="<%= office.office_name %>">
+            <%= office.office_name %>
+          </option>
+          <% }); %>
+        </select>
+        <input
+          type="text"
+          name="searchTerm"
+          placeholder="Enter name or employee ID"
+          required
+        />
+        <button type="submit">Search</button>
+      </form>
+
+      <div class="results">
+        <% if (employees.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>IDNO</th>
+              <th>Last Name</th>
+              <th>First Name</th>
+              <th>Middle Name</th>
+              <th>Employment Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% employees.forEach(employee => { %>
+            <tr>
+              <td><%= employee.employeeid %></td>
+              <td><%= employee.employeelname %></td>
+              <td><%= employee.employeefname %></td>
+              <td><%= employee.employeemi %></td>
+              <td
+                style="color: <%= employee.employeeempstat === 0 ? 'red' : 'black' %>;"
+              >
+                <%= employee.employeeempstat === 0 ? 'Resigned' : 'Active' %>
+              </td>
+              <td>
+                <a
+                  href="/employees/details?employeeId=<%= employee.employeeid %>&office=<%= employee.office %>"
+                  >View Details</a
+                >
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <% if (page > 1) { %>
+          <a
+            href="?page=<%= page - 1 %>&limit=<%= limit %>&searchTerm=<%= searchTerm %>&office=<%= office %>"
+            >Previous</a
+          >
+          <% } %>
+
+          <span>Page <%= page %> of <%= totalPages %></span>
+
+          <% if (page < totalPages) { %>
+          <a
+            href="?page=<%= page + 1 %>&limit=<%= limit %>&searchTerm=<%= searchTerm %>&office=<%= office %>"
+            >Next</a
+          >
+          <% } %>
+        </div>
+
+        <% } else { %>
+        <p>No results found</p>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

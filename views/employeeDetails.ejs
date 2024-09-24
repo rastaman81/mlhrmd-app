@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/employeeDetails.css" />
+    <title>Employee Details</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Employee Details</h1>
+      
+      <div class="employee-status">
+        <h2>Status</h2>
+        <p>
+          <strong>Employment Status:</strong>
+          <% if (employee.employeeempstat === 0) { %>
+            <span class="status-resigned">Resigned</span>
+            <p><strong>Date Resigned:</strong> <%= employee.empresigndate ? employee.empresigndate : "N/A" %></p>
+          <% } else { %>
+            <span class="status-active">Active</span>
+          <% } %>
+        </p>
+      </div>
+
+      <div class="employee-info">
+        <p><strong>ID No:</strong> <%= employee.employeeid %></p>
+        <p>
+          <strong>Name:</strong> <%= employee.employeefname %> <%= employee.employeelname %> <%= employee.employeemi %>
+        </p>
+        <p><strong>Position:</strong> <%= employee.employeedesignation %></p>
+        <p><strong>Region/Division:</strong> <%= employee.region %></p>
+        <p><strong>Branch/Department:</strong> <%= employee.branch %></p>
+        <p><strong>Area Manager/Division Head:</strong> <%= employee.areamanager %></p>
+        <p><strong>Hired Date:</strong> <%= employee.employeedateemp %></p>
+        <p><strong>Mobile No:</strong> <%= employee.employeecontactno %></p>
+        <p><strong>Email:</strong> <%= employee.employeeemail %></p>
+      </div>
+
+      <div class="employee-details">
+        <h2>Personal Information</h2>
+        <p><strong>Gender:</strong> <%= employee.employeegender %></p>
+        <p><strong>Civil Status:</strong> <%= employee.employeestatus %></p>
+        <p><strong>Birth Date:</strong> <%= employee.employeebdate %></p>
+        <p><strong>Birth Place:</strong> <%= employee.employeebplace %></p>
+        <p><strong>Religion:</strong> <%= employee.employeereligion %></p>
+        <p><strong>Address:</strong> <%= employee.employeeaddress %></p>
+      </div>
+
+      <div class="employee-family">
+        <h2>Family Information</h2>
+        <p><strong>Spouse:</strong> <%= employee.employeespouse %></p>
+        <p><strong>Spouse's Work:</strong> <%= employee.employeespousework %></p>
+        <p><strong>Father:</strong> <%= employee.employeefathersname %></p>
+        <p><strong>Father's Work:</strong> <%= employee.employeefatherswork %></p>
+        <p><strong>Mother:</strong> <%= employee.employeemothersname %></p>
+        <p><strong>Mother's Work:</strong> <%= employee.employeemotherwork %></p>
+      </div>
+
+      <div class="employee-education">
+        <h2>Education</h2>
+        <div class="education-entry">
+          <strong>Grade School:</strong>
+          <p>Name: <%= employee.employeeschool1 %></p>
+          <p>Address: <%= employee.employeeaddress1 %></p>
+          <p>Year Graduated: <%= employee.employeescyear1 %></p>
+        </div>
+        <div class="education-entry">
+          <strong>High School:</strong>
+          <p>Name: <%= employee.employeeschool2 %></p>
+          <p>Address: <%= employee.employeeaddress2 %></p>
+          <p>Year Graduated: <%= employee.employeescyear2 %></p>
+        </div>
+        <div class="education-entry">
+          <strong>College:</strong>
+          <p>Name: <%= employee.employeeschool3 %></p>
+          <p>Address: <%= employee.employeeaddress3 %></p>
+          <p>Course: <%= employee.employeeschool4 %></p>
+          <p>Year Graduated: <%= employee.employeescyear3 %></p>
+        </div>
+      </div>
+
+      <div class="employee-government">
+        <h2>Government ID Information</h2>
+        <p><strong>SSS No:</strong> <%= employee.employeesss %></p>
+        <p><strong>Pagibig No:</strong> <%= employee.employeepagibig %></p>
+        <p><strong>Philhealth No:</strong> <%= employee.employeephilhealth %></p>
+        <p><strong>TIN:</strong> <%= employee.employeetin %></p>
+      </div>
+
+      <a href="/search" class="back-button">Back to Search</a>
+    </div>
+  </body>
+</html>
