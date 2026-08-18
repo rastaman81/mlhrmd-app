@@ -1,0 +1,1514 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Payroll Reports</title>
+    
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Add datepicker CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  </head>
+  <body>
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+      <!-- Navbar Section (Top Bar) -->
+      {{> header}}
+
+      <!-- Main Content Section -->
+      <div class="main-content">
+        <!-- Payroll Utilities Card -->
+        <div class="search-card">
+          <h2>
+            <i class="fas fa-calculator me-2"></i>
+            Payroll Reports
+          </h2>
+
+          <!-- Payroll Utilities Form -->
+          <form id="payrollReportsForm">
+            <div class="row g-3 mb-3">
+              <!-- Date Range Picker -->
+              <div class="col-md-3">
+                <label for="dateRange" class="form-label">Date Range</label>
+                <input
+                  type="text"
+                  id="dateRange"
+                  class="form-control datepicker"
+                  placeholder="Select date range"
+                  readonly
+                />
+              </div>
+
+              <!-- Office Selection -->
+              <div class="col-md-3">
+                <label for="officeSelect" class="form-label">Office</label>
+                <select
+                  name="office"
+                  id="officeSelect"
+                  class="form-select"
+                >
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">
+                      {{this.office_name}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Region Selection -->
+              <div class="col-md-3">
+                <label for="regionSelect" class="form-label">Region</label>
+                <select
+                  name="region"
+                  id="regionSelect"
+                  class="form-select"
+                >
+                  <option value="" selected>All Regions</option>
+                  {{#each regions}}
+                    <option value="{{this.region_name}}">
+                      {{this.region_name}}
+                    </option>
+                  {{/each}}
+                  
+                </select>
+              </div>
+
+              <!-- Report Type -->
+              <div class="col-md-3">
+                <label for="reportType" class="form-label">Report Type</label>
+                <select
+                  name="reportType"
+                  id="reportType"
+                  class="form-select"
+                >
+                  <option value="" disabled selected>Select Report</option>
+                  {{#each reportTypes}}
+                    <option value="{{this.reporttype}}">
+                      {{this.reporttype}}
+                    </option>
+                  {{/each}}
+                  
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3 justify-content-center" >
+              <!-- Income Type -->
+              <div class="col-md-4">
+    <label for="incomeType" class="form-label">Income Type</label>
+    <select
+      name="incomeType"
+      id="incomeType"
+      class="form-select" disabled
+    >
+      <option value="" disabled selected>Select Income Type</option>
+      {{#each incomeTypes}}
+        <option value="{{this.income_name}}">
+          {{this.income_description}}
+        </option>
+      {{/each}}
+    </select>
+  </div>
+
+              <!-- Deduction Type -->
+              <div class="col-md-4">
+              <label for="deductionType" class="form-label">Deduction Type</label>
+    <select
+      name="deductionType"
+      id="deductionType"
+      class="form-select" disabled
+    >
+      <option value="" disabled selected>Select Deduction Type</option>
+      {{#each deductionTypes}}
+        <option value="{{this.deduction_name}}">
+          {{this.deduction_description}}
+        </option>
+      {{/each}}
+    </select>
+  </div>
+
+              <!-- Action Buttons -->
+              <div class="col-md-4 d-flex align-items-end">
+                <button
+                  type="submit"
+                  class="btn btn-primary me-2 flex-grow-1"
+                >
+                  <i class="fas fa-file-export me-2"></i>Generate Report
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary flex-grow-1"
+                  id="resetBtn"
+                >
+                  <i class="fas fa-redo me-2"></i>Reset
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Report Results Container -->
+        <div class="table-container mt-4" id="reportResults" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Report Results</h3>
+            <button class="btn btn-sm btn-outline-secondary" id="exportBtn">
+              <i class="fas fa-download me-1"></i>Export to Excel
+            </button>
+          </div>
+          
+          <div class="table-responsive">
+            <table id="report-table" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Name</th>
+                  <th>Office</th>
+                  <th>Region</th>
+                  <th>Gross Pay</th>
+                  <th>Deductions</th>
+                  <th>Net Pay</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Report data will be populated here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Loading and Error Messages -->
+          <div id="report-loading" class="text-center my-5" style="display: none">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Generating report...</p>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div
+          id="error-message"
+          class="alert alert-danger mt-4"
+          style="display: none"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS (required for dropdown functionality) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <!-- Datepicker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/js/scripts.js"></script>
+    
+    <script>
+      // Initialize date range picker
+      document.addEventListener('DOMContentLoaded', function() {
+        flatpickr("#dateRange", {
+          mode: "range",
+          dateFormat: "Y-m-d",
+          allowInput: true
+        });
+
+        // Form submission handler
+        document.getElementById('payrollReportsForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          generateReport();
+        });
+
+        // Reset button handler
+        document.getElementById('resetBtn').addEventListener('click', function() {
+          document.getElementById('payrollReportsForm').reset();
+          document.getElementById('reportResults').style.display = 'none';
+        });
+
+        // Export button handler
+        document.getElementById('exportBtn').addEventListener('click', function() {
+          // Implement export functionality
+          alert('Export functionality will be implemented here');
+        });
+      });
+
+      {{!-- function generateReport() {
+        // Show loading indicator
+        document.getElementById('report-loading').style.display = 'block';
+        document.getElementById('reportResults').style.display = 'none';
+        document.getElementById('error-message').style.display = 'none';
+
+        // Simulate API call with timeout
+        setTimeout(function() {
+          document.getElementById('report-loading').style.display = 'none';
+          
+          // In a real implementation, you would populate the table with actual data
+          // For now, we'll just show the empty table
+          document.getElementById('reportResults').style.display = 'block';
+        }, 1500);
+      } --}}
+
+      // Update the generateReport function in your payroll-utilities.hbs
+async function generateReport() {
+  const form = document.getElementById('payrollReportsForm');
+  const selectedRegion = document.getElementById('regionSelect')
+  const deductionSelect = document.getElementById('deductionType');
+  const incomeSelect = document.getElementById('incomeType');
+  const formData = new FormData(form);
+  const dateRange = document.getElementById('dateRange').value;
+  const selectedOffice = officeSelect.value;
+  console.log('Selected Region: ', selectedRegion.value)
+
+
+  // Check if the report type is "kp wallet (csv file)" and selectedRegion is "all regions"
+  console.log(dateRange)
+  if (reportType.value.toLowerCase() === "kp wallet (csv file)" && selectedRegion.value.toLowerCase() === "") {
+    alert('Please select a specific region for this report.');
+    return;  // Exit the function early
+  }
+
+  if (dateRange) {
+    formData.append('dateRange', dateRange);
+  }
+
+  // Convert FormData to URL-encoded string
+  const formDataObj = {};
+  formData.forEach((value, key) => {
+    formDataObj[key] = value;
+  });
+//console.log(formDataObj)
+  // Show loading indicator
+  document.getElementById('report-loading').style.display = 'block';
+  document.getElementById('reportResults').style.display = 'none';
+  document.getElementById('error-message').style.display = 'none';
+
+  try {
+    const response = await fetch('/payroll/reports/generate-report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formDataObj)
+    });
+    
+    const data = await response.json();
+    
+    console.log(data)
+    
+    if (data.success) {
+
+      // Check if we have results before generating reports
+      if (!data.results || data.results.length === 0) {
+        alert('No data found for the selected criteria');
+        return;
+      }
+
+      data.results.officeSelect = officeSelect;
+      if (reportType.value.toLowerCase().trim() === "complete payroll details"){
+        console.log('complete payroll report')
+        if(selectedOffice.toLowerCase() === 'ml group'){
+generateMLGExcelReport(data.results);
+        }else {
+          await generateExcelReport(data.results);
+        }
+        
+      }else if (reportType.value.toLowerCase() === "deduction") {
+    console.log('deduction', deductionSelect.value.toLowerCase());
+
+    const deductionMap = {
+        "mlfund (xls)": { type: "mlfund (xls)", action: generateExcelMlFund },
+        "mlfund (pdf)": { type: "mlfund (pdf)", action: generatePdfReport, category: 'deduction' },
+        "sako": { type: "sako", action: generatePdfReport, category: 'deduction' },
+        "coated": { type: "coated", action: generatePdfReport, category: 'deduction' },
+        "cooprecla": { type: "cooprecla", action: generatePdfReport, category: 'deduction' },
+        "sakocommodity": { type: 'fake', action: generatePdfReport, category: 'deduction' },
+        "deductionamount1": { type: 'gpa insurance', action: generatePdfReport, category: 'deduction' },
+        "c_hmo": { type: 'hmo', action: generatePdfReport, category: 'deduction' },
+        "incometax": { type: 'income tax', action: generatePdfReport, category: 'deduction' },
+        "installaccount": { type: 'install account', action: generatePdfReport, category: 'deduction' },
+        "lates": { type: 'lates', action: generatePdfReport, category: 'deduction' },
+        "leaves": { type: 'leaves', action: generatePdfReport, category: 'deduction' },
+        "sakoprovi": { type: 'mortuary', action: generatePdfReport, category: 'deduction' },
+        "sakopettycash": { type: 'motor loan', action: generatePdfReport, category: 'deduction' },
+        "opec": { type: 'opec', action: generatePdfReport, category: 'deduction' },
+        "canteen": { type: 'opec support', action: generatePdfReport, category: 'deduction' },
+        "ticket": { type: 'opec ticket', action: generatePdfReport, category: 'deduction' },
+        "sakoprime": { type: 'sako deductions', action: generatePdfReport, category: 'deduction' },
+        "overappraisal": { type: 'over appraisal', action: generatePdfReport, category: 'deduction' },
+        "deductionamount2": { type: 'over payments', action: generatePdfReport, category: 'deduction' },
+        "sakoprime":  { type: 'other deductions', action: generatePdfReport, category: 'deduction' },
+        "pagibigloan": { type: 'pagibig loan', action: generatePdfReport, category: 'deduction' },
+        "sssloan": { type: 'sss loan', action: generatePdfReport, category: 'deduction' },
+        "mobilebill": { type: 'telecoms', action: generatePdfReport, category: 'deduction' }
+    };
+
+    const selectedDeduction = deductionSelect.value.toLowerCase();
+    
+    if (deductionMap[selectedDeduction]) {
+        const { type, action, category } = deductionMap[selectedDeduction];
+        if (selectedDeduction === "mlfund (xls)") {
+            await action(data.results); // Special case for XLS
+        } else {
+            action(data.results, type, category, selectedRegion.value, selectedOffice); // For all other PDF reports
+        }
+    }
+}else if (reportType.value.toLowerCase() === "income") {
+    console.log('income', incomeSelect.value.toLowerCase());
+    const incomeMap = {"basicpay": { type: "basic pay", action: generatePdfReport, category: 'income' },
+                      "cola": { type: "cola", action: generatePdfReport, category: 'income' },
+                      "abmallow": { type: "hazard allowance", action: generatePdfReport, category: 'income' },
+                      "houseallow": { type: "housing allowance", action: generatePdfReport, category: 'income' },
+                      "incomeamount1": { type: "pb/excess pb", action: generatePdfReport, category: 'income' },
+                      "incomeamount2": { type: "other income", action: generatePdfReport, category: 'income' },
+                      "supervisoryallow2": { type: "location allowance", action: generatePdfReport, category: 'income' },
+                      "managementallow": { type: "management allowance", action: generatePdfReport, category: 'income' },
+                      "bmallow": { type: "positional allowance", action: generatePdfReport, category: 'income' },
+                      "auditorsallow": { type: "single post allowance", action: generatePdfReport, category: 'income' },
+                      "totalot": { type: "total overtime", action: generatePdfReport, category: 'income' },
+                      "travelallow": { type: "transportation allowance", action: generatePdfReport, category: 'income' },};
+    const selectedIncome = incomeSelect.value.toLowerCase();
+
+    if (incomeMap[selectedIncome]) {
+        const { type, action, category } = incomeMap[selectedIncome];
+        
+            action(data.results, type, category, selectedRegion.value); // For all other PDF reports
+        
+    }
+}else if (reportType.value.toLowerCase() === "kp") {
+  console.log(data.results);
+
+  // Define default values for 'type', 'category', and 'region' for the 'kp' report type
+  const type = "kp";  // Assuming 'kp' is the report type
+  const category = "kp category";  // You can change this if there is a specific category for 'kp'
+  const region = selectedRegion.value || "";  // Assuming you want to pass the selected region from the form
+
+  // Call the generatePdfReport with these parameters
+  generatePdfReport(data.results, type, category, region, selectedOffice);
+} else if (reportType.value.toLowerCase() === "kp wallet") {
+  console.log(data.results);
+
+  // Define default values for 'type', 'category', and 'region' for the 'kp' report type
+  const type = "kp wallet";  // Assuming 'kp' is the report type
+  const category = "kp wallet";  // You can change this if there is a specific category for 'kp'
+  const region = selectedRegion.value || "";  // Assuming you want to pass the selected region from the form
+
+  // Call the generatePdfReport with these parameters
+  generatePdfReport(data.results, type, category, region, selectedOffice);
+}
+ else if (reportType.value.toLowerCase() === "payroll summary (net)") {
+  console.log(data.results);
+
+  // Define default values for 'type', 'category', and 'region' for the 'kp' report type
+  const type = "payroll summary (net)";  // Assuming 'kp' is the report type
+  const category = "payroll net pay";  // You can change this if there is a specific category for 'kp'
+  const region = selectedRegion.value || "";  // Assuming you want to pass the selected region from the form
+
+  // Call the generatePdfReport with these parameters
+  generatePdfReport(data.results, type, category, region, selectedOffice);
+} else if (reportType.value.toLowerCase() === "payroll summary (region)") {
+  console.log(data.results);
+
+  // Define default values for 'type', 'category', and 'region' for the 'kp' report type
+  const type = "payroll summary (region)";  // Assuming 'kp' is the report type
+  const category = "payroll net pay";  // You can change this if there is a specific category for 'kp'
+  const region = selectedRegion.value || "";  // Assuming you want to pass the selected region from the form
+
+  // Call the generatePdfReport with these parameters
+  generatePdfReport(data.results, type, category, region, selectedOffice);
+} else if (reportType.value.toLowerCase() === "kp wallet (csv file)") {
+  //console.log(data.results);
+const regionVal = selectedRegion.value || "";  
+  // Create a CSV for each region
+  const regions = [...new Set(data.results.map(item => item.region))]; // Extract unique regions from data.results
+
+  // Get the end date (assuming the format is in data.results)
+  //const endDate = dateRange.split(" - ")[1]; // Assuming dateRange is in the format "startDate - endDate"
+  
+  const { endDate } = getDates(dateRange);
+
+ 
+
+  // Create CSV file for each region
+  regions.forEach(region => {
+    // Filter data for the current region
+    const regionData = data.results.filter(item => item.region === region);
+    
+    // Convert region data to CSV format
+    const csvContent = convertToCSV(regionData);
+    
+    // Create the CSV file name
+    const fileName = `KPWallet_${regionVal}_${endDate}.csv`;
+    
+    // Trigger the download of the CSV file
+    downloadCSV(csvContent, fileName);
+  });
+} 
+
+else {
+        console.log(deductionSelect.value, deductionSelect.text)
+      }
+      
+    } else {
+      showError(data.message || 'Error generating report');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Failed to generate report: ' + error.message);
+  } finally {
+    document.getElementById('report-loading').style.display = 'none';
+  }
+}
+
+
+// THIS CODE IS WORKING FOR THE OUTPUT Ñ ----------- START
+// Utility function to convert JSON data to CSV format
+//function convertToCSV(data) {
+//  const header = Object.keys(data[0]);
+//  const rows = data.map(item => 
+//    header.map(field => `"${item[field] || ""}"`).join(",") // Ensuring that we escape values that might contain commas
+//  );
+
+//  return [header.join(","), ...rows].join("\n");
+//}
+
+// Utility function to trigger the CSV file download
+// Utility function to trigger the CSV file download with UTF-8 encoding
+//function downloadCSV(content, fileName) {
+  // Create a Blob with UTF-8 encoding
+//  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+
+//  const link = document.createElement("a");
+//  if (link.download !== undefined) { // Check if the browser supports the download attribute
+//    const url = URL.createObjectURL(blob);
+//    link.setAttribute("href", url);
+//    link.setAttribute("download", fileName);
+//    link.style.visibility = 'hidden';
+//    document.body.appendChild(link);
+//    link.click();
+//    document.body.removeChild(link);
+//  }
+//}
+// THIS CODE IS WORKING FOR THE OUTPUT Ñ ----------- END
+
+// Utility function to replace Ñ with N in the lastName field only
+function sanitizeLastName(str) {
+  if (str) {
+    console.log('Sanitizing:', str); 
+    return str.replace(/[Ññ]/g, 'N');
+  }
+  return str;
+}
+
+// Utility function to convert JSON data to CSV format
+function convertToCSV(data) {
+  // Check if data is not empty
+  if (data.length === 0) {
+    return '';
+  }
+
+  // Get all keys (columns) from the first object (assuming all objects have the same structure)
+  const header = Object.keys(data[0]);
+
+  // Map data to CSV, only sanitize the lastName field
+  const rows = data.map(item => 
+    header.map(field => {
+      // Sanitize only lastName field
+      
+      if (field.toLowerCase() === 'last name') {
+        return `"${sanitizeLastName(item[field] || "")}"`;
+      }
+      return `"${item[field] || ""}"`; // No sanitization for other fields
+    }).join(",")
+  );
+
+  // Return the CSV string: header + rows
+  return [header.join(","), ...rows].join("\n");
+}
+
+// Utility function to trigger the CSV file download with UTF-8 encoding
+function downloadCSV(content, fileName) {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+
+  const link = document.createElement("a");
+  if (link.download !== undefined) { // Check if the browser supports the download attribute
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+
+// getting the dates ----- start
+function getDates(dateRange) {
+  let startDate = null;
+  let endDate = null;
+
+  if (dateRange && dateRange.includes(" to ")) {
+    [startDate, endDate] = dateRange.split(" to ");
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+      startDate = start.toISOString().split("T")[0];
+      endDate = end.toISOString().split("T")[0];
+    } else {
+      startDate = null;
+      endDate = null;
+    }
+  }
+
+  return { startDate, endDate };
+}
+// getting the date ------- end
+
+
+
+async function generateExcelMlFund(results) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+
+  // Define headers
+  const headers = [
+    'REGION CODE', 
+    'REGION DESCRIPTION', 
+    '#', 
+    'IDNO', 
+    'EMPLOYEE NAME', 
+    'AMOUNT'
+  ];
+
+  // Group data by region_description
+  results.forEach(employee => {
+    if (!groupedData[employee.region]) {
+      groupedData[employee.region] = {};
+    }
+    if (!groupedData[employee.region][employee.department]) {
+      groupedData[employee.region][employee.department] = [];
+    }
+    groupedData[employee.region][employee.department].push(employee);
+  });
+
+  // Sort regions alphabetically
+  const sortedRegionDescriptions = Object.keys(groupedData).sort();
+
+  sortedRegionDescriptions.forEach(regionDescription => {
+    const regionData = groupedData[regionDescription];
+    const wsData = [];
+    let columnWidths = headers.map(header => header.length); // Initialize with header widths
+    let rowIndex = 1;
+
+    // Add report headers
+    wsData.push([`Payroll Date: ${formatDate(results[0].enddate)}`]);
+    wsData.push(['ML FUND DEDUCTION']);
+    wsData.push(headers); // This is row 3 (0-based index 2)
+
+    // Process each department
+    Object.keys(regionData).forEach(department => {
+      const departmentEmployees = regionData[department];
+
+      departmentEmployees.forEach(emp => {
+        const row = [
+          emp.region_code || '',
+          emp.region_description || '',
+          rowIndex++,
+          emp.idno || '',
+          emp.employee || '',
+          Number(emp.mlfund) || 0
+        ];
+
+        // Update column widths based on content
+        row.forEach((cell, index) => {
+          const cellWidth = String(cell).length;
+          if (cellWidth > columnWidths[index]) {
+            columnWidths[index] = cellWidth;
+          }
+        });
+
+        wsData.push(row);
+      });
+
+      // Add department summary
+      const totals = Array(headers.length).fill(0);
+      const numericColumns = [5];
+      departmentEmployees.forEach(emp => {
+        numericColumns.forEach(col => {
+          totals[col] += parseFloat(emp.mlfund) || 0;
+        });
+      });
+
+      const summaryRow = new Array(headers.length).fill('');
+      summaryRow[0] = 'TOTAL EMPLOYEES:';
+      summaryRow[2] = departmentEmployees.length;
+      numericColumns.forEach(col => {
+        summaryRow[col] = totals[col];
+      });
+
+      // Update widths for summary row
+      summaryRow.forEach((cell, index) => {
+        const cellWidth = String(cell).length;
+        if (cellWidth > columnWidths[index]) {
+          columnWidths[index] = cellWidth;
+        }
+      });
+
+      wsData.push(summaryRow);
+      wsData.push([]); // Empty row between departments
+    });
+
+    // Create worksheet
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // Set column widths based on widest content (headers + data)
+    ws['!cols'] = columnWidths.map(width => ({
+      wch: Math.min(width + 2, 50) // Add 2 chars padding, max 50 chars wide
+    }));
+
+    // Format numeric columns
+    Object.keys(ws).forEach(cellAddress => {
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+      
+      // Format amount column (5th column)
+      if (colIndex === 5) {
+        cell.z = '#,##0.00';
+      }
+      
+      // Style header row (row 3 in 0-based index)
+      if (XLSX.utils.decode_cell(cellAddress).r === 2) {
+        cell.s = {
+          font: { bold: true },
+          fill: { fgColor: { rgb: "D3D3D3" } } // Light gray background
+        };
+      }
+      
+      // Style totals row
+      const lastDataRow = wsData.length - 2; // -2 because we added empty row
+      if (XLSX.utils.decode_cell(cellAddress).r === lastDataRow) {
+        cell.s = {
+          font: { bold: true },
+          border: { top: { style: 'thin', color: { rgb: '000000' } } }
+        };
+      }
+    });
+
+    // Add worksheet to workbook
+    const sheetName = regionDescription.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  // Generate filename with current date
+  const date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `MLFund_Report_${date}.xlsx`);
+}
+
+async function generatePdfReport(results, type, category, region, office) {
+  console.log('new approach', region, office);
+  
+  try {
+    const endDate = results[0]?.enddate;
+
+    // Construct the base filename
+    let filename = `${capitalizeFirstLetter(type)}_${capitalizeFirstLetter(category)}_Report_${formatDateString(endDate)}.pdf`;
+
+
+    // If region is provided and not empty, add it to the filename
+    if (typeof region === 'string' && region.trim() !== "") {
+    filename = `${capitalizeFirstLetter(type)}_${capitalizeFirstLetter(category)}_Report_${capitalizeFirstLetter(region)}_${formatDateString(endDate)}.pdf`;
+}
+
+    const response = await fetch('/payroll/reports/generate-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        reportData: results,
+        reportType: type,
+        category: category,
+        office: office
+      })
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;  // Use the constructed filename
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } else {
+      throw new Error('Failed to generate PDF');
+    }
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    alert('Failed to generate PDF. Please try again.');
+  }
+}
+
+function capitalizeFirstLetter(word) {
+  if (typeof word === 'string' && word.length > 0) {
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }
+  return word; // In case the input is not a valid string
+}
+
+const formatDateString = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};
+
+async function generatePdfMlFund1(results) {
+  try {
+    // Load required libraries
+    if (typeof jsPDF === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const script1 = document.createElement('script');
+        script1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        script1.onload = () => {
+          const script2 = document.createElement('script');
+          script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js';
+          script2.onload = () => {
+            window.jsPDF = window.jspdf.jsPDF;
+            resolve();
+          };
+          script2.onerror = reject;
+          document.head.appendChild(script2);
+        };
+        script1.onerror = reject;
+        document.head.appendChild(script1);
+      });
+    }
+
+    // Group data by region and department
+    const groupedData = {};
+    results.forEach(employee => {
+      if (!groupedData[employee.region]) {
+        groupedData[employee.region] = {};
+      }
+      if (!groupedData[employee.region][employee.department]) {
+        groupedData[employee.region][employee.department] = [];
+      }
+      groupedData[employee.region][employee.department].push(employee);
+    });
+
+    // Sort regions alphabetically
+    const sortedRegions = Object.keys(groupedData).sort();
+
+    // Create PDF document (letter size, portrait)
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'in',
+      format: 'letter'
+    });
+
+    // Define styles
+    const styles = {
+      header: {
+        fontSize: 12,
+        bold: true,
+        textColor: [0, 0, 0],
+        fillColor: [211, 211, 211],
+        halign: 'left'
+      },
+      subHeader: {
+        fontSize: 11,
+        bold: true,
+        halign: 'left'
+      },
+      tableHeader: {
+        fontSize: 10,
+        bold: true,
+        fillColor: [211, 211, 211],
+        textColor: [0, 0, 0],
+        halign: 'center'
+      },
+      tableBody: {
+        fontSize: 9,
+        textColor: [0, 0, 0],
+        halign: 'left'
+      },
+      tableNumber: {
+        fontSize: 9,
+        halign: 'right'
+      },
+      totalRow: {
+        fontSize: 10,
+        bold: true,
+        textColor: [0, 0, 0],
+        lineWidth: 0,
+        lineColor: [255, 255, 255]
+      },
+      regionHeader: {
+        fontSize: 11,
+        bold: true,
+        textColor: [0, 0, 0],
+        halign: 'left'
+      }
+    };
+
+    // Process each region
+    for (let regionIndex = 0; regionIndex < sortedRegions.length; regionIndex++) {
+      const region = sortedRegions[regionIndex];
+      
+      // Add new page for each region except the first
+      if (regionIndex > 0) {
+        doc.addPage();
+      }
+
+      let startY = 0.5;
+      
+      // Add report header FOR EACH REGION
+      doc.setFontSize(styles.header.fontSize);
+      doc.setFont(undefined, 'bold');
+      doc.text('ML FUND DEDUCTION', 0.5, startY, { align: 'left' });
+      
+      doc.setFontSize(styles.subHeader.fontSize);
+      doc.text(`Payroll Date: ${formatDate(results[0].enddate)}`, 0.5, startY + 0.3);
+      startY += 0.6;
+
+      {{!-- // Add region header
+      doc.setFontSize(styles.regionHeader.fontSize);
+      doc.setFont(undefined, 'bold');
+      doc.text(`Region: ${region}`, 0.5, startY);
+      startY += 0.3; --}}
+
+      // Process departments in this region
+      const departments = Object.keys(groupedData[region]);
+      for (const dept of departments) {
+        const employees = groupedData[region][dept];
+        const tableData = [];
+
+        // Add employee rows
+        employees.forEach((emp, empIndex) => {
+          tableData.push([
+            emp.region_code || '',
+            emp.region_description || '',
+            empIndex + 1,
+            emp.idno || '',
+            emp.employee || '',
+            { 
+              content: formatNumber(emp.mlfund), 
+              styles: styles.tableNumber 
+            }
+          ]);
+        });
+
+        // Add department total
+        const deptTotal = employees.reduce((sum, emp) => sum + (parseFloat(emp.mlfund) || 0), 0);
+        tableData.push([
+          { content: 'TOTAL EMPLOYEES:', colSpan: 2, styles: styles.totalRow },
+          { content: employees.length, styles: styles.totalRow },
+          { content: '', styles: styles.totalRow },
+          { content: '', styles: styles.totalRow },
+          { 
+            content: formatNumber(deptTotal), 
+            styles: { ...styles.totalRow, halign: 'right' } 
+          }
+        ]);
+
+        // Add empty row between departments
+        tableData.push([{ content: '', colSpan: 6 }]);
+
+        // Generate table
+        doc.autoTable({
+          head: [['REGION CODE', 'REGION DESC', '#', 'IDNO', 'EMPLOYEE NAME', 'AMOUNT']],
+          body: tableData,
+          startY: startY,
+          margin: { left: 0.5, right: 0.5 },
+          headStyles: styles.tableHeader,
+          bodyStyles: styles.tableBody,
+          columnStyles: {
+            0: { cellWidth: 0.8 },
+            1: { cellWidth: 1.2 },
+            2: { cellWidth: 0.5 },
+            3: { cellWidth: 0.8 },
+            4: { cellWidth: 2.5 },
+            5: { cellWidth: 1.0 }
+          },
+          styles: {
+            cellPadding: 0.05,
+            fontSize: 10,
+            overflow: 'linebreak'
+          }
+        });
+
+        startY = doc.lastAutoTable.finalY + 0.2;
+      }
+    }
+
+    // Save the PDF
+    const date = new Date().toISOString().slice(0, 10);
+    doc.save(`MLFund_Report_${date}.pdf`);
+
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    alert('Failed to generate PDF. Please try again or check console for details.');
+  }
+}
+
+
+async function loadScripts(urls) {
+  const promises = urls.map(url => {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${url}"]`)) {
+        resolve();
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = url;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+      document.head.appendChild(script);
+    });
+  });
+  
+  await Promise.all(promises);
+}
+
+const numberDate = (dateString) => {
+  const dateOnly = new Date(dateString).toISOString().slice(0, 10);
+  return dateOnly;  
+}
+
+// GENERATING COMPLETE PAYROLL REPORT FOR ML GROUP // START
+async function generateMLGExcelReport(results) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+  
+  // Define headers
+  const headers = [
+    'AREA/DEPARTMENT',
+    'LAST NAME',
+    'FIRST NAME',
+    'PAYROLL TYPE',
+    'DAILY RATE',
+    'NO. DAYS',
+    'BASIC PAY',
+    'ALLOWANCES',
+    'OVERTIME',
+    'COLA',
+    'OTHER INCOME',
+    'GROSS PAY',
+    'LATES',
+    'LEAVE W/O PAY', 
+    'INCOME TAX', 
+    'SSS CONTRIBUTION', 
+    'PAGIBIG CONTRIBUTION', 
+    'SSS LOAN', 
+    'PAGIBIG LOAN', 
+    'CAR-MOTOR LOAN', 
+    'ML FUND', 
+    'HMO', 
+    'ML CELLPHONE',
+    'PHILHEALTH', 
+    'ML ACCOUNT', 
+    'ATD', 
+    'ODETTE LOAN', 
+    'ML LENDING', 
+    'PAYABLES',
+    '', // deductionDesc1
+    '', // deductionDesc2
+    'TOTAL DEDUCTION', 
+    'TOTAL NET',
+  ];
+let payrollDate = '';
+  results.forEach(employee => {
+    if (!groupedData[employee.region]) {
+      groupedData[employee.region] = {};
+    }
+    if (!groupedData[employee.region][employee.department]) {
+      groupedData[employee.region][employee.department] = [];
+    }
+    groupedData[employee.region][employee.department].push(employee);
+  });
+
+  const sortedRegions = Object.keys(groupedData).sort();
+
+  sortedRegions.forEach(region => {
+    const regionData = groupedData[region];
+    const sortedDepartments = Object.keys(regionData).sort();
+    const wsData = [];
+    let columnWidths = [];
+
+    wsData.push(['M. Lhuillier Financial Services Inc - Complete Payroll Report']);
+    wsData.push([]);
+
+    sortedDepartments.forEach(department => {
+      
+      const departmentEmployees = regionData[department];
+      const employeeCount = departmentEmployees.length;
+      const firstEmployee = departmentEmployees[0];
+      
+      const departmentHeaders = [...headers];
+      departmentHeaders[29] = firstEmployee.deductionDesc1 || '';
+      departmentHeaders[30] = firstEmployee.deductionDesc2 || '';
+      payrollDate = `${firstEmployee.endDate}`;
+      wsData.push([`${region} - ${department}`]);
+      wsData.push([`Payroll Period - ${formatDate(firstEmployee.startDate)} to ${formatDate(firstEmployee.endDate)}`]);
+      wsData.push(departmentHeaders);
+
+      departmentHeaders.forEach((header, index) => {
+        columnWidths[index] = Math.max(columnWidths[index] || 0, header.length);
+      });
+
+      const sortedEmployees = departmentEmployees.sort((a, b) => {
+        const lastNameCompare = a.lastname.localeCompare(b.lastname);
+        return lastNameCompare !== 0 ? lastNameCompare : a.firstname.localeCompare(b.firstname);
+      });
+
+      // Initialize totals - all numeric columns start at 0
+      const totals = Array(headers.length).fill(0);
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+      sortedEmployees.forEach(emp => {
+        const row = [
+          emp.department,
+          emp.lastname,
+          emp.firstname,
+          emp.payrollType.toUpperCase(),
+          emp.dailyrate,
+          Number(emp.minutesworked) || 0,    
+          emp.basicpay,
+          emp.totalallow,
+          emp.totalot,
+          emp.cola,
+          emp.otherincome,
+          emp.gross,
+          emp.lates,
+          emp.absent, 
+          emp.incometax, 
+          emp.ssscontri, 
+          emp.pagibigcontri, 
+          emp.sssloan, 
+          emp.pagibigloan, 
+          emp.carloan,
+          emp.mlfund, 
+          emp.hmo, 
+          emp.mlcellphone,
+          emp.philhealth, 
+          emp.mlaccount, 
+          emp.atd, 
+          emp.odetteloan, 
+          emp.deductionamount1, 
+          emp.deductionamount2, 
+          emp.mllending,
+          emp.payables,
+          Number(emp.totaldeduction) || 0, 
+          emp.totalnet,
+        ];
+
+        // Update totals - all numeric columns will show 0 even if no values
+        numericColumns.forEach(col => {
+          const value = parseFloat(row[col]) || 0;
+          totals[col] += value;
+          row[col] = value === 0 ? 0 : row[col]; // Ensure 0 values are explicit
+        });
+
+        wsData.push(row);
+        row.forEach((cell, index) => {
+          columnWidths[index] = Math.max(columnWidths[index] || 0, String(cell).length);
+        });
+      });
+
+      // Add summary row with all totals (including zeros)
+      const summaryRow = new Array(headers.length).fill('');
+      summaryRow[0] = `TOTAL EMPLOYEES: ${employeeCount}`;
+      
+      numericColumns.forEach(col => {
+        summaryRow[col] = totals[col]; // Will show 0 for zero totals
+      });
+
+      wsData.push(summaryRow);
+      wsData.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = columnWidths.map(width => ({ wch: Math.min(Math.max(width + 2, 10), 50) }));
+
+    // Apply only number formatting (no styling)
+    Object.keys(ws).forEach(cellAddress => {
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+      if (numericColumns.includes(colIndex)) {
+        cell.z = '#,##0.00';
+      }
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  //const date = Date(payrollDate).toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `${results.officeSelect.value}_Payroll_Report_${numberDate(payrollDate)}.xlsx`);
+}
+
+// GENERATING COMPLETE PAYROLL REPORT FOR ML GROUP //
+
+async function generateExcelReport(results) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+  
+  // Define headers
+  const headers = [
+    'AREA/DEPARTMENT',
+    'LAST NAME',
+    'FIRST NAME',
+    'PAYROLL TYPE',
+    'DAILY RATE',
+    'NO. DAYS',
+    'BASIC PAY',
+    'ALLOWANCES',
+    'OVERTIME',
+    'COLA',
+    'OTHER INCOME',
+    'GROSS PAY',
+    'LATES',
+    'LEAVE W/O PAY', 
+    'INCOME TAX', 
+    'SSS CONTRIBUTION', 
+    'PAGIBIG CONTRIBUTION', 
+    'SSS LOAN', 
+    'PAGIBIG LOAN', 
+    'ML FUND', 
+    'OPEC', 
+    'OVER APPRAISAL',
+    'COOP RECLA', 
+    'PHILHEALTH', 
+    'INSTALL ACCOUNT', 
+    'OPEC TICKET', 
+    'TELECOMS', 
+    'OPEC SUPPORT', 
+    'MORTUARY', 
+    'FAKE', 
+    'OTHER DEDUCTIONS', 
+    'SAKO',
+    'MOTOR LOAN', 
+    'HMO',
+    '', // deductionDesc1
+    '', // deductionDesc2
+    'TOTAL DEDUCTION', 
+    'TOTAL NET',
+  ];
+let payrollDate = '';
+  results.forEach(employee => {
+    if (!groupedData[employee.region]) {
+      groupedData[employee.region] = {};
+    }
+    if (!groupedData[employee.region][employee.department]) {
+      groupedData[employee.region][employee.department] = [];
+    }
+    groupedData[employee.region][employee.department].push(employee);
+  });
+
+  const sortedRegions = Object.keys(groupedData).sort();
+
+  sortedRegions.forEach(region => {
+    const regionData = groupedData[region];
+    const sortedDepartments = Object.keys(regionData).sort();
+    const wsData = [];
+    let columnWidths = [];
+
+    wsData.push(['M. Lhuillier Financial Services Inc - Complete Payroll Report']);
+    wsData.push([]);
+
+    sortedDepartments.forEach(department => {
+      
+      const departmentEmployees = regionData[department];
+      const employeeCount = departmentEmployees.length;
+      const firstEmployee = departmentEmployees[0];
+      
+      const departmentHeaders = [...headers];
+      departmentHeaders[34] = firstEmployee.deductionDesc1 || '';
+      departmentHeaders[35] = firstEmployee.deductionDesc2 || '';
+      payrollDate = `${firstEmployee.endDate}`;
+      wsData.push([`${region} - ${department}`]);
+      wsData.push([`Payroll Period - ${formatDate(firstEmployee.startDate)} to ${formatDate(firstEmployee.endDate)}`]);
+      wsData.push(departmentHeaders);
+
+      departmentHeaders.forEach((header, index) => {
+        columnWidths[index] = Math.max(columnWidths[index] || 0, header.length);
+      });
+
+      const sortedEmployees = departmentEmployees.sort((a, b) => {
+        const lastNameCompare = a.lastname.localeCompare(b.lastname);
+        return lastNameCompare !== 0 ? lastNameCompare : a.firstname.localeCompare(b.firstname);
+      });
+
+      // Initialize totals - all numeric columns start at 0
+      const totals = Array(headers.length).fill(0);
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37];
+      sortedEmployees.forEach(emp => {
+        const row = [
+          emp.department,
+          emp.lastname,
+          emp.firstname,
+          emp.payrollType.toUpperCase(),
+          emp.dailyrate,
+          Number(emp.minutesworked) || 0,    
+          emp.basicpay,
+          emp.totalallow,
+          emp.totalot,
+          emp.cola,
+          emp.otherincome,
+          emp.gross,
+          emp.lates,
+          emp.absent, 
+          emp.incometax, 
+          emp.ssscontri, 
+          emp.pagibigcontri, 
+          emp.sssloan, 
+          emp.pagibigloan, 
+          emp.mlfund, 
+          emp.opec, 
+          emp.overappraisal,
+          emp.cooprecla, 
+          emp.philhealth, 
+          emp.installaccount, 
+          emp.ticket, 
+          emp.mobilebill, 
+          emp.canteen, 
+          emp.sakoprovi, 
+          emp.sakocommodity, 
+          emp.sakoprime, 
+          emp.sakoemergency,
+          emp.sakopettycash, 
+          emp.deductionamount1, 
+          emp.deductionamount2, 
+          emp.hmo,
+          Number(emp.totaldeduction) || 0, 
+          emp.totalnet,
+        ];
+
+        // Update totals - all numeric columns will show 0 even if no values
+        numericColumns.forEach(col => {
+          const value = parseFloat(row[col]) || 0;
+          totals[col] += value;
+          row[col] = value === 0 ? 0 : row[col]; // Ensure 0 values are explicit
+        });
+
+        wsData.push(row);
+        row.forEach((cell, index) => {
+          columnWidths[index] = Math.max(columnWidths[index] || 0, String(cell).length);
+        });
+      });
+
+      // Add summary row with all totals (including zeros)
+      const summaryRow = new Array(headers.length).fill('');
+      summaryRow[0] = `TOTAL EMPLOYEES: ${employeeCount}`;
+      
+      numericColumns.forEach(col => {
+        summaryRow[col] = totals[col]; // Will show 0 for zero totals
+      });
+
+      wsData.push(summaryRow);
+      wsData.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = columnWidths.map(width => ({ wch: Math.min(Math.max(width + 2, 10), 50) }));
+
+    // Apply only number formatting (no styling)
+    Object.keys(ws).forEach(cellAddress => {
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37];
+      if (numericColumns.includes(colIndex)) {
+        cell.z = '#,##0.00';
+      }
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  //const date = Date(payrollDate).toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `${results.officeSelect.value}_Payroll_Report_${numberDate(payrollDate)}.xlsx`);
+}
+
+
+// Format a number to display with commas
+  const formatNumber = (num) => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(num);
+  };
+
+// Helper function to format dates
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Intl.DateTimeFormat('en-US', options).format(date);
+}
+
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+function populateReportTable(data) {
+  const tableBody = document.querySelector('#report-table tbody');
+  tableBody.innerHTML = ''; // Clear existing rows
+  
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.employeeid}</td>
+      <td>${row.name}</td>
+      <td>${row.office}</td>
+      <td>${row.region}</td>
+      <td>${formatCurrency(row.gross_pay)}</td>
+      <td>${formatCurrency(row.deductions)}</td>
+      <td>${formatCurrency(row.net_pay)}</td>
+    `;
+    tableBody.appendChild(tr);
+  });
+}
+
+function formatCurrency(amount) {
+  return amount ? parseFloat(amount).toLocaleString('en-PH', {
+    style: 'currency',
+    currency: 'PHP'
+  }) : '₱0.00';
+}
+
+function showError(message) {
+  const errorDiv = document.getElementById('error-message');
+  errorDiv.textContent = message;
+  errorDiv.style.display = 'block';
+}
+
+// Add this inside your existing <script> tags in payroll-utilities.hbs
+
+// Office selection change handler
+document.getElementById('officeSelect').addEventListener('change', async function() {
+  
+  const office = this.value;
+  
+  const regionSelect = document.getElementById('regionSelect');
+  
+  if (!office) {
+    // Clear regions if no office selected
+    regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+    return;
+  }
+
+  try {
+    // Show loading state
+    regionSelect.disabled = true;
+    regionSelect.innerHTML = '<option value="">Loading regions...</option>';
+
+    const response = await fetch(`/payroll/reports/regions?office=${encodeURIComponent(office)}`);
+    const data = await response.json();
+
+    if (data.success) {
+      // Populate regions dropdown
+      regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+      data.regions.forEach(region => {
+        const option = document.createElement('option');
+        option.value = region.region_name;
+        option.textContent = region.region_name;
+        regionSelect.appendChild(option);
+      });
+    } else {
+      showError(data.message || 'Failed to load regions');
+      regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+    }
+  } catch (error) {
+    console.error('Error loading regions:', error);
+    showError('Failed to load regions');
+    regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+  } finally {
+    regionSelect.disabled = false;
+  }
+});
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const reportTypeSelect = document.getElementById('reportType');
+    const incomeTypeSelect = document.getElementById('incomeType');
+    const deductionTypeSelect = document.getElementById('deductionType');
+
+console.log(deductionTypeSelect.value, "testing")
+console.log(incomeTypeSelect.value, "testing1")
+    // Hide income and deduction type by default
+    incomeTypeSelect.closest('.col-md-4').classList.add('hidden');
+    deductionTypeSelect.closest('.col-md-4').classList.add('hidden');
+
+    // Disable them initially as well
+    incomeTypeSelect.disabled = true;
+    deductionTypeSelect.disabled = true;
+
+    reportTypeSelect.addEventListener('change', function () {
+      const reportType = reportTypeSelect.value.toLowerCase();
+      console.log(reportType)
+
+      // Show incomeType if "income" is selected
+      if (reportType === 'income') {
+        console.log('income1')
+        incomeTypeSelect.disabled = false;
+        incomeTypeSelect.closest('.col-md-4').classList.remove('hidden');
+        
+        // Hide deductionType if income is selected
+        deductionTypeSelect.disabled = true;
+        deductionTypeSelect.closest('.col-md-4').classList.add('hidden');
+        deductionTypeSelect.value = ''; // Reset Deduction
+      }
+      // Show deductionType if "deduction" is selected
+      else if (reportType === 'deduction') {
+        console.log('deduction1')
+        deductionTypeSelect.disabled = false;
+        deductionTypeSelect.closest('.col-md-4').classList.remove('hidden');
+        
+        // Hide incomeType if deduction is selected
+        incomeTypeSelect.disabled = true;
+        incomeTypeSelect.closest('.col-md-4').classList.add('hidden');
+        incomeTypeSelect.value = ''; // Reset Income
+      } else {
+        console.log('else1')
+        // If no "Income" or "Deduction" selected, hide both
+        incomeTypeSelect.disabled = true;
+        incomeTypeSelect.closest('.col-md-4').classList.add('hidden');
+        incomeTypeSelect.value = '';
+
+        deductionTypeSelect.disabled = true;
+        deductionTypeSelect.closest('.col-md-4').classList.add('hidden');
+        deductionTypeSelect.value = '';
+      }
+    });
+  });
+
+
+
+    </script>
+  </body>
+</html>

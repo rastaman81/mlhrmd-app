@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    .nla-section {
+      border: 1px solid #E3E6EB;
+      border-radius: .65rem;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16,24,40,.04);
+      margin-bottom: 1.25rem;
+    }
+    .nla-section-header {
+      border-bottom: 1px solid #E3E6EB;
+      padding: .85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      border-radius: .65rem .65rem 0 0;
+    }
+    .nla-section-header i    { color: #2E6F9E; }
+    .nla-section-header strong { color: #0F2233; font-weight: 600; font-size: .97rem; }
+    .nla-section-body { padding: 1.15rem; }
+
+    .form-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #16304A;
+      margin-bottom: .35rem;
+    }
+    .form-control, .form-select {
+      border-color: #E3E6EB;
+      font-size: .9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12);
+    }
+    .form-control[readonly] {
+      background: #F6F7F9;
+      color: #6B7686;
+      cursor: not-allowed;
+    }
+
+    /* Sub-unit table */
+    #subUnitTable thead th {
+      background: #16304A;
+      color: #fff;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #1e3e5e;
+      padding: .7rem 1rem;
+    }
+    #subUnitTable tbody td {
+      font-size: .88rem;
+      color: #0F2233;
+      padding: .6rem 1rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+    #subUnitTable tbody tr:nth-child(odd) td  { background: #F6F7F9; }
+    #subUnitTable tbody tr:nth-child(even) td { background: #fff; }
+
+    /* Employee search modal table */
+    #employeeSearchResults tr td {
+      font-size: .85rem;
+      padding: .6rem .85rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+    #employeeModal .modal-content  { border-radius: .65rem; border: none; }
+    #employeeModal .modal-header   { border-bottom: 1px solid #E3E6EB; }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-sitemap" style="color:#2E6F9E;"></i>
+            {{#if isEdit}}Edit Region{{else}}Add Region{{/if}}
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">
+            {{#if isEdit}}Update region details, areas, and assigned managers.{{else}}Create a new organizational region or group.{{/if}}
+          </p>
+        </div>
+        <a href="/records/regions" class="btn btn-outline-secondary" style="font-size:.88rem;">
+          <i class="fas fa-arrow-left me-1"></i> Back
+        </a>
+      </div>
+
+      <!-- Alert -->
+      <div id="formMessage" class="alert d-none mb-3" style="border-radius:.55rem; font-size:.9rem; border:none; border-left:4px solid transparent;"></div>
+
+      <form id="regionForm">
+
+        <!-- Region Details -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-map-marker-alt"></i>
+            <strong>Region Details</strong>
+          </div>
+          <div class="nla-section-body">
+            <div class="row g-3">
+
+              <div class="col-md-3">
+                <label class="form-label">Office <span style="color:#C1483D;">*</span></label>
+                <select class="form-select" id="office" name="office" required>
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">{{this.office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Type <span style="color:#C1483D;">*</span></label>
+                <select class="form-select" id="regionType" name="regionType" required>
+                  <option value="" disabled selected>Select Type</option>
+                  <option value="operations">Operations</option>
+                  <option value="support">Support</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Region / Group Name <span style="color:#C1483D;">*</span></label>
+                <input type="text" class="form-control" id="regionName" name="regionName" placeholder="Enter region or support group name" required>
+              </div>
+
+              <div class="col-md-5">
+                <label class="form-label">Region / Division Head <span style="color:#C1483D;">*</span></label>
+                <input type="text" class="form-control" id="regionManagerName" placeholder="No employee selected" readonly required>
+                <input type="hidden" id="regionManagerId" name="regionManagerId">
+              </div>
+
+              <div class="col-md-5">
+                <label class="form-label">Head Designation</label>
+                <input type="text" class="form-control" id="regionManagerDesignation" placeholder="Auto-filled after employee selection" readonly>
+              </div>
+
+              <div class="col-md-2 d-flex align-items-end">
+                <button
+                  type="button"
+                  class="btn w-100"
+                  id="assignRegionHeadBtn"
+                  data-bs-toggle="modal"
+                  data-bs-target="#employeeSearchModal"
+                  style="background:#2E6F9E; border-color:#2E6F9E; color:#fff; font-weight:500; font-size:.9rem;"
+                >
+                  <i class="fas fa-search me-1"></i> Search Head
+                </button>
+              </div>
+
+              {{#if isEdit}}
+              <div class="col-md-4">
+                <label class="form-label d-block">Region Status</label>
+                <div class="form-check form-switch mt-1">
+                  <input class="form-check-input" type="checkbox" id="regionStatus" name="regionStatus" checked>
+                  <label class="form-check-label" for="regionStatus" id="regionStatusLabel" style="font-weight:600; color:#0F2233;">Active</label>
+                </div>
+                <small style="font-size:.78rem; color:#6B7686;">Inactive regions will no longer be used in active transactions.</small>
+              </div>
+              {{/if}}
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub Units -->
+        <div class="nla-section">
+          <div class="nla-section-header" style="justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:.55rem;">
+              <i class="fas fa-layer-group" style="color:#2E6F9E;"></i>
+              <div>
+                <strong id="subUnitTitle">Areas</strong>
+                <span id="subUnitDescription" style="font-size:.78rem; color:#6B7686; margin-left:.5rem;">Add operational areas and assign area managers.</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm" id="addSubUnitBtn"
+              style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-size:.82rem; font-weight:500;">
+              <i class="fas fa-plus me-1"></i> <span id="addSubUnitLabel">Add Area</span>
+            </button>
+          </div>
+
+          <div style="padding:0;">
+            <div class="table-responsive">
+              <table class="table mb-0" id="subUnitTable">
+                <thead>
+                  <tr>
+                    <th style="width:35%;">Name</th>
+                    <th style="width:35%;">Head / Manager</th>
+                    <th style="width:20%;">Designation</th>
+                    <th style="width:10%; text-align:center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="subUnitTableBody">
+                  <tr id="emptySubUnitRow">
+                    <td colspan="4" style="text-align:center; color:#6B7686; padding:2rem; font-size:.9rem;">
+                      No areas / departments added yet.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Action Bar -->
+        <div style="position:sticky; bottom:0; background:rgba(255,255,255,.97); border:1px solid #E3E6EB; border-radius:.65rem; padding:1rem 1.15rem; box-shadow:0 -4px 16px rgba(16,24,40,.06); display:flex; align-items:center; justify-content:flex-end; gap:.75rem; margin-top:.5rem;">
+          <button type="reset" id="resetRegionBtn" class="btn btn-outline-secondary" style="font-size:.9rem;">
+            <i class="fas fa-redo me-1"></i> Reset
+          </button>
+          <button type="submit" class="btn" style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-weight:500; font-size:.9rem; padding:.55rem 1.5rem;">
+            <i class="fas fa-save me-1"></i>
+            {{#if isEdit}}Update Region{{else}}Save Region{{/if}}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Employee Search Modal -->
+<div class="modal fade" id="employeeSearchModal" tabindex="-1" aria-hidden="true" aria-labelledby="employeeModalLabel">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content" id="employeeModal">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="employeeModalLabel">
+          <i class="fas fa-user-tie me-2" style="color:#2E6F9E;"></i> Search Employee
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="employeeSearchInput"
+              placeholder="Search by employee ID, name, designation" style="border-color:#E3E6EB;">
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn w-100" id="searchEmployeeBtn"
+              style="background:#2E6F9E; border-color:#2E6F9E; color:#fff; font-weight:500; font-size:.9rem;">
+              <i class="fas fa-search me-1"></i> Search
+            </button>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-outline-secondary w-100" id="clearSearchBtn" style="font-size:.9rem;">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem;">Employee ID</th>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem;">Employee Name</th>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem;">Designation</th>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem;">Branch</th>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem;">Area</th>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem;">Region</th>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem;">Status</th>
+                <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.75rem 1rem; text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="employeeSearchResults">
+              <tr>
+                <td colspan="8" style="text-align:center; color:#6B7686; padding:2rem; font-size:.9rem;">
+                  <i class="fas fa-magnifying-glass" style="color:#E3E6EB; font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                  Search for an employee.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="border-top:1px solid #E3E6EB;">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="font-size:.9rem;">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const isEdit             = {{#if isEdit}}true{{else}}false{{/if}};
+  const editRegionId       = "{{regionData.regionid}}";
+  const existingRegionData = {{{json regionData}}};
+  const existingSubUnits   = {{{json subUnitsData}}} || [];
+  console.log(existingSubUnits);
+
+  const regionForm            = document.getElementById("regionForm");
+  const regionType            = document.getElementById("regionType");
+  const subUnitTitle          = document.getElementById("subUnitTitle");
+  const subUnitDescription    = document.getElementById("subUnitDescription");
+  const addSubUnitBtn         = document.getElementById("addSubUnitBtn");
+  const addSubUnitLabel       = document.getElementById("addSubUnitLabel");
+  const subUnitTableBody      = document.getElementById("subUnitTableBody");
+  const formMessage           = document.getElementById("formMessage");
+  const employeeSearchInput   = document.getElementById("employeeSearchInput");
+  const searchEmployeeBtn     = document.getElementById("searchEmployeeBtn");
+  const clearSearchBtn        = document.getElementById("clearSearchBtn");
+  const employeeSearchResults = document.getElementById("employeeSearchResults");
+
+  let subUnits            = [];
+  let currentAssignTarget = null;
+
+  // ── ALERTS ────────────────────────────────────────────────────────────────
+  function showMessage(type, message) {
+    const colorMap = {
+      success: { bg: 'rgba(31,122,108,.08)',  border: '#1F7A6C', text: '#1F7A6C' },
+      danger:  { bg: 'rgba(193,72,61,.08)',   border: '#C1483D', text: '#C1483D' },
+      warning: { bg: 'rgba(168,118,42,.08)',  border: '#A8762A', text: '#A8762A' },
+    };
+    const c = colorMap[type] || colorMap.danger;
+    formMessage.style.background  = c.bg;
+    formMessage.style.borderColor = c.border;
+    formMessage.style.color       = c.text;
+    formMessage.innerHTML         = message;
+    formMessage.classList.remove("d-none");
+  }
+
+  function clearMessage() {
+    formMessage.className   = "alert d-none";
+    formMessage.textContent = "";
+  }
+
+  // ── TYPE CHANGE ───────────────────────────────────────────────────────────
+  regionType.addEventListener("change", function () {
+    subUnits = [];
+    renderSubUnits();
+    if (this.value === "operations") {
+      subUnitTitle.textContent       = "Areas";
+      subUnitDescription.textContent = "Add operational areas and assign area managers.";
+      addSubUnitLabel.textContent    = "Add Area";
+    } else {
+      subUnitTitle.textContent       = "Departments";
+      subUnitDescription.textContent = "Add departments and assign department heads.";
+      addSubUnitLabel.textContent    = "Add Department";
+    }
+  });
+
+  // ── ADD SUB UNIT ──────────────────────────────────────────────────────────
+  addSubUnitBtn.addEventListener("click", function () {
+    const type = document.getElementById("regionType").value;
+    if (!type) { showMessage("danger", "Please select region type first."); return; }
+    subUnits.push({
+      id:          "",
+      name:        type === "operations" ? `Area ${String.fromCharCode(65 + subUnits.length)}` : "",
+      managerId:   "",
+      managerName: "",
+      designation: "",
+      locked:      type === "operations",
+    });
+    renderSubUnits();
+  });
+
+  // ── RENDER SUB UNITS ──────────────────────────────────────────────────────
+  function renderSubUnits() {
+    if (subUnits.length === 0) {
+      subUnitTableBody.innerHTML = `
+        <tr id="emptySubUnitRow">
+          <td colspan="4" style="text-align:center; color:#6B7686; padding:2rem; font-size:.9rem;">
+            No areas / departments added yet.
+          </td>
+        </tr>`;
+      return;
+    }
+
+    subUnitTableBody.innerHTML = "";
+
+    subUnits.forEach((unit, index) => {
+      const type        = document.getElementById("regionType").value;
+      let displayName   = unit.name || "";
+
+      if (type === "operations" && !isEdit && !displayName) {
+        displayName  = `Area ${String.fromCharCode(65 + index)}`;
+        unit.name    = displayName;
+        unit.locked  = true;
+      }
+      if (type === "operations") unit.locked = true;
+
+      subUnitTableBody.innerHTML += `
+        <tr>
+          <td>
+            <input type="text" class="form-control form-control-sm"
+              value="${displayName}"
+              ${unit.locked ? "readonly" : ""}
+              onchange="updateSubUnitName(${index}, this.value)"
+              style="border-color:#E3E6EB; ${unit.locked ? 'background:#F6F7F9; color:#6B7686;' : ''}">
+          </td>
+          <td>
+            <input type="text" class="form-control form-control-sm"
+              value="${unit.managerName || ''}"
+              placeholder="No employee assigned"
+              readonly style="background:#F6F7F9; color:#6B7686; border-color:#E3E6EB;">
+          </td>
+          <td>
+            <input type="text" class="form-control form-control-sm"
+              value="${unit.designation || ''}"
+              readonly style="background:#F6F7F9; color:#6B7686; border-color:#E3E6EB;">
+          </td>
+          <td style="text-align:center;">
+            <button type="button" class="btn btn-sm me-1"
+              onclick="assignSubUnitManager(${index})"
+              style="background:transparent; border:1px solid #2E6F9E; color:#2E6F9E; font-size:.75rem;">
+              <i class="fas fa-user-plus"></i>
+            </button>
+            <button type="button" class="btn btn-sm"
+              onclick="removeSubUnit(${index})"
+              style="background:transparent; border:1px solid #C1483D; color:#C1483D; font-size:.75rem;">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function updateSubUnitName(index, value) {
+    if (subUnits[index].locked) return;
+    subUnits[index].name = value;
+  }
+
+  function removeSubUnit(index) {
+    subUnits.splice(index, 1);
+    renderSubUnits();
+  }
+
+  // ── ASSIGN REGION HEAD ────────────────────────────────────────────────────
+  document.getElementById("assignRegionHeadBtn").addEventListener("click", function () {
+    currentAssignTarget = "region";
+  });
+
+  function assignSubUnitManager(index) {
+    currentAssignTarget = index;
+    new bootstrap.Modal(document.getElementById("employeeSearchModal")).show();
+  }
+
+  function assignEmployee(employeeId, employeeName, designation) {
+    if (currentAssignTarget === "region") {
+      document.getElementById("regionManagerId").value          = employeeId;
+      document.getElementById("regionManagerName").value        = employeeName;
+      document.getElementById("regionManagerDesignation").value = designation;
+    } else {
+      subUnits[currentAssignTarget].managerId   = employeeId;
+      subUnits[currentAssignTarget].managerName = employeeName;
+      subUnits[currentAssignTarget].designation = designation;
+      renderSubUnits();
+    }
+    bootstrap.Modal.getInstance(document.getElementById("employeeSearchModal")).hide();
+  }
+
+  // ── EMPLOYEE SEARCH ───────────────────────────────────────────────────────
+  clearSearchBtn.addEventListener("click", function () {
+    employeeSearchInput.value   = "";
+    employeeSearchResults.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center; color:#6B7686; padding:2rem; font-size:.9rem;">
+          <i class="fas fa-magnifying-glass" style="color:#E3E6EB; font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+          Search for an employee.
+        </td>
+      </tr>`;
+  });
+
+  searchEmployeeBtn.addEventListener("click", async function () {
+    const keyword = employeeSearchInput.value.trim();
+    if (!keyword) {
+      employeeSearchResults.innerHTML = `
+        <tr><td colspan="8" style="text-align:center; color:#C1483D; padding:1.5rem; font-size:.9rem;">
+          Please enter a search keyword.
+        </td></tr>`;
+      return;
+    }
+
+    employeeSearchResults.innerHTML = `
+      <tr><td colspan="8" style="text-align:center; color:#6B7686; padding:2rem; font-size:.9rem;">
+        <div class="spinner-border spinner-border-sm me-2" role="status" style="color:#2E6F9E;"></div> Searching...
+      </td></tr>`;
+
+    try {
+      const office = document.getElementById("office").value;
+      const type   = document.getElementById("regionType").value;
+      if (!office) { showMessage("danger", "Please select an office first."); return; }
+
+      const res    = await fetch(`/records/regions/search-manager?keyword=${encodeURIComponent(keyword)}&office=${encodeURIComponent(office)}&type=${encodeURIComponent(type)}`);
+      const result = await res.json();
+
+      if (!result.success || !Array.isArray(result.data) || result.data.length === 0) {
+        employeeSearchResults.innerHTML = `
+          <tr><td colspan="8" style="text-align:center; color:#6B7686; padding:2rem; font-size:.9rem;">
+            <i class="fas fa-magnifying-glass" style="color:#E3E6EB; font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+            No active employees found.
+          </td></tr>`;
+        return;
+      }
+
+      employeeSearchResults.innerHTML = result.data.map(emp => `
+        <tr>
+          <td>${emp.employee_id ?? ""}</td>
+          <td style="font-weight:600;">${emp.employee_name ?? ""}</td>
+          <td>${emp.designation ?? ""}</td>
+          <td>${emp.branch ?? ""}</td>
+          <td>${emp.area ?? ""}</td>
+          <td>${emp.region ?? ""}</td>
+          <td>
+            <span style="background:rgba(31,122,108,.1); color:#1F7A6C; font-size:.75rem; font-weight:600; padding:.2rem .6rem; border-radius:1rem; display:inline-block;">
+              ${emp.status ?? "Active"}
+            </span>
+          </td>
+          <td style="text-align:center;">
+            <button type="button" class="btn btn-sm"
+              onclick="assignEmployee('${emp.employee_id}','${(emp.employee_name || '').replace(/'/g,"\\'")}','${(emp.designation || '').replace(/'/g,"\\'")}')"
+              style="background:#2E6F9E; border-color:#2E6F9E; color:#fff; font-size:.78rem; font-weight:500;">
+              <i class="fas fa-check me-1"></i> Assign
+            </button>
+          </td>
+        </tr>`).join("");
+
+    } catch (err) {
+      console.error(err);
+      employeeSearchResults.innerHTML = `
+        <tr><td colspan="8" style="text-align:center; color:#C1483D; padding:1.5rem; font-size:.9rem;">
+          Failed to search employees.
+        </td></tr>`;
+    }
+  });
+
+  employeeSearchInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); searchEmployeeBtn.click(); }
+  });
+
+  // ── RESET ─────────────────────────────────────────────────────────────────
+  document.getElementById("resetRegionBtn").addEventListener("click", function () {
+    subUnits = [];
+    renderSubUnits();
+    clearMessage();
+    document.getElementById("regionManagerId").value          = "";
+    document.getElementById("regionManagerName").value        = "";
+    document.getElementById("regionManagerDesignation").value = "";
+  });
+
+  // ── SUBMIT ────────────────────────────────────────────────────────────────
+  regionForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    clearMessage();
+
+    const payload = {
+      office:            document.getElementById("office").value,
+      type:              document.getElementById("regionType").value,
+      regionName:        document.getElementById("regionName").value,
+      regionManagerId:   document.getElementById("regionManagerId").value,
+      regionManagerName: document.getElementById("regionManagerName").value,
+      status: isEdit
+        ? (document.getElementById("regionStatus").checked ? 1 : 0)
+        : 1,
+      subUnits,
+    };
+
+    if (!payload.regionName)      { showMessage("danger", "Region/group name is required."); return; }
+    if (!payload.regionManagerId) { showMessage("danger", "Please assign a region/division head."); return; }
+
+    try {
+      const url    = isEdit ? `/records/regions/update/${editRegionId}` : "/records/regions/save";
+      const method = isEdit ? "PUT" : "POST";
+      const res    = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        showMessage("success", result.message || "Region saved successfully.");
+        regionForm.reset();
+        subUnits = [];
+        renderSubUnits();
+      } else {
+        if (result.code === "AREA_HAS_EMPLOYEES") {
+          let html = `<strong>${result.message}</strong><hr>`;
+          result.areasWithAssignedEmployees.forEach(area => {
+            html += `<div class="mb-2"><strong>${area.areaName}</strong>
+              <span style="background:rgba(193,72,61,.1);color:#C1483D;font-size:.75rem;font-weight:600;padding:.2rem .55rem;border-radius:1rem;display:inline-block;margin-left:.35rem;">
+                ${area.employeeCount} employee(s)
+              </span>
+              <ul class="mb-0 mt-1">`;
+            area.employees.forEach(emp => {
+              html += `<li>${emp.employeeid} - ${emp.employeeName}${emp.designation ? ` (${emp.designation})` : ""}</li>`;
+            });
+            html += `</ul></div>`;
+          });
+          showMessage("danger", html);
+          return;
+        }
+        showMessage("danger", result.message || "Failed to save region.");
+      }
+    } catch (err) {
+      console.error(err);
+      showMessage("danger", "Unexpected error occurred while saving.");
+    }
+  });
+
+  // ── INIT (EDIT MODE) ──────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    const regionStatus      = document.getElementById("regionStatus");
+    const regionStatusLabel = document.getElementById("regionStatusLabel");
+
+    if (regionStatus) {
+      regionStatus.checked        = Number(existingRegionData.status ?? 1) === 1;
+      regionStatusLabel.textContent = regionStatus.checked ? "Active" : "Inactive";
+      regionStatus.addEventListener("change", function () {
+        regionStatusLabel.textContent = this.checked ? "Active" : "Inactive";
+      });
+    }
+
+    if (!isEdit) return;
+
+    const officeDropdown = document.getElementById("office");
+    if (officeDropdown && existingRegionData.office) {
+      officeDropdown.value = existingRegionData.office;
+      officeDropdown.setAttribute("disabled", true);
+    }
+
+    document.getElementById("office").value                   = existingRegionData.office        || "";
+    document.getElementById("regionType").value               = existingRegionData.region_type   || "";
+    document.getElementById("regionName").value               = existingRegionData.regionname    || "";
+    document.getElementById("regionManagerId").value          = existingRegionData.manager_id    || "";
+    document.getElementById("regionManagerName").value        = existingRegionData.region_manager || "";
+    document.getElementById("regionManagerDesignation").value = existingRegionData.designation   || "";
+
+    console.log("existingSubUnits", existingSubUnits);
+
+    subUnits = Array.isArray(existingSubUnits)
+      ? existingSubUnits.map(unit => ({
+          id:          unit.id          || "",
+          name:        unit.name        || "",
+          managerId:   unit.managerId   || "",
+          managerName: unit.managerName || "",
+          designation: unit.designation || "",
+          locked:      existingRegionData.region_type === "operations",
+        }))
+      : [];
+
+    console.log("subUnits after mapping", subUnits);
+    renderSubUnits();
+  });
+</script>
+
+</body>
+</html>

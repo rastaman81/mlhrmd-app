@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #F6F7F9; }
+
+    .bm-card {
+      border: 1px solid #E3E6EB;
+      border-radius: .65rem;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16,24,40,.04);
+      margin-bottom: 1.25rem;
+    }
+    .bm-card-header {
+      border-bottom: 1px solid #E3E6EB;
+      padding: .85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: .65rem .65rem 0 0;
+    }
+    .bm-card-header-left {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+    }
+    .bm-card-header i    { color: #2E6F9E; }
+    .bm-card-header strong { color: #0F2233; font-weight: 600; font-size: .97rem; }
+    .bm-card-body { padding: 1.15rem; }
+
+    .form-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #16304A;
+      margin-bottom: .35rem;
+    }
+    .form-control, .form-select {
+      border-color: #E3E6EB;
+      font-size: .9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12);
+    }
+    .form-control[readonly], .form-control:disabled {
+      background: #F6F7F9;
+      color: #6B7686;
+    }
+
+    /* Branch table */
+    #branchTable thead th {
+      background: #16304A;
+      color: #fff;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #1e3e5e;
+      padding: .7rem 1rem;
+      white-space: nowrap;
+    }
+    #branchTable tbody td {
+      font-size: .88rem;
+      color: #0F2233;
+      padding: .55rem 1rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+    #branchTable tbody tr:nth-child(odd)  td { background: #F6F7F9; }
+    #branchTable tbody tr:nth-child(even) td { background: #fff; }
+
+    /* Inline editing */
+    #branchTable tbody tr.is-editing td {
+      background: #EEF5FB !important;
+    }
+    #branchTable tbody tr.is-editing td:first-child {
+      border-left: 3px solid #2E6F9E;
+    }
+
+    #branchTable tbody tr.is-new td {
+      background: #EEF9F3 !important;
+    }
+    #branchTable tbody tr.is-new td:first-child {
+      border-left: 3px solid #1F7A6C;
+    }
+
+    #branchTable.has-active-row tbody tr:not(.is-editing):not(.is-new) td {
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .inline-input {
+      border: 1px solid #CBD2DA;
+      border-radius: .4rem;
+      padding: .3rem .55rem;
+      font-size: .87rem;
+      width: 100%;
+      background: #fff;
+      color: #0F2233;
+    }
+    .inline-input:focus {
+      outline: none;
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .15rem rgba(46,111,158,.15);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .25rem .65rem;
+      border-radius: 1rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all .18s ease;
+      border: 1px solid transparent;
+    }
+    .status-badge.active   { background: rgba(31,122,108,.1);  color: #1F7A6C; border-color: rgba(31,122,108,.25); }
+    .status-badge.inactive { background: rgba(193,72,61,.08);  color: #C1483D; border-color: rgba(193,72,61,.2); }
+    .status-badge:hover    { filter: brightness(.92); }
+
+    .btn-icon {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: .4rem;
+      width: 2rem;
+      height: 2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .82rem;
+      cursor: pointer;
+      transition: all .15s ease;
+      margin: 0 2px;
+    }
+    .btn-icon.edit     { color: #2E6F9E; border-color: #2E6F9E; }
+    .btn-icon.transfer { color: #A8762A; border-color: #A8762A; }
+    .btn-icon.save     { color: #1F7A6C; border-color: #1F7A6C; }
+    .btn-icon.cancel   { color: #6B7686; border-color: #CBD2DA; }
+    .btn-icon.delete   { color: #C1483D; border-color: #C1483D; }
+    .btn-icon:hover    { filter: brightness(.88); }
+
+    .table-state-row td {
+      text-align: center;
+      padding: 3rem 1rem !important;
+      color: #6B7686;
+      font-size: .9rem;
+      background: #fff !important;
+    }
+
+    /* Transfer modal */
+    #transferModal .modal-content { border-radius: .65rem; border: none; }
+    #transferModal .modal-header  { border-bottom: 1px solid #E3E6EB; }
+    #transferModal .modal-footer  { border-top: 1px solid #E3E6EB; }
+
+    .transfer-from {
+      background: #F6F7F9;
+      border: 1px solid #E3E6EB;
+      border-radius: .5rem;
+      padding: .75rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .transfer-from label { font-size: .75rem; font-weight: 600; color: #6B7686; text-transform: uppercase; letter-spacing: .04em; }
+    .transfer-from p { margin: 0; font-size: .92rem; font-weight: 600; color: #0F2233; }
+
+    .alert-bm {
+      border-radius: .55rem;
+      font-size: .9rem;
+      border: none;
+      border-left: 4px solid transparent;
+      display: none;
+    }
+    .alert-bm.show { display: block; }
+    .alert-bm.success { background: rgba(31,122,108,.08);  border-color: #1F7A6C; color: #1F7A6C; }
+    .alert-bm.danger  { background: rgba(193,72,61,.08);   border-color: #C1483D; color: #C1483D; }
+    .alert-bm.warning { background: rgba(168,118,42,.08);  border-color: #A8762A; color: #A8762A; }
+
+    /* Unassigned card */
+    #unassignedCard .bm-card-header {
+      background: #FFF8F0;
+      border-color: #F0DCC0;
+    }
+    #unassignedCard .bm-card-header i {
+      color: #A8762A;
+    }
+    #unassignedCard .bm-card-header strong {
+      color: #A8762A;
+    }
+    #unassignedTable thead th {
+      background: #A8762A;
+      color: #fff;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #8a6623;
+      padding: .7rem 1rem;
+      white-space: nowrap;
+    }
+    #unassignedTable tbody td {
+      font-size: .88rem;
+      color: #0F2233;
+      padding: .55rem 1rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+    #unassignedTable tbody tr:nth-child(odd) td { background: #FFFDF8; }
+    #unassignedTable tbody tr:nth-child(even) td { background: #fff; }
+
+    .unassigned-checkbox {
+      width: 16px;
+      height: 16px;
+      accent-color: #A8762A;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-code-branch" style="color:#2E6F9E;"></i>
+            Branch Management
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">
+            Select an office, region, and area to view and manage branches.
+          </p>
+        </div>
+      </div>
+
+      <!-- Global Alert -->
+      <div id="pageAlert" class="alert-bm mb-3"></div>
+
+      <!-- Filter Card -->
+      <div class="bm-card">
+        <div class="bm-card-header">
+          <div class="bm-card-header-left">
+            <i class="fas fa-filter"></i>
+            <strong>Filter</strong>
+          </div>
+        </div>
+        <div class="bm-card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Office <span style="color:#C1483D;">*</span></label>
+              <select class="form-select" id="officeSelect">
+                <option value="" disabled selected>Select Office</option>
+                {{#each offices}}
+                  <option value="{{this.office_name}}">{{this.office_name}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Region / Division <span style="color:#C1483D;">*</span></label>
+              <select class="form-select" id="regionSelect" disabled>
+                <option value="" selected>Select Region</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Area / Department <span style="color:#C1483D;">*</span></label>
+              <select class="form-select" id="areaSelect" disabled>
+                <option value="" selected>Select Area / Department</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Branch Table Card -->
+      <div class="bm-card" id="branchCard" style="display:none;">
+        <div class="bm-card-header">
+          <div class="bm-card-header-left">
+            <i class="fas fa-code-branch"></i>
+            <div>
+              <strong id="branchCardTitle">Branches</strong>
+              <span id="branchCardSub" style="font-size:.78rem; color:#6B7686; margin-left:.5rem;"></span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm" id="addBranchBtn"
+            style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-size:.82rem; font-weight:500;">
+            <i class="fas fa-plus me-1"></i> Add Branch
+          </button>
+        </div>
+        <div style="padding:0;">
+          <div class="table-responsive">
+            <table class="table mb-0" id="branchTable">
+              <thead>
+                <tr>
+                  <th style="width:12%;">Branch No.</th>
+                  <th style="width:25%;">Branch Name</th>
+                  <th style="width:30%;">Address</th>
+                  <th style="width:12%; text-align:center;">Status</th>
+                  <th style="width:21%; text-align:center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="branchTableBody">
+                <tr class="table-state-row">
+                  <td colspan="6">
+                    <i class="fas fa-code-branch" style="font-size:1.5rem; color:#E3E6EB; display:block; margin-bottom:.5rem;"></i>
+                    No branches loaded.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unassigned Branches Card -->
+      <div class="bm-card" id="unassignedCard" style="display:none; border-left: 3px solid #A8762A;">
+        <div class="bm-card-header" style="background: #FFF8F0; border-color: #F0DCC0;">
+          <div class="bm-card-header-left">
+            <i class="fas fa-exclamation-triangle" style="color:#A8762A;"></i>
+            <div>
+              <strong style="color:#A8762A;">Unassigned Branches</strong>
+              <span id="unassignedCount" style="font-size:.78rem; color:#A8762A; margin-left:.5rem;"></span>
+            </div>
+            <span style="font-size:.75rem; color:#6B7686; background:#F6F7F9; padding:.2rem .6rem; border-radius:1rem; margin-left:.5rem;">
+              <i class="fas fa-info-circle me-1"></i>
+              Branches without area assignment
+            </span>
+          </div>
+          <div>
+            <button type="button" class="btn btn-sm" id="assignSelectedBtn"
+              style="background:#A8762A; border-color:#A8762A; color:#fff; font-size:.82rem; font-weight:500; display:none;" disabled>
+              <i class="fas fa-check me-1"></i> Assign Selected to Area
+            </button>
+            <button type="button" class="btn btn-sm" id="selectAllUnassigned"
+              style="background:transparent; border:1px solid #A8762A; color:#A8762A; font-size:.82rem; font-weight:500; margin-left:.5rem;">
+              <i class="fas fa-check-double me-1"></i> Select All
+            </button>
+          </div>
+        </div>
+        <div style="padding:0;">
+          <div class="table-responsive">
+            <table class="table mb-0" id="unassignedTable">
+              <thead>
+                <tr>
+                  <th style="width:3%;">
+                    <input type="checkbox" id="unassignedSelectAll" style="accent-color:#A8762A; width:16px; height:16px;">
+                  </th>
+                  <th style="width:10%;">Branch No.</th>
+                  <th style="width:25%;">Branch Name</th>
+                  <th style="width:28%;">Address</th>
+                  <th style="width:15%;">Region</th>
+                  <th style="width:19%; text-align:center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="unassignedTableBody">
+                <tr class="table-state-row">
+                  <td colspan="6" style="text-align:center; padding:1.5rem; color:#6B7686;">
+                    <i class="fas fa-check-circle" style="color:#1F7A6C; font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                    All branches are assigned to areas.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Transfer Modal -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" id="transferModalContent">
+      <div class="modal-header" style="background: #A8762A; color: white;">
+        <h5 class="modal-title" style="font-size:1rem; font-weight:700;">
+          <i class="fas fa-arrows-alt-h me-2"></i>
+          Transfer Branch
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:1.25rem;">
+        <div id="transferAlert" class="alert-bm mb-3"></div>
+        <div class="transfer-from">
+          <label>Current Location</label>
+          <p id="transferCurrentBranch" style="margin-top:.2rem;"></p>
+          <label style="margin-top:.5rem;">Region → Area</label>
+          <p id="transferCurrentLocation"></p>
+        </div>
+        <div id="transferChangesPreview" style="display:none;" class="mb-3">
+          <div style="background: #EEF5FB; border: 1px solid #CBD2DA; border-radius: .5rem; padding: .75rem 1rem;">
+            <label style="font-size:.75rem; font-weight:600; color:#6B7686; text-transform:uppercase; letter-spacing:.04em;">
+              <i class="fas fa-arrow-right me-1"></i> Changes to be made
+            </label>
+            <div id="transferChanges" style="margin-top:.3rem;"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">New Region / Division <span style="color:#C1483D;">*</span></label>
+          <select class="form-select" id="transferRegionSelect">
+            <option value="" disabled selected>Select Region</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">New Area / Department <span style="color:#C1483D;">*</span></label>
+          <select class="form-select" id="transferAreaSelect" disabled>
+            <option value="" disabled selected>Select Area / Department</option>
+          </select>
+        </div>
+        <div id="affectedEmployeesContainer" style="display:none;">
+          <div style="background: #FFF8F0; border: 1px solid #F0DCC0; border-radius: .5rem; padding: .75rem 1rem;">
+            <label style="font-size:.75rem; font-weight:600; color:#A8762A; text-transform:uppercase; letter-spacing:.04em;">
+              <i class="fas fa-users me-1"></i> Affected Employees
+            </label>
+            <p id="affectedEmployeesCount" style="margin:.3rem 0 .5rem; font-size:.85rem; color:#6B7686;">
+              Loading affected employees...
+            </p>
+            <div style="max-height:150px; overflow-y:auto; border:1px solid #E3E6EB; border-radius:.4rem; background:#fff;">
+              <table class="table table-sm mb-0" style="font-size:.82rem;">
+                <thead style="background:#F6F7F9; position:sticky; top:0;">
+                  <tr>
+                    <th style="padding:.4rem .6rem;">ID</th>
+                    <th style="padding:.4rem .6rem;">Name</th>
+                    <th style="padding:.4rem .6rem;">Designation</th>
+                  </tr>
+                </thead>
+                <tbody id="affectedEmployeesBody">
+                  <tr>
+                    <td colspan="3" style="text-align:center; padding:1rem; color:#6B7686;">
+                      <i class="fas fa-spinner fa-spin me-2"></i> Loading...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="font-size:.78rem; color:#A8762A; margin-top:.4rem;">
+              <i class="fas fa-info-circle me-1"></i>
+              These active employees will have their records updated automatically.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="font-size:.9rem;">
+          Cancel
+        </button>
+        <button type="button" class="btn" id="confirmTransferBtn"
+          style="background:#A8762A; border-color:#A8762A; color:#fff; font-weight:500; font-size:.9rem;" disabled>
+          <i class="fas fa-arrows-alt-h me-1"></i> Confirm Transfer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #A8762A; color: white;">
+        <h5 class="modal-title" style="font-size:1rem; font-weight:700;">
+          <i class="fas fa-link me-2"></i>
+          Assign Branches to Area
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:1.25rem;">
+        <div id="assignAlert" class="alert-bm mb-3"></div>
+        <div style="background: #FFF8F0; border: 1px solid #F0DCC0; border-radius: .5rem; padding: .75rem 1rem; margin-bottom: 1rem;">
+          <label style="font-size:.75rem; font-weight:600; color:#A8762A; text-transform:uppercase; letter-spacing:.04em;">
+            <i class="fas fa-code-branch me-1"></i> Branches to Assign
+          </label>
+          <p id="assignBranchesList" style="margin:.3rem 0 0; font-size:.9rem; color:#0F2233;"></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Target Area / Department <span style="color:#C1483D;">*</span></label>
+          <select class="form-select" id="assignAreaSelect">
+            <option value="" disabled selected>Select Area</option>
+          </select>
+          <div id="assignAreaInfo" style="font-size:.78rem; color:#6B7686; margin-top:.3rem;"></div>
+        </div>
+        <div style="background: #EEF5FB; border: 1px solid #CBD2DA; border-radius: .5rem; padding: .75rem 1rem;">
+          <label style="font-size:.75rem; font-weight:600; color:#6B7686; text-transform:uppercase; letter-spacing:.04em;">
+            <i class="fas fa-info-circle me-1"></i> What will happen?
+          </label>
+          <ul style="font-size:.82rem; color:#0F2233; margin:.3rem 0 0; padding-left:1.2rem;">
+            <li>Branches will be assigned to the selected area</li>
+            <li>Active employees in these branches will be updated automatically</li>
+            <li>This action is reversible via Transfer</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="font-size:.9rem;">
+          Cancel
+        </button>
+        <button type="button" class="btn" id="confirmAssignBtn"
+          style="background:#A8762A; border-color:#A8762A; color:#fff; font-weight:500; font-size:.9rem;" disabled>
+          <i class="fas fa-check me-1"></i> Assign Branches
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Employee List Modal -->
+<div class="modal fade" id="employeeListModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #C1483D; color: white;">
+        <h5 class="modal-title" style="font-size:1rem; font-weight:700;">
+          <i class="fas fa-users me-2"></i>
+          Active Employees in Branch
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:1.25rem;">
+        <div id="employeeListAlert" class="alert-bm mb-3"></div>
+        <p style="font-size:.9rem; color:#6B7686; margin-bottom:1rem;">
+          <strong id="employeeCountDisplay">0</strong> active employee(s) found in this branch.
+          Please reassign or terminate these employees before deactivating the branch.
+        </p>
+        <div class="table-responsive">
+          <table class="table table-hover" style="font-size:.88rem;">
+            <thead style="background: #F6F7F9; position: sticky; top: 0;">
+              <tr>
+                <th style="font-weight:600; color:#16304A; width:12%;">Employee ID</th>
+                <th style="font-weight:600; color:#16304A; width:25%;">Name</th>
+                <th style="font-weight:600; color:#16304A; width:20%;">Designation</th>
+                <th style="font-weight:600; color:#16304A; width:18%;">Region</th>
+                <th style="font-weight:600; color:#16304A; width:18%;">Area</th>
+                <th style="font-weight:600; color:#16304A; width:7%;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="employeeListBody">
+              <tr>
+                <td colspan="6" style="text-align:center; padding:2rem; color:#6B7686;">
+                  <i class="fas fa-spinner fa-spin me-2"></i> Loading...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="font-size:.9rem;">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // ─────────────────────────────────────────────────────────────
+  // STATE
+  // ─────────────────────────────────────────────────────────────
+  let selectedOffice   = '';
+  let selectedRegionId = '';
+  let selectedAreaId   = '';
+  let selectedRegionName = '';
+  let selectedAreaName   = '';
+
+  let transferBranchCode = null;
+  let transferBranchName = '';
+
+  // ─────────────────────────────────────────────────────────────
+  // ELEMENTS
+  // ─────────────────────────────────────────────────────────────
+  const officeSelect      = document.getElementById('officeSelect');
+  const regionSelect      = document.getElementById('regionSelect');
+  const areaSelect        = document.getElementById('areaSelect');
+  const branchCard        = document.getElementById('branchCard');
+  const branchCardTitle   = document.getElementById('branchCardTitle');
+  const branchCardSub     = document.getElementById('branchCardSub');
+  const branchTableBody   = document.getElementById('branchTableBody');
+  const branchTable       = document.getElementById('branchTable');
+  const addBranchBtn      = document.getElementById('addBranchBtn');
+  const pageAlert         = document.getElementById('pageAlert');
+
+  const unassignedCard        = document.getElementById('unassignedCard');
+  const unassignedTableBody   = document.getElementById('unassignedTableBody');
+  const unassignedSelectAll   = document.getElementById('unassignedSelectAll');
+  const selectAllUnassigned   = document.getElementById('selectAllUnassigned');
+  const assignSelectedBtn     = document.getElementById('assignSelectedBtn');
+
+  const transferModal         = new bootstrap.Modal(document.getElementById('transferModal'));
+  const transferRegionSelect  = document.getElementById('transferRegionSelect');
+  const transferAreaSelect    = document.getElementById('transferAreaSelect');
+  const confirmTransferBtn    = document.getElementById('confirmTransferBtn');
+  const transferAlert         = document.getElementById('transferAlert');
+
+  const assignModal           = new bootstrap.Modal(document.getElementById('assignModal'));
+  const assignAreaSelect      = document.getElementById('assignAreaSelect');
+  const confirmAssignBtn      = document.getElementById('confirmAssignBtn');
+  const assignAlert           = document.getElementById('assignAlert');
+
+  const employeeListModal     = new bootstrap.Modal(document.getElementById('employeeListModal'));
+
+  // ─────────────────────────────────────────────────────────────
+  // ALERT HELPERS
+  // ─────────────────────────────────────────────────────────────
+  function showAlert(el, type, message) {
+    el.className = `alert-bm ${type} show`;
+    el.innerHTML = message;
+  }
+
+  function clearAlert(el) {
+    el.className = 'alert-bm';
+    el.innerHTML = '';
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // ESCAPE HELPERS
+  // ─────────────────────────────────────────────────────────────
+  function escJs(str) {
+    return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  function escAttr(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // TABLE STATE HELPERS
+  // ─────────────────────────────────────────────────────────────
+  function setTableLoading() {
+    branchTable.classList.remove('has-active-row');
+    branchTableBody.innerHTML = `
+      <tr class="table-state-row">
+        <td colspan="6">
+          <div class="spinner-border spinner-border-sm me-2" role="status" style="color:#2E6F9E;"></div>
+          Loading branches...
+        </td>
+      </tr>`;
+  }
+
+  function setTableEmpty(message = 'No branches found.') {
+    branchTable.classList.remove('has-active-row');
+    branchTableBody.innerHTML = `
+      <tr class="table-state-row">
+        <td colspan="6">
+          <i class="fas fa-code-branch" style="font-size:1.5rem; color:#E3E6EB; display:block; margin-bottom:.5rem;"></i>
+          ${message}
+        </td>
+      </tr>`;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // OFFICE → LOAD REGIONS
+  // ─────────────────────────────────────────────────────────────
+  officeSelect.addEventListener('change', async function () {
+    selectedOffice = this.value;
+    selectedRegionId = '';
+    selectedAreaId   = '';
+
+    regionSelect.innerHTML = '<option value="" disabled selected>Loading regions...</option>';
+    regionSelect.disabled  = true;
+    areaSelect.innerHTML   = '<option value="" disabled selected>Select Area / Department</option>';
+    areaSelect.disabled    = true;
+    branchCard.style.display = 'none';
+    unassignedCard.style.display = 'none';
+    clearAlert(pageAlert);
+
+    try {
+      const res  = await fetch(`/records/branches/regions?office=${encodeURIComponent(selectedOffice)}`);
+      const data = await res.json();
+
+      regionSelect.innerHTML = '<option value="" disabled selected>Select Region</option>';
+
+      if (data.success && data.regions.length > 0) {
+        data.regions.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value          = r.regionid;
+          opt.textContent    = r.regionname;
+          opt.dataset.name   = r.regionname;
+          regionSelect.appendChild(opt);
+        });
+        regionSelect.disabled = false;
+      } else {
+        regionSelect.innerHTML = '<option value="" disabled selected>No regions found</option>';
+      }
+    } catch (err) {
+      console.error(err);
+      regionSelect.innerHTML = '<option value="" disabled selected>Failed to load regions</option>';
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // REGION → LOAD AREAS
+  // ─────────────────────────────────────────────────────────────
+  regionSelect.addEventListener('change', async function () {
+    const opt = this.options[this.selectedIndex];
+    selectedRegionId   = this.value;
+    selectedRegionName = opt.dataset.name || opt.textContent;
+    selectedAreaId     = '';
+
+    areaSelect.innerHTML = '<option value="" disabled selected>Loading areas...</option>';
+    areaSelect.disabled  = true;
+    branchCard.style.display = 'none';
+    unassignedCard.style.display = 'none';
+    clearAlert(pageAlert);
+
+    try {
+      const res  = await fetch(`/records/branches/areas?office=${encodeURIComponent(selectedOffice)}&regionId=${encodeURIComponent(selectedRegionId)}`);
+      const data = await res.json();
+
+      areaSelect.innerHTML = '<option value="" disabled selected>Select Area / Department</option>';
+
+      if (data.success && data.areas.length > 0) {
+        data.areas.forEach(a => {
+          const opt = document.createElement('option');
+          opt.value        = a.areaid;
+          opt.textContent  = a.area_name || a.areaname;
+          opt.dataset.name = a.area_name || a.areaname;
+          areaSelect.appendChild(opt);
+        });
+        areaSelect.disabled = false;
+      } else {
+        areaSelect.innerHTML = '<option value="" disabled selected>No areas found</option>';
+      }
+
+      // Load unassigned branches for this region
+      await loadUnassignedBranches();
+
+    } catch (err) {
+      console.error(err);
+      areaSelect.innerHTML = '<option value="" disabled selected>Failed to load areas</option>';
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // AREA → LOAD BRANCHES
+  // ─────────────────────────────────────────────────────────────
+  areaSelect.addEventListener('change', async function () {
+    const opt = this.options[this.selectedIndex];
+    selectedAreaId   = this.value;
+    selectedAreaName = opt.dataset.name || opt.textContent;
+
+    branchCard.style.display = 'block';
+    branchCardTitle.textContent = `Branches — ${selectedAreaName}`;
+    branchCardSub.textContent   = '';
+    clearAlert(pageAlert);
+
+    await loadBranches();
+    await loadUnassignedBranches();
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // LOAD BRANCHES
+  // ─────────────────────────────────────────────────────────────
+  async function loadBranches() {
+    setTableLoading();
+
+    try {
+      const res = await fetch(`/records/branches/by-area?office=${encodeURIComponent(selectedOffice)}&regionId=${encodeURIComponent(selectedRegionId)}&areaId=${encodeURIComponent(selectedAreaId)}`);
+      const data = await res.json();
+
+      if (!data.success) {
+        setTableEmpty('Failed to load branches.');
+        return;
+      }
+
+      const branches = data.branches || [];
+      branchCardSub.textContent = `${branches.length} branch${branches.length !== 1 ? 'es' : ''}`;
+
+      if (branches.length === 0) {
+        setTableEmpty('No branches found for this area. Click <strong>Add Branch</strong> to create one.');
+        return;
+      }
+
+      branchTableBody.innerHTML = '';
+      branches.forEach(b => appendBranchRow(b));
+      branchTable.classList.remove('has-active-row');
+    } catch (err) {
+      console.error(err);
+      setTableEmpty('Unexpected error loading branches.');
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // RENDER A BRANCH ROW (display mode)
+  // ─────────────────────────────────────────────────────────────
+  function appendBranchRow(b) {
+    const tr = document.createElement('tr');
+    tr.dataset.branchcode = b.branchcode;
+    tr.innerHTML = `
+      <td>${b.branch_no || '—'}</td>
+      <td>${b.branchname || '—'}</td>
+      <td>${b.branchaddress || '—'}</td>
+      <td style="text-align:center;">
+        <span
+          class="status-badge ${Number(b.is_active) === 1 ? 'active' : 'inactive'}"
+          onclick="toggleStatus(this, ${b.branchcode})"
+          title="Click to toggle status">
+          <i class="fas ${Number(b.is_active) === 1 ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+          ${Number(b.is_active) === 1 ? 'Active' : 'Inactive'}
+        </span>
+      </td>
+      <td style="text-align:center; white-space: nowrap;">
+        <button class="btn-icon edit" title="Edit" onclick="enterEditMode(this)"><i class="fas fa-pencil"></i></button>
+        <button class="btn-icon transfer" title="Transfer" onclick="openTransferModal(${b.branchcode}, '${escJs(b.branchname)}')"><i class="fas fa-arrows-alt-h"></i></button>
+      </td>
+    `;
+    branchTableBody.appendChild(tr);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // INLINE EDIT MODE
+  // ─────────────────────────────────────────────────────────────
+  function enterEditMode(btn) {
+    if (branchTable.classList.contains('has-active-row')) return;
+
+    const tr          = btn.closest('tr');
+    const branchcode  = tr.dataset.branchcode;
+    const cells       = tr.querySelectorAll('td');
+
+    const branchNo    = cells[0].textContent.trim() === '—' ? '' : cells[0].textContent.trim();
+    const branchName  = cells[1].textContent.trim() === '—' ? '' : cells[1].textContent.trim();
+    const branchAddr  = cells[2].textContent.trim() === '—' ? '' : cells[2].textContent.trim();
+    const statusBadge = cells[3].innerHTML;
+
+    tr.classList.add('is-editing');
+    branchTable.classList.add('has-active-row');
+
+    tr.innerHTML = `
+      <td><input class="inline-input" id="ei-branch_no" value="${escAttr(branchNo)}" placeholder="Branch No."></td>
+      <td><input class="inline-input" id="ei-branchname" value="${escAttr(branchName)}" placeholder="Branch Name" required></td>
+      <td><input class="inline-input" id="ei-branchaddress" value="${escAttr(branchAddr)}" placeholder="Address"></td>
+      <td style="text-align:center;">${statusBadge}</td>
+      <td style="text-align:center; white-space: nowrap;">
+        <button class="btn-icon save" title="Save changes" onclick="saveEdit(this, ${branchcode})"><i class="fas fa-check"></i></button>
+        <button class="btn-icon cancel" title="Cancel" onclick="cancelEdit(this, ${branchcode})"><i class="fas fa-xmark"></i></button>
+      </td>
+    `;
+    tr.dataset.branchcode = branchcode;
+    tr.querySelector('#ei-branchname').focus();
+  }
+
+  async function saveEdit(btn, branchcode) {
+    const tr          = btn.closest('tr');
+    const branchName  = tr.querySelector('#ei-branchname').value.trim();
+
+    if (!branchName) {
+      showAlert(pageAlert, 'warning', 'Branch name is required.');
+      tr.querySelector('#ei-branchname').focus();
+      return;
+    }
+
+    const payload = {
+      branch_no:     tr.querySelector('#ei-branch_no').value.trim(),
+      branchname:    branchName,
+      branchaddress: tr.querySelector('#ei-branchaddress').value.trim(),
+      office:        selectedOffice,
+    };
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+      const res  = await fetch(`/records/branches/update/${branchcode}`, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showAlert(pageAlert, 'success', 'Branch updated successfully.');
+        await loadBranches();
+        await loadUnassignedBranches();
+      } else {
+        showAlert(pageAlert, 'danger', data.message || 'Failed to update branch.');
+        cancelEdit(btn, branchcode);
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert(pageAlert, 'danger', 'Unexpected error. Please try again.');
+      cancelEdit(btn, branchcode);
+    }
+  }
+
+  function cancelEdit(btn, branchcode) {
+    branchTable.classList.remove('has-active-row');
+    loadBranches();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // ADD BRANCH (NEW ROW)
+  // ─────────────────────────────────────────────────────────────
+  addBranchBtn.addEventListener('click', function () {
+    if (branchTable.classList.contains('has-active-row')) {
+      showAlert(pageAlert, 'warning', 'Please save or cancel the current edit before adding a new branch.');
+      return;
+    }
+
+    clearAlert(pageAlert);
+
+    const emptyRow = branchTableBody.querySelector('.table-state-row');
+    if (emptyRow) emptyRow.remove();
+
+    const tr = document.createElement('tr');
+    tr.classList.add('is-new');
+    tr.innerHTML = `
+      <td><input class="inline-input" id="new-branch_no" placeholder="Branch No."></td>
+      <td><input class="inline-input" id="new-branchname" placeholder="Branch Name *" required></td>
+      <td><input class="inline-input" id="new-branchaddress" placeholder="Address"></td>
+      <td style="text-align:center;">
+        <span class="status-badge active">
+          <i class="fas fa-circle-check"></i> Active
+        </span>
+      </td>
+      <td style="text-align:center; white-space: nowrap;">
+        <button class="btn-icon save" title="Save new branch" onclick="saveNewBranch(this)"><i class="fas fa-check"></i></button>
+        <button class="btn-icon cancel" title="Discard" onclick="cancelNewBranch(this)"><i class="fas fa-xmark"></i></button>
+      </td>
+    `;
+
+    branchTableBody.appendChild(tr);
+    branchTable.classList.add('has-active-row');
+    tr.querySelector('#new-branchname').focus();
+    tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  async function saveNewBranch(btn) {
+    const tr          = btn.closest('tr');
+    const branchName  = tr.querySelector('#new-branchname').value.trim();
+
+    if (!branchName) {
+      showAlert(pageAlert, 'warning', 'Branch name is required.');
+      tr.querySelector('#new-branchname').focus();
+      return;
+    }
+
+    const payload = {
+      office:        selectedOffice,
+      branchregid:   selectedRegionId,
+      branchareaid:  selectedAreaId,
+      branch_no:     tr.querySelector('#new-branch_no').value.trim(),
+      branchname:    branchName,
+      branchaddress: tr.querySelector('#new-branchaddress').value.trim(),
+    };
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+      const res  = await fetch('/records/branches/save', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showAlert(pageAlert, 'success', `Branch "<strong>${branchName}</strong>" created successfully.`);
+        await loadBranches();
+        await loadUnassignedBranches();
+      } else {
+        showAlert(pageAlert, 'danger', data.message || 'Failed to save branch.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert(pageAlert, 'danger', 'Unexpected error. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i>';
+    }
+  }
+
+  function cancelNewBranch(btn) {
+    const tr = btn.closest('tr');
+    tr.remove();
+    branchTable.classList.remove('has-active-row');
+
+    if (branchTableBody.querySelectorAll('tr').length === 0) {
+      setTableEmpty('No branches found for this area. Click <strong>Add Branch</strong> to create one.');
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // STATUS TOGGLE
+  // ─────────────────────────────────────────────────────────────
+  async function toggleStatus(badge, branchcode) {
+    const isCurrentlyActive = badge.classList.contains('active');
+    const newStatus = isCurrentlyActive ? 0 : 1;
+
+    if (isCurrentlyActive) {
+      try {
+        const checkRes = await fetch(`/records/branches/check-employees/${branchcode}?office=${encodeURIComponent(selectedOffice)}`);
+        const checkData = await checkRes.json();
+
+        if (checkData.success && !checkData.canDeactivate && checkData.employees && checkData.employees.length > 0) {
+          showEmployeeModal(checkData.employees, branchcode);
+          return;
+        }
+
+        if (checkData.success && checkData.canDeactivate) {
+          await performToggle(badge, branchcode, newStatus);
+          return;
+        }
+
+        if (!checkData.success) {
+          showAlert(pageAlert, 'danger', checkData.message || 'Failed to check branch employees.');
+          return;
+        }
+      } catch (err) {
+        console.error('Error checking employees:', err);
+        showAlert(pageAlert, 'danger', 'Failed to check branch employees.');
+        return;
+      }
+    } else {
+      await performToggle(badge, branchcode, newStatus);
+    }
+  }
+
+  async function performToggle(badge, branchcode, newStatus) {
+    const isCurrentlyActive = badge.classList.contains('active');
+    badge.classList.toggle('active', !isCurrentlyActive);
+    badge.classList.toggle('inactive', isCurrentlyActive);
+    badge.innerHTML = `
+      <i class="fas ${newStatus === 1 ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+      ${newStatus === 1 ? 'Active' : 'Inactive'}
+    `;
+    badge.style.pointerEvents = 'none';
+
+    try {
+      const res = await fetch(`/records/branches/toggle-status/${branchcode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          is_active: newStatus, 
+          office: selectedOffice 
+        }),
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        badge.classList.toggle('active', isCurrentlyActive);
+        badge.classList.toggle('inactive', !isCurrentlyActive);
+        badge.innerHTML = `
+          <i class="fas ${isCurrentlyActive ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+          ${isCurrentlyActive ? 'Active' : 'Inactive'}
+        `;
+        showAlert(pageAlert, 'danger', data.message || 'Failed to update status.');
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert(pageAlert, 'danger', 'Unexpected error updating status.');
+      badge.classList.toggle('active', isCurrentlyActive);
+      badge.classList.toggle('inactive', !isCurrentlyActive);
+      badge.innerHTML = `
+        <i class="fas ${isCurrentlyActive ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+        ${isCurrentlyActive ? 'Active' : 'Inactive'}
+      `;
+    } finally {
+      badge.style.pointerEvents = '';
+    }
+  }
+
+  function showEmployeeModal(employees, branchcode) {
+    const tbody = document.getElementById('employeeListBody');
+    const countDisplay = document.getElementById('employeeCountDisplay');
+
+    tbody.innerHTML = '';
+    countDisplay.textContent = employees.length;
+
+    if (!employees || employees.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:2rem; color:#6B7686;">
+            <i class="fas fa-info-circle" style="font-size:1.2rem; display:block; margin-bottom:.5rem;"></i>
+            No active employees found
+          </td>
+        </tr>
+      `;
+    } else {
+      employees.forEach(emp => {
+        const tr = document.createElement('tr');
+        const fullName = `${emp.employeelname}, ${emp.employeefname}${emp.employeemi ? ' ' + emp.employeemi : ''}`;
+        tr.innerHTML = `
+          <td><strong>${emp.employeeid}</strong></td>
+          <td>${fullName}</td>
+          <td>${emp.employeedesignation || '—'}</td>
+          <td>${emp.regionname || '—'}</td>
+          <td>${emp.area_name || '—'}</td>
+          <td><span class="badge bg-success">Active</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    const alertEl = document.getElementById('employeeListAlert');
+    clearAlert(alertEl);
+    
+    if (employees.length > 0) {
+      showAlert(alertEl, 'warning', 
+        `<i class="fas fa-exclamation-triangle me-2"></i> 
+         This branch has <strong>${employees.length}</strong> active employee(s). 
+         Please reassign or terminate them before deactivating.`
+      );
+    } else {
+      showAlert(alertEl, 'success', 
+        `<i class="fas fa-check-circle me-2"></i> 
+         No active employees found. You can safely deactivate this branch.`
+      );
+    }
+
+    employeeListModal.show();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // TRANSFER MODAL
+  // ─────────────────────────────────────────────────────────────
+  async function openTransferModal(branchcode, branchName) {
+    transferBranchCode = branchcode;
+    transferBranchName = branchName;
+
+    document.getElementById('transferCurrentBranch').textContent  = branchName;
+    document.getElementById('transferCurrentLocation').textContent = `${selectedRegionName} → ${selectedAreaName}`;
+
+    clearAlert(transferAlert);
+    confirmTransferBtn.disabled = true;
+    document.getElementById('affectedEmployeesContainer').style.display = 'none';
+
+    transferRegionSelect.innerHTML = '<option value="" disabled selected>Loading regions...</option>';
+    transferAreaSelect.innerHTML   = '<option value="" disabled selected>Select Area / Department</option>';
+    transferAreaSelect.disabled    = true;
+
+    transferModal.show();
+
+    try {
+      const res  = await fetch(`/records/branches/regions?office=${encodeURIComponent(selectedOffice)}`);
+      const data = await res.json();
+
+      transferRegionSelect.innerHTML = '<option value="" disabled>Select New Region</option>';
+
+      if (data.success && data.regions.length > 0) {
+        let currentRegionOption = null;
+        
+        data.regions.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value       = r.regionid;
+          opt.textContent = r.regionname;
+          
+          if (String(r.regionid) === String(selectedRegionId)) {
+            opt.textContent += ' (current)';
+            currentRegionOption = opt;
+          }
+          
+          transferRegionSelect.appendChild(opt);
+        });
+        
+        if (currentRegionOption) {
+          currentRegionOption.selected = true;
+          transferRegionSelect.dispatchEvent(new Event('change'));
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      clearAlert(transferAlert);
+      showAlert(transferAlert, 'danger', 'Failed to load regions.');
+    }
+  }
+
+  transferRegionSelect.addEventListener('change', async function () {
+    const newRegionId = this.value;
+    transferAreaSelect.innerHTML  = '<option value="" disabled selected>Loading areas...</option>';
+    transferAreaSelect.disabled   = true;
+    confirmTransferBtn.disabled = true;
+    clearAlert(transferAlert);
+
+    try {
+      const res  = await fetch(`/records/branches/areas?office=${encodeURIComponent(selectedOffice)}&regionId=${encodeURIComponent(newRegionId)}`);
+      const data = await res.json();
+
+      transferAreaSelect.innerHTML = '<option value="" disabled selected>Select New Area</option>';
+
+      if (data.success && data.areas.length > 0) {
+        data.areas.forEach(a => {
+          const opt = document.createElement('option');
+          opt.value       = a.areaid;
+          opt.textContent = a.area_name || a.areaname;
+          if (String(a.areaid) === String(selectedAreaId) && String(newRegionId) === String(selectedRegionId)) {
+            opt.textContent += ' (current)';
+          }
+          transferAreaSelect.appendChild(opt);
+        });
+        transferAreaSelect.disabled = false;
+      } else {
+        transferAreaSelect.innerHTML = '<option value="" disabled selected>No areas found</option>';
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert(transferAlert, 'danger', 'Failed to load areas.');
+    }
+  });
+
+  function validateTransferForm() {
+    const regionSelected = transferRegionSelect.value && transferRegionSelect.value !== '';
+    const areaSelected = transferAreaSelect.value && transferAreaSelect.value !== '';
+    confirmTransferBtn.disabled = !(regionSelected && areaSelected);
+  }
+
+  transferRegionSelect.addEventListener('change', function() {
+    clearAlert(transferAlert);
+    validateTransferForm();
+  });
+
+  transferAreaSelect.addEventListener('change', function() {
+    clearAlert(transferAlert);
+    validateTransferForm();
+  });
+
+  confirmTransferBtn.addEventListener('click', async function () {
+    const newRegionId = transferRegionSelect.value;
+    const newAreaId   = transferAreaSelect.value;
+
+    clearAlert(transferAlert);
+
+    if (!newRegionId) { showAlert(transferAlert, 'warning', 'Please select a new region.'); return; }
+    if (!newAreaId)   { showAlert(transferAlert, 'warning', 'Please select a new area.');   return; }
+
+    if (String(newRegionId) === String(selectedRegionId) && String(newAreaId) === String(selectedAreaId)) {
+      showAlert(transferAlert, 'warning', 'The selected location is the same as the current one. Please choose a different area.');
+      return;
+    }
+
+    confirmTransferBtn.disabled = true;
+    confirmTransferBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Transferring...';
+
+    try {
+      const res  = await fetch(`/records/branches/transfer/${transferBranchCode}`, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          office: selectedOffice,
+          branchregid: newRegionId,
+          branchareaid: newAreaId,
+        }),
+      });
+      
+      const data = await res.json();
+
+      if (data.success) {
+        transferModal.hide();
+        showAlert(pageAlert, 'success', `Branch "<strong>${transferBranchName}</strong>" has been transferred successfully.`);
+        await loadBranches();
+        await loadUnassignedBranches();
+      } else {
+        showAlert(transferAlert, 'danger', data.message || 'Transfer failed.');
+      }
+    } catch (err) {
+      console.error('Error during transfer:', err);
+      showAlert(transferAlert, 'danger', 'Unexpected error. Please try again.');
+    } finally {
+      confirmTransferBtn.disabled = false;
+      confirmTransferBtn.innerHTML = '<i class="fas fa-arrows-alt-h me-1"></i> Confirm Transfer';
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // UNASSIGNED BRANCHES HANDLING
+  // ─────────────────────────────────────────────────────────────
+  let unassignedBranches = [];
+
+  async function loadUnassignedBranches() {
+    if (!selectedRegionId) {
+      unassignedCard.style.display = 'none';
+      return;
+    }
+
+    try {
+          const res = await fetch(`/records/branches/unassigned?office=${encodeURIComponent(selectedOffice)}&regionId=${encodeURIComponent(selectedRegionId)}`);
+      const data = await res.json();
+
+      if (data.success && data.branches && data.branches.length > 0) {
+        unassignedBranches = data.branches;
+        unassignedCard.style.display = 'block';
+        document.getElementById('unassignedCount').textContent = `(${data.branches.length} unassigned)`;
+        renderUnassignedBranches(data.branches);
+        assignSelectedBtn.style.display = 'inline-flex';
+      } else {
+        unassignedCard.style.display = 'none';
+      }
+    } catch (err) {
+      console.error('Error loading unassigned branches:', err);
+    }
+  }
+
+  function renderUnassignedBranches(branches) {
+    unassignedTableBody.innerHTML = '';
+    
+    if (!branches || branches.length === 0) {
+      unassignedTableBody.innerHTML = `
+        <tr class="table-state-row">
+          <td colspan="6" style="text-align:center; padding:1.5rem; color:#6B7686;">
+            <i class="fas fa-check-circle" style="color:#1F7A6C; font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+            All branches are assigned to areas.
+          </td>
+        </tr>
+      `;
+      assignSelectedBtn.style.display = 'none';
+      return;
+    }
+
+    branches.forEach(b => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <input type="checkbox" class="unassigned-checkbox" value="${b.branchcode}" style="accent-color:#A8762A; width:16px; height:16px;">
+        </td>
+        <td>${b.branch_no || '—'}</td>
+        <td>${b.branchname || '—'}</td>
+        <td>${b.branchaddress || '—'}</td>
+        <td>${b.region_name || '—'}</td>
+        <td style="text-align:center;">
+          <button class="btn-icon transfer" title="Assign to Area" onclick="quickAssignBranch('${b.branchcode}', '${escJs(b.branchname)}')">
+            <i class="fas fa-link"></i>
+          </button>
+        </td>
+      `;
+      unassignedTableBody.appendChild(tr);
+    });
+
+    unassignedSelectAll.checked = false;
+    updateAssignButtonState();
+  }
+
+  function updateAssignButtonState() {
+    const checked = document.querySelectorAll('.unassigned-checkbox:checked');
+    const count = checked.length;
+    
+    if (count > 0) {
+      assignSelectedBtn.style.display = 'inline-flex';
+      assignSelectedBtn.disabled = false;
+      assignSelectedBtn.innerHTML = `<i class="fas fa-check me-1"></i> Assign ${count} Branch${count > 1 ? 'es' : ''} to Area`;
+    } else {
+      assignSelectedBtn.disabled = true;
+      assignSelectedBtn.innerHTML = '<i class="fas fa-check me-1"></i> Assign Selected to Area';
+    }
+  }
+
+  unassignedSelectAll.addEventListener('change', function() {
+    document.querySelectorAll('.unassigned-checkbox').forEach(cb => {
+      cb.checked = this.checked;
+    });
+    updateAssignButtonState();
+  });
+
+  selectAllUnassigned.addEventListener('click', function(e) {
+    e.preventDefault();
+    unassignedSelectAll.checked = !unassignedSelectAll.checked;
+    unassignedSelectAll.dispatchEvent(new Event('change'));
+  });
+
+  document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('unassigned-checkbox')) {
+      updateAssignButtonState();
+    }
+  });
+
+  function quickAssignBranch(branchcode, branchName) {
+    const checkboxes = document.querySelectorAll('.unassigned-checkbox');
+    checkboxes.forEach(cb => {
+      cb.checked = cb.value === branchcode;
+    });
+    updateAssignButtonState();
+    openAssignModal();
+  }
+
+  assignSelectedBtn.addEventListener('click', function() {
+    openAssignModal();
+  });
+
+  async function openAssignModal() {
+    const checked = document.querySelectorAll('.unassigned-checkbox:checked');
+    const branches = Array.from(checked).map(cb => {
+      const row = cb.closest('tr');
+      return {
+        code: cb.value,
+        name: row.querySelector('td:nth-child(3)').textContent.trim()
+      };
+    });
+
+    if (branches.length === 0) {
+      showAlert(pageAlert, 'warning', 'Please select at least one branch to assign.');
+      return;
+    }
+
+    document.getElementById('assignBranchesList').textContent = branches.map(b => b.name).join(', ');
+
+    try {
+      const res = await fetch(`/records/branches/areas?office=${encodeURIComponent(selectedOffice)}&regionId=${encodeURIComponent(selectedRegionId)}`);
+      const data = await res.json();
+
+      assignAreaSelect.innerHTML = '<option value="" disabled selected>Select Area</option>';
+      
+      if (data.success && data.areas.length > 0) {
+        data.areas.forEach(a => {
+          if (String(a.areaid) !== String(selectedAreaId)) {
+            const opt = document.createElement('option');
+            opt.value = a.areaid;
+            opt.textContent = a.area_name || a.areaname;
+            assignAreaSelect.appendChild(opt);
+          }
+        });
+        
+        if (assignAreaSelect.options.length === 1) {
+          assignAreaSelect.innerHTML = '<option value="" disabled selected>No other areas available</option>';
+          confirmAssignBtn.disabled = true;
+        }
+      }
+    } catch (err) {
+      console.error('Error loading areas:', err);
+      showAlert(assignAlert, 'danger', 'Failed to load areas.');
+    }
+
+    clearAlert(assignAlert);
+    confirmAssignBtn.disabled = true;
+    assignModal.show();
+  }
+
+  confirmAssignBtn.addEventListener('click', async function() {
+    const targetAreaId = assignAreaSelect.value;
+
+    if (!targetAreaId) {
+      showAlert(assignAlert, 'warning', 'Please select a target area.');
+      return;
+    }
+
+    const checked = document.querySelectorAll('.unassigned-checkbox:checked');
+    const branchCodes = Array.from(checked).map(cb => cb.value);
+
+    if (branchCodes.length === 0) {
+      showAlert(assignAlert, 'warning', 'No branches selected.');
+      return;
+    }
+
+    confirmAssignBtn.disabled = true;
+    confirmAssignBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Assigning...';
+
+    try {
+    const res = await fetch('/records/branches/bulk-assign', {
+                method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          office: selectedOffice,
+          branchAreaId: targetAreaId,
+          branchCodes: branchCodes
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        assignModal.hide();
+        showAlert(pageAlert, 'success', data.message);
+        await loadBranches();
+        await loadUnassignedBranches();
+      } else {
+        showAlert(assignAlert, 'danger', data.message || 'Assignment failed.');
+      }
+    } catch (err) {
+      console.error('Error assigning branches:', err);
+      showAlert(assignAlert, 'danger', 'Unexpected error. Please try again.');
+    } finally {
+      confirmAssignBtn.disabled = false;
+      confirmAssignBtn.innerHTML = '<i class="fas fa-check me-1"></i> Assign Branches';
+    }
+  });
+
+  assignAreaSelect.addEventListener('change', function() {
+    confirmAssignBtn.disabled = !this.value;
+    const info = document.getElementById('assignAreaInfo');
+    if (this.value) {
+      const opt = this.options[this.selectedIndex];
+      info.textContent = `Will assign to: ${opt.textContent}`;
+    } else {
+      info.textContent = '';
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // EXPOSE FUNCTIONS GLOBALLY
+  // ─────────────────────────────────────────────────────────────
+  window.toggleStatus = toggleStatus;
+  window.enterEditMode = enterEditMode;
+  window.saveEdit = saveEdit;
+  window.cancelEdit = cancelEdit;
+  window.saveNewBranch = saveNewBranch;
+  window.cancelNewBranch = cancelNewBranch;
+  window.openTransferModal = openTransferModal;
+  window.quickAssignBranch = quickAssignBranch;
+  window.loadUnassignedBranches = loadUnassignedBranches;
+  window.performToggle = performToggle;
+  window.showEmployeeModal = showEmployeeModal;
+</script>
+
+</body>
+</html>

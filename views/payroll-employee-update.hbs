@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Update Employee</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      .form-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+      }
+      .section-title {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+        color: #0d6efd;
+      }
+      /* Smooth transition for both allowance and deduction sections */
+.allowance-group, .deduction-group {
+  display: none; /* Hide by default */
+  transition: all 0.3s ease;
+}
+
+.allowance-header, .deduction-header {
+  cursor: pointer; /* Change cursor to pointer on hover */
+  transition: all 0.3s ease;
+}
+
+.allowance-header:hover, .deduction-header:hover {
+  color: #007bff; /* Change the text color when hovering */
+  text-decoration: underline; /* Underline the header when hovered */
+}
+input[type="number"] {
+  text-align: right; /* Align numbers to the right */
+}
+/* Add to your style section */
+.form-switch .form-check-input {
+  width: 3em;
+  height: 1.5em;
+  margin-left: 0;
+  cursor: pointer;
+}
+
+.form-switch .form-check-label {
+  margin-left: 0.5em;
+  cursor: pointer;
+  user-select: none;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      {{> header}}
+
+      <div class="main-content">
+        <div class="card">
+          <h2 class="card-header bg-primary text-white">
+            <i class="fas fa-user-edit me-2"></i>Update Employee: {{employee.E_LN}}, {{employee.E_FN}} {{employee.E_MI}}
+          </h2>
+          
+          <div class="card-body">
+            <form id="updateEmployeeForm">
+              <input type="hidden" name="idno" value="{{employee.E_IDNO}}">
+              <input type="hidden" id="employeeRegion" value="{{employee.region}}">
+              <input type="hidden" id="employeeOffice" value="{{employee.office}}">
+              
+              <div class="form-section">
+                <h4 class="section-title">Employee Details</h4>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-3">
+                    <label class="form-label">ID Number</label>
+                    <input type="text" class="form-control" value="{{employee.E_IDNO}}" readonly>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" name="lastname" class="form-control" value="{{employee.E_LN}}">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">First Name</label>
+                    <input type="text" name="firstname" class="form-control" value="{{employee.E_FN}}">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Middle Initial</label>
+                    <input type="text" name="mi" class="form-control" value="{{employee.E_MI}}">
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-4">
+                    <label class="form-label">ADDRESS</label>
+                    <input type="text" name="address" class="form-control" value="{{employee.E_ADDR}}" >
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">MARITAL STATUS</label>
+                    <select name="maritalStatus" class="form-select">
+                      <option value="S" {{#if (eq employee.E_STAT 'S')}}selected{{/if}}>Single</option>
+                      <option value="M" {{#if (eq employee.E_STAT 'M')}}selected{{/if}}>Married</option>
+                      <option value="W" {{#if (eq employee.E_STAT 'W')}}selected{{/if}}>Widowed</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">BIRTH DATE</label>
+                    <input type="date" name="birthdate" class="form-control" 
+                          value="{{formatNumericDate employee.E_DATEB}}">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">WALLET ACCOUNT</label>
+                    <input type="text" name="mobile" class="form-control" value="{{employee.E_TEL}}">
+                  </div>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                  {{!-- //<div class="col-md-4"> --}}
+                    {{!-- <label class="form-label">Region</label> --}}
+                    {{!-- <input type="text" class="form-control" value="{{employee.region}}" readonly> --}}
+                  {{!-- </div> --}}
+                  <div class="col-md-4">
+                    <label class="form-label">Region</label>
+                    <select name="region" id="regionSelect" class="form-select">
+                      {{!-- <option value="{{employee.E_DEPT}}" selected>{{employee.E_DEPT}}</option> --}}
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Department/Area</label>
+                    <select name="department" id="departmentSelect" class="form-select">
+                      {{!-- <option value="{{employee.E_DEPT}}" selected>{{employee.E_DEPT}}</option> --}}
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Branch</label>
+                    <select name="branch" id="branchSelect" class="form-select">
+                      {{!-- <option value="{{employee.E_BRANCH}}" selected>{{employee.E_BRANCH}}</option> --}}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Designation</label>
+                    <select name="designation" id="designationSelect" class="form-select"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Hired Date</label>
+                    <input type="date" name="hireddate" class="form-control" 
+                          value="{{formatNumericDate employee.E_DATEE}}">
+                  </div>
+                  <div class="col-md-4">
+  <label class="form-label">Employee Status</label>
+  <select name="compstat" id="employeeStatusSelect" class="form-select"></select>
+</div>
+                  <div class="col-md-4">
+  <label class="form-label">Resigned Date</label>
+  <input type="date" name="resigneddate" class="form-control" 
+        value="{{#if employee.E_DATER}}{{formatNumericDate employee.E_DATER}}{{/if}}">
+</div
+                </div>
+                <div class="col-md-4">
+    <label class="form-label">Transferred</label>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="transferredSwitch" name="transferred" {{#if employee.transferred}}checked{{/if}}>
+      <label class="form-check-label" for="transferredSwitch">No</label>
+    </div>
+  </div>
+              </div>
+
+              <div class="form-section">
+                <h4 class="section-title">Payroll Rates</h4>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-1">
+                    <label class="form-label">Basis</label>
+                    <select id="basePaySelect" name="basis" class="form-select" required>
+                      <option value="1" selected>1</option>
+                      <option value="2" >2</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Monthly Rate</label>
+                    <input
+                      type="number"
+                      id="monthlyRate"
+                      name="monthlyRate"
+                      class="form-control"
+                      step="0.01"
+                      value="{{formatNumber employee.E_MRATE 0.00}}"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Daily Rate</label>
+                    <input
+                      type="number"
+                      id="dailyRate"
+                      name="dailyRate"
+                      class="form-control"
+                      step="0.01"
+                      value="{{formatNumber employee.E_DRATE 0.00}}"
+                    />
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Hourly Rate</label>
+                    <input
+                      type="number"
+                      id="hourlyRate"
+                      name="hourlyRate"
+                      class="form-control"
+                      step="0.01"
+                      value="{{formatNumber employee.E_HRATE  0.00}}"
+                    />
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-2">
+                    <label for="yesNoTIN" class="form-label">Taxable?</label>
+                    <select id="yesNoTIN" name="taxable" class="form-select" required>
+                      <option value="true" selected>Yes</option>
+                      <option value="false" >No</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">TIN</label>
+                    <input type="text" name="tin" class="form-control" value="{{employee.E_TIN}}">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Income Tax Deduction</label>
+                    <input
+                      type="number"
+                      id="incomeTax"
+                      name="incomeTax"
+                      class="form-control"
+                      step="0.01"
+                      value="{{formatNumber employee.E_TINDED  0.00}}"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <label for="yesNoSSS" class="form-label">SSS?</label>
+                    <select id="yesNoSSS" name="yesNoSSS" class="form-select" required>
+                      <option value="true" selected>Yes</option>
+                      <option value="false" >No</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">SSS No</label>
+                    <input type="text" name="sss" class="form-control" value="{{employee.E_SSSNUM }}">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">SSS Deduction</label>
+                    <input
+                      type="number"
+                      id="sssDeduction"
+                      name="sssDeduction"
+                      class="form-control"
+                      step="0.01"
+                      value="{{formatNumber employee.E_SSSDED  0.00}}"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-section">
+                <h4 class="section-title allowance-header">Allowances</h4>
+                <div class="allowance-group">
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-3">
+                      <label class="form-label">Management</label>
+                      <input type="number" name="managementAllowance" id="managementAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW1  0.00}}" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Transportation</label>
+                      <input type="number" name="transportationAllowance" id="transportationAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW2  0.00}}" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Positional</label>
+                      <input type="number" name="positionalAllowance" id="positionalAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW3 0.00}}" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Hazard</label>
+                      <input type="number" name="hazardAllowance" id="hazardAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW4  0.00}}" />
+                    </div>
+
+                  </div>
+
+                  
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-3">
+                      <label class="form-label">Location</label>
+                      <input type="number" name="locationAllowance" id="locationAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW5  0.00}}" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Housing</label>
+                      <input type="number" name="housingAllowance" id="housingAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW6  0.00}}" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Supervisory</label>
+                      <input type="number" name="supervisoryAllowance" id="supervisoryAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW7  0.00}}" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Single Post</label>
+                      <input type="number" name="singlePostAllowance" id="singlePostAllowance" class="form-control" step="0.01" value="{{formatNumber employee.E_ALLOW8  0.00}}" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {{!-- DEDUCTIONS GROUP --}}
+              <div class="form-section"> 
+                <h4 class="section-title deduction-header">Deductions</h4>
+                <div class="deduction-group">
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">SSS Loan</label>
+                      <input type="number" name="sssLoan" id="sssLoan" class="form-control" step="0.01" value="{{formatNumber employee.E_SSSLON  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Paigibig Contribution</label>
+                      <input type="number" name="pagibigContribution" id="pagibigContribution" class="form-control" step="0.01" value="{{formatNumber employee.E_PAGCONT  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Pagibig Loan</label>
+                      <input type="number" name="pagibigLoan" id="pagibigLoan" class="form-control" step="0.01" value="{{formatNumber employee.E_PAGLOAN 0.00}}" />
+                    </div>
+                  </div>
+
+                  
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">ML Fund</label>
+                      <input type="number" name="mlfund" id="mlfund" class="form-control" step="0.01" value="{{formatNumber employee.E_DED1  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">OPEC</label>
+                      <input type="number" name="opec" id="opec" class="form-control" step="0.01" value="{{formatNumber employee.E_DED2  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Over Appraisal</label>
+                      <input type="number" name="overAppraisal" id="overAppraisal" class="form-control" step="0.01" value="{{formatNumber employee.E_DED3  0.00}}" />
+                    </div>
+                    </div>
+                    <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">Coop Recla</label>
+                      <input type="number" name="coopRecla" id="coopRecla" class="form-control" step="0.01" value="{{formatNumber employee.E_DED4  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Philhealth</label>
+                      <input type="number" name="philhealth" id="philhealth" class="form-control" step="0.01" value="{{formatNumber employee.E_DED5  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Install Account</label>
+                      <input type="number" name="installAccount" id="installAccount" class="form-control" step="0.01" value="{{formatNumber employee.E_DED6  0.00}}" />
+                    </div>
+                  </div>
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">OPEC Ticket</label>
+                      <input type="number" name="opecTicket" id="opecTicket" class="form-control" step="0.01" value="{{formatNumber employee.E_DED7  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Telecoms</label>
+                      <input type="number" name="telecoms" id="telecoms" class="form-control" step="0.01" value="{{formatNumber employee.E_DED8  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">OPEC Support</label>
+                      <input type="number" name="opecSupport" id="opecSupport" class="form-control" step="0.01" value="{{formatNumber employee.E_DED9  0.00}}" />
+                    </div>
+                  </div>
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">Coated</label>
+                      <input type="number" name="coated" id="coated" class="form-control" step="0.01" value="{{formatNumber employee.LMCUNION  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">HMO</label>
+                      <input type="number" name="hmo" id="hmo" class="form-control" step="0.01" value="{{formatNumber employee.E_HMO  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">GPA Insurance</label>
+                      <input type="number" name="gpaInsurance" id="gpaInsurance" class="form-control" step="0.01" value="{{formatNumber employee.E_OTHDED1  0.00}}" />
+                    </div>
+                  </div>
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">Over Payments</label>
+                      <input type="number" name="overPayments" id="overPayments" class="form-control" step="0.01" value="{{formatNumber employee.E_OTHDED2  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Mortuary</label>
+                      <input type="number" name="mortuary" id="mortuary" class="form-control" step="0.01" value="{{formatNumber employee.E_DED10  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Fake</label>
+                      <input type="number" name="fake" id="fake" class="form-control" step="0.01" value="{{formatNumber employee.E_DED11  0.00}}" />
+                    </div>
+                  </div>
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">Other Deductions</label>
+                      <input type="number" name="otherDeductions" id="otherDeductions" class="form-control" step="0.01" value="{{formatNumber employee.E_DED12  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">SAKO</label>
+                      <input type="number" name="sako" id="sako" class="form-control" step="0.01" value="{{formatNumber employee.E_DED13  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Motor Loan</label>
+                      <input type="number" name="motorLoan" id="motorLoan" class="form-control" step="0.01" value="{{formatNumber employee.E_DED14  0.00}}" />
+                    </div>
+                  </div>
+                  <div class="row g-3 mb-3"> 
+                    <div class="col-md-4">
+                      <label class="form-label">Available 1</label>
+                      <input type="number" name="available1" id="available1" class="form-control" step="0.01" value="{{formatNumber employee.E_DED15  0.00}}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Available 2</label>
+                      <input type="number" name="available2" id="available2" class="form-control" step="0.01" value="{{formatNumber employee.E_DED16  0.00}}" />
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+
+              </div>
+
+              <div class="d-flex justify-content-end mt-4">
+  <button type="button" class="btn btn-secondary me-2" onclick="window.history.back()">
+    <i class="fas fa-arrow-left me-2"></i>Back
+  </button>
+  <button type="submit" class="btn btn-primary" id="saveEmployeeBtn">
+    <i class="fas fa-save me-2"></i>Save Changes
+  </button>
+</div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+  
+  //const employeeRegion = document.getElementById('regionSelect').value.toLowerCase();
+    //const employeeRegion = document.getElementById('employeeRegion').value.toLowerCase();
+  const regionSelect = document.getElementById('regionSelect');
+  const employeeOffice = document.getElementById('employeeOffice').value.toLowerCase();
+  const currentDept = '{{employee.E_DEPT}}';
+  const currentBranch = '{{employee.E_BRANCH}}';
+  const currentDesignation = '{{employee.E_POS}}'; // This should match your backend field
+  const currentEmployeeStatus = '{{employee.E_COMPSTAT}}'; // Get current employee status
+  const currentBasePay = '{{employee.E_BASIS}}'; // Add the employee base pay
+  const currentTaxable = '{{employee.E_TAXABLE}}'; // Add the employee taxable or not
+  const currentSSS = '{{employee.E_SSS}}'; // Add the employee taxable or not
+
+// Add this to your DOMContentLoaded event listener
+const transferredSwitch = document.getElementById('transferredSwitch');
+const transferredLabel = document.querySelector('label[for="transferredSwitch"]');
+
+// Set initial state (default to "No" if not specified)
+if (!transferredSwitch.hasAttribute('checked')) {
+  transferredSwitch.checked = false;
+  transferredLabel.textContent = 'No';
+}
+
+// Add event listener for toggle
+transferredSwitch.addEventListener('change', function() {
+  transferredLabel.textContent = this.checked ? 'Yes' : 'No';
+});
+
+  
+// Add this function to get the current region
+function getCurrentRegion() {
+  return regionSelect.value.toLowerCase();
+}
+  
+
+  const departmentSelect = document.getElementById('departmentSelect');
+  const branchSelect = document.getElementById('branchSelect');
+  const designationSelect = document.getElementById('designationSelect');
+  const employeeStatusSelect = document.getElementById('employeeStatusSelect');
+  const basePaySelect = document.getElementById('basePaySelect'); // Add basePaySelect
+  const yesNoTIN = document.getElementById('yesNoTIN');
+  const yesNoSSS = document.getElementById('yesNoSSS');
+
+  
+
+  const monthlyRateInput = document.getElementById("monthlyRate");
+        const dailyRateInput = document.getElementById("dailyRate");
+        const hourlyRateInput = document.getElementById("hourlyRate");
+
+        monthlyRateInput.addEventListener("change", function () {
+          const monthlyRateValue = parseFloat(monthlyRateInput.value);
+          if (monthlyRateValue > 0) {
+            dailyRateInput.value = (monthlyRateValue / 30).toFixed(2);
+            hourlyRateInput.value = (monthlyRateValue / 30 / 8).toFixed(2);
+          } else {
+            dailyRateInput.value = 0.0; // or '0.00' if you prefer to show zero
+            hourlyRateInput.value = 0.0;
+          }
+        });
+
+        dailyRateInput.addEventListener("change", function () {
+          const dailyRateValue = parseFloat(dailyRateInput.value);
+          if (dailyRateValue > 0) {
+            hourlyRateInput.value = (dailyRateValue / 8).toFixed(2);
+          } else {
+            hourlyRateInput.value = 0.0;
+          }
+        });
+// Function to handle the change event on the basePaySelect
+      basePaySelect.addEventListener('change', function() {
+  // Get the value of basePaySelect (it should be a string)
+  const selectedValue = basePaySelect.value;
+
+  // Compare the selected value with '2' (since it's a string)
+  if (selectedValue === '2') {
+    monthlyRateInput.value = '0.00';  // Set monthly rate to 0.00
+    monthlyRateInput.disabled = true; // Disable the monthly rate input
+  } else {
+    monthlyRateInput.disabled = false; // Enable the monthly rate input
+  }
+});
+
+// 2. Update your existing event listener to include the improvements:
+regionSelect.addEventListener('change', function() {
+  console.log('Region changed to:', this.value);
+  
+  // Disable and show loading
+  departmentSelect.disabled = true;
+  branchSelect.disabled = true;
+  departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
+  branchSelect.innerHTML = '<option value="">Select department first</option>';
+
+  setTimeout(() => {
+    try {
+      // 1. First repopulate departments
+      populateDepartments();
+      
+      // 2. MANUALLY trigger branch population for the first department
+      if (departmentSelect.options.length > 0) {
+        // Only if there are departments available
+        populateBranches();
+      }
+      
+      // 3. Repopulate designations if needed
+      populateDesignations();
+    } catch (error) {
+      console.error('Error updating:', error);
+      departmentSelect.innerHTML = '<option value="">Error loading</option>';
+    } finally {
+      departmentSelect.disabled = false;
+      branchSelect.disabled = false;
+    }
+  }, 0);
+});
+        // Add this after your populate functions
+{{!-- regionSelect.addEventListener('change', function() {
+  console.log('Region changed to:', this.value);
+  populateDepartments();
+  populateDesignations(); // You might want to repopulate designations too if they're region-dependent
+}); --}}
+
+  const allowanceHeader = document.querySelector(".allowance-header");
+    const deductionHeader = document.querySelector(".deduction-header");
+    const allowanceGroup = document.querySelector(".allowance-group");
+    const deductionGroup = document.querySelector(".deduction-group");
+
+  // Set initial state to hidden (in case it is not hidden)
+    allowanceGroup.style.display = "none"; 
+    deductionGroup.style.display = "none";
+
+    // Toggle the visibility of the allowances group
+    allowanceHeader.addEventListener("click", function() {
+      // Toggle display between 'none' and 'block'
+      if (allowanceGroup.style.display === "none" || allowanceGroup.style.display === "") {
+        allowanceGroup.style.display = "block";
+      } else {
+        allowanceGroup.style.display = "none";
+      }
+    });
+
+    // Toggle the visibility of the deductions group
+    deductionHeader.addEventListener("click", function() {
+      // Toggle display between 'none' and 'block'
+      if (deductionGroup.style.display === "none" || deductionGroup.style.display === "") {
+        deductionGroup.style.display = "block";
+      } else {
+        deductionGroup.style.display = "none";
+      }
+    });
+
+  const numberFields = document.querySelectorAll('input[type="number"]');
+  
+  numberFields.forEach(function (field) {
+    // Ensure the field shows 0.00 if it's empty or 0
+    if (field.value === "" || field.value === "0") {
+      field.value = "0.00";
+    }
+
+    // Format the value to always show 2 decimal places
+    field.addEventListener("blur", function () {
+      let value = parseFloat(field.value);
+      if (isNaN(value) || value === 0) {
+        field.value = "0.00";
+      } else {
+        field.value = value.toFixed(2); // Always show two decimal places
+      }
+    });
+
+    // On focus, remove 0.00 if the user wants to edit
+    field.addEventListener("focus", function () {
+      if (field.value === "0.00") {
+        field.value = "";
+      }
+    });
+  });
+
+  const regions = {{{json regions}}}
+  const designations = {{{json designations}}};
+  const employeeStatus = {{{json employeeStatus}}};
+  console.log(employeeStatus)
+  
+
+  const branchData = {
+    luzon: {{{json luzonBranches}}},
+    vismin: {{{json visminBranches}}},
+    mlgroup: {{{json mlgroupBranches}}}
+  };
+
+  let branchesToUse = [];
+  if (employeeOffice === 'luzon') {
+    branchesToUse = branchData.luzon || [];
+  } else if (employeeOffice === 'vismin') {
+    branchesToUse = branchData.vismin || [];
+  } else if (employeeOffice === 'mlgroup') {
+    branchesToUse = branchData.mlgroup || [];
+  }
+
+  let isInitialLoad = true; // ✅ Used to control initial branch selection
+
+  function populateEmployeeStatus() {
+  console.log("=== populateEmployeeStatus DEBUG ===");
+  console.log("Current employee status:", currentEmployeeStatus);
+  console.log("Employee status data:", employeeStatus);
+  
+  // Clear the select
+  employeeStatusSelect.innerHTML = '';
+  
+  // Check if employeeStatus data exists and is an array
+  if (!Array.isArray(employeeStatus)) {
+    console.error('Employee status data is not an array:', employeeStatus);
+    
+    // Add fallback option
+    if (currentEmployeeStatus) {
+      const fallbackOption = new Option(currentEmployeeStatus, currentEmployeeStatus, true, true);
+      employeeStatusSelect.add(fallbackOption);
+    }
+    return;
+  }
+
+  let hasSelectedOption = false;
+
+  // Add each status option to the dropdown
+  employeeStatus.forEach(status => {
+    // Use consistent property access
+    const statusValue = status.status_name || status.value || status.status_value;
+    const statusName = status.status_name || status.name || statusValue;
+    
+    if (!statusValue || !statusName) {
+      console.warn('Invalid status object:', status);
+      return;
+    }
+
+    const isSelected = statusValue === currentEmployeeStatus;
+    if (isSelected) {
+      hasSelectedOption = true;
+    }
+    
+    console.log(`Adding option: ${statusValue}, selected: ${isSelected}`);
+    
+    const option = new Option(statusName, statusValue, isSelected, isSelected);
+    employeeStatusSelect.add(option);
+  });
+
+  // DEBUG: Verify what was actually added to the select
+  console.log("Final select options:");
+  for (let i = 0; i < employeeStatusSelect.options.length; i++) {
+    const option = employeeStatusSelect.options[i];
+    console.log(`  [${i}] value="${option.value}", text="${option.text}", selected=${option.selected}`);
+  }
+
+  // Fallback if current status isn't in the options
+  if (currentEmployeeStatus && !hasSelectedOption) {
+    console.log(`Adding fallback option for: ${currentEmployeeStatus}`);
+    const fallbackOption = new Option(
+      currentEmployeeStatus, 
+      currentEmployeeStatus, 
+      true, 
+      true
+    );
+    fallbackOption.disabled = true;
+    employeeStatusSelect.add(fallbackOption);
+  }
+
+  // DEBUG: Check the final state
+  console.log("Select value after population:", employeeStatusSelect.value);
+  console.log("Select selectedIndex:", employeeStatusSelect.selectedIndex);
+  console.log("Select name attribute:", employeeStatusSelect.getAttribute('name'));
+  
+  // CRITICAL: Ensure the select has a name attribute
+  if (!employeeStatusSelect.getAttribute('name')) {
+    console.error('WARNING: Select element has no name attribute!');
+    employeeStatusSelect.setAttribute('name', 'compstat');
+    console.log('Added name="compstat" attribute to select');
+  }
+}
+
+  function populateDesignations() {
+    designationSelect.innerHTML = '';
+    
+    const currentRegion = getCurrentRegion();
+    // Determine which group to show based on employee's region
+    let groupToMatch = 'operations'; // default
+    if (currentRegion === 'support') {
+      groupToMatch = 'support';
+    } else if (currentRegion === 'mancomm') {
+      groupToMatch = 'mancomm';
+    }
+
+    // Filter and sort designations
+    const filteredDesignations = (designations || [])
+      .filter(d => d.designation_group?.toLowerCase() === groupToMatch)
+      .sort((a, b) => a.designation.localeCompare(b.designation));
+
+    // Add options to select
+    filteredDesignations.forEach(d => {
+      const isSelected = d.designation === currentDesignation;
+      const option = new Option(d.designation, d.designation, isSelected, isSelected);
+      designationSelect.add(option);
+    });
+
+    // Fallback for current designation if not found in the group
+    if (currentDesignation && !filteredDesignations.some(d => d.designation === currentDesignation)) {
+      const fallbackOption = new Option(currentDesignation, currentDesignation, true, true);
+      fallbackOption.disabled = true;
+      designationSelect.add(fallbackOption);
+    }
+  }
+
+  // Function to populate regions dropdown
+function populateRegions() {
+  // Clear existing options
+  regionSelect.innerHTML = '';
+  
+  // Check if regions data exists and is an array
+  if (!Array.isArray(regions)) {
+    console.error('Regions data is not an array:', regions);
+    return;
+  }
+
+  // Add each region as an option
+  regions.forEach(region => {
+    // Handle different possible property names for region value/name
+    const regionValue = region.region_name || region.value || region.id;
+    const regionName = region.region_name || region.name || regionValue;
+    
+    if (!regionValue || !regionName) {
+      console.warn('Invalid region object:', region);
+      return;
+    }
+
+    // Check if this is the employee's current region
+    const isSelected = regionValue.toLowerCase() === '{{employee.region}}'.toLowerCase();
+    
+    // Create and add the option
+    const option = new Option(
+      regionName, 
+      regionValue, 
+      isSelected, 
+      isSelected
+    );
+    regionSelect.add(option);
+  });
+
+  
+
+  // Fallback if current region isn't in the options
+  const currentRegion = '{{employee.region}}';
+  if (currentRegion && 
+      !regions.some(r => (r.value || r.region_name || r.id) === currentRegion)) {
+    const fallbackOption = new Option(
+      currentRegion, 
+      currentRegion, 
+      true, 
+      true
+    );
+    fallbackOption.disabled = true;
+    regionSelect.add(fallbackOption);
+  }
+}
+
+function populateDepartments() {
+  const currentRegion = getCurrentRegion();
+  departmentSelect.innerHTML = ''; // Clear existing
+  
+  const filteredDepartments = branchesToUse
+    .filter(branch => branch.B_SOURCE?.toLowerCase() === currentRegion)
+    .map(branch => branch.B_AREA);
+
+  const uniqueDepartments = [...new Set(filteredDepartments)]
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+
+  // Add default option if no departments
+  if (uniqueDepartments.length === 0) {
+    departmentSelect.add(new Option('No departments available', ''));
+    return;
+  }
+
+  // Add all department options
+  uniqueDepartments.forEach(dept => {
+    const isSelected = dept === currentDept;
+    const option = new Option(dept, dept, isSelected, isSelected);
+    departmentSelect.add(option);
+  });
+
+  
+
+  // Always trigger branch population after departments load
+  populateBranches();
+}
+  {{!-- function populateDepartments() {
+    //console.log('Populating departments for region:', currentRegion);
+    //console.log('Available branches:', branchesToUse);
+    const currentRegion = getCurrentRegion();
+      console.log('Populating departments for region:', currentRegion);
+
+  departmentSelect.innerHTML = '';
+
+  const filteredDepartments = branchesToUse
+    .filter(branch => {
+      const matches = branch.B_SOURCE?.toLowerCase() === currentRegion;
+      console.log(`Branch ${branch.B_DESCRIPTION} - B_SOURCE: ${branch.B_SOURCE}, matches: ${matches}`);
+      return matches;
+    })
+    .map(branch => branch.B_AREA);
+
+  console.log('Filtered departments:', filteredDepartments);
+
+  const uniqueDepartments = [...new Set(filteredDepartments)]
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));  // <-- Sort departments here
+
+  uniqueDepartments.forEach(dept => {
+    const isSelected = dept === currentDept;
+    const option = new Option(dept, dept, isSelected, isSelected);
+    departmentSelect.add(option);
+  });
+
+  if (currentDept && !uniqueDepartments.includes(currentDept)) {
+    const fallbackOption = new Option(currentDept, currentDept, true, true);
+    fallbackOption.disabled = true;
+    departmentSelect.add(fallbackOption);
+  }
+
+  populateBranches();
+
+} --}}
+
+function populateBranches() {
+  const selectedDept = departmentSelect.value;
+  const selectedReg = getCurrentRegion().toLowerCase();
+  console.log(selectedDept, employeeRegion.value)
+  branchSelect.innerHTML = '';
+
+  const filteredBranches = branchesToUse.filter(branch =>
+    branch.B_SOURCE?.toLowerCase() === selectedReg &&
+    branch.B_AREA === selectedDept
+  );
+
+  // Sort branches alphabetically by description
+  filteredBranches.sort((a, b) => a.B_DESCRIPTION.localeCompare(b.B_DESCRIPTION));
+
+  filteredBranches.forEach(branch => {
+    const shouldSelect = isInitialLoad && branch.B_DESCRIPTION === currentBranch;
+    const option = new Option(branch.B_DESCRIPTION, branch.B_DESCRIPTION, shouldSelect, shouldSelect);
+    branchSelect.add(option);
+  });
+
+  if (
+    isInitialLoad &&
+    currentBranch &&
+    !filteredBranches.some(branch => branch.B_DESCRIPTION === currentBranch)
+  ) {
+    const fallbackOption = new Option(currentBranch + ' (invalid)', currentBranch, true, true);
+    fallbackOption.disabled = true;
+    branchSelect.add(fallbackOption);
+  }
+
+  isInitialLoad = false;
+}
+if (basePaySelect) {
+    basePaySelect.value = currentBasePay || '1'; // Default to '1' if no value exists
+  }
+
+  if (yesNoTIN) {
+    yesNoTIN.value = currentTaxable || false; // Default to '1' if no value exists
+  }
+
+  if (yesNoSSS) {
+    yesNoSSS.value = currentSSS || false; // Default to '1' if no value exists
+  }
+
+populateRegions();
+  populateDepartments();
+  populateDesignations();
+  populateEmployeeStatus();
+
+  departmentSelect.addEventListener('change', populateBranches);
+
+  document.getElementById('updateEmployeeForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  // Convert empty date values to null
+  const dateInputs = document.querySelectorAll('input[type="date"]');
+  dateInputs.forEach(input => {
+    if (!input.value) input.value = '';
+  });
+  
+  // Get the submit button by ID
+  const saveBtn = document.getElementById('saveEmployeeBtn');
+  
+  if (!saveBtn) {
+    console.error('Submit button not found - check button ID and form structure');
+    alert('System error - please refresh the page and try again');
+    return;
+  }
+
+  // Show loading state
+  const originalBtnText = saveBtn.innerHTML;
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+
+  try {
+    // Collect form data and send to server
+    const formData = new FormData(this);
+    const employeeData = Object.fromEntries(formData.entries());
+
+    // DEBUG: Check the compstat value before sending
+  console.log("compstat before send:", employeeData.compstat);
+  console.log("compstat type:", typeof employeeData.compstat);
+  console.log("compstat length:", employeeData.compstat?.length);
+    
+    // Add additional fields
+    // Get the checkbox element
+const transferredSwitch = document.getElementById('transferredSwitch');
+
+// Get the value (true if checked, false if not)
+const isTransferred = transferredSwitch.checked;
+
+    console.log(isTransferred); // true if checked, false if not
+    console.log(regionSelect.value)
+    console.log(document.getElementById('employeeRegion').value)
+    employeeData.region = regionSelect.value;//document.getElementById('employeeRegion').value;
+    employeeData.originalRegion = document.getElementById('employeeRegion').value;
+    employeeData.office = document.getElementById('employeeOffice').value;
+    employeeData.isTransferred = isTransferred;
+    
+    console.log(employeeData)
+    // Send to server
+    const response = await fetch('/payroll/employee-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(employeeData)
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('Employee updated successfully!');
+      window.location.href = '/payroll/employee-edit';
+    } else {
+      throw new Error(result.message || 'Update failed');
+    }
+  } catch (error) {
+    console.error('Update error:', error);
+    alert(`Error: ${error.message}`);
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = originalBtnText;
+    }
+  }
+});
+
+  
+  
+});
+
+{{!-- function populateDesignations() {
+  const designationSelect = document.getElementById('designationSelect');
+console.log(designations)
+  // Clear existing options
+  designationSelect.innerHTML = '';
+console.log('employeeRegion', employeeRegion.value)
+  let groupToMatch = 'operations';
+  if (employeeRegion === 'support') {
+    groupToMatch = 'support';
+  } else if (employeeRegion === 'mancomm') {
+    groupToMatch = 'mancomm';
+  }
+
+  const filteredDesignations = designations
+    .filter(d => d.designation_group?.toLowerCase() === groupToMatch)
+    .sort((a, b) => a.designation.localeCompare(b.designation));
+
+  filteredDesignations.forEach(d => {
+    const isSelected = d.designation === currentDesignation;
+    const option = new Option(d.designation, d.designation, isSelected, isSelected);
+    designationSelect.add(option);
+  });
+
+  // Optional: fallback in case current designation doesn't exist in the group
+  if (currentDesignation && !filteredDesignations.some(d => d.designation === currentDesignation)) {
+    const fallbackOption = new Option(currentDesignation + ' (invalid)', currentDesignation, true, true);
+    fallbackOption.disabled = true;
+    designationSelect.add(fallbackOption);
+  }
+} --}}
+
+
+</script>
+
+<script>
+  function handleDateInput(inputElement) {
+    // Clear the value if the user deletes the date
+    if (!inputElement.value) {
+      inputElement.value = '';
+    }
+  }
+</script>
+
+  </body>
+</html>

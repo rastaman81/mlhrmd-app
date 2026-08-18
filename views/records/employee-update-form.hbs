@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    .nla-section {
+      border: 1px solid #E3E6EB;
+      border-radius: .65rem;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16,24,40,.04);
+      margin-bottom: 1.25rem;
+    }
+    .nla-section-header {
+      border-bottom: 1px solid #E3E6EB;
+      padding: .85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      border-radius: .65rem .65rem 0 0;
+    }
+    .nla-section-header i { color: #2E6F9E; }
+    .nla-section-header strong { color: #0F2233; font-weight: 600; font-size: .97rem; }
+    .nla-section-body { padding: 1.15rem; }
+
+    .nla-subsection-label {
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #2E6F9E;
+      margin: 0 0 .75rem;
+      padding-bottom: .4rem;
+      border-bottom: 1px solid #E3E6EB;
+    }
+
+    .nla-edu-divider {
+      border-top: 1px dashed #E3E6EB;
+      margin: 1.15rem 0;
+    }
+
+    .form-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #16304A;
+      margin-bottom: .35rem;
+    }
+    .form-control, .form-select {
+      border-color: #E3E6EB;
+      font-size: .9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12);
+    }
+    .uneditable {
+      background-color: #F6F7F9;
+      color: #6B7686;
+      cursor: not-allowed;
+      font-style: italic;
+      border-color: #E3E6EB !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-user-edit" style="color:#2E6F9E;"></i> Update Employee
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Edit and save changes to the employee record.</p>
+        </div>
+        <a href="/employee/update" class="btn btn-outline-secondary" style="font-size:.88rem;">
+          <i class="fas fa-arrow-left me-1"></i> Cancel
+        </a>
+      </div>
+
+      <form id="employeeUpdateForm">
+        <input type="hidden" name="office" value="{{office}}">
+        <input type="hidden" id="selectedRegion" value="{{employee.employeeregion}}">
+        <input type="hidden" id="selectedArea" value="{{employee.employeeareamngr}}">
+        <input type="hidden" id="selectedBranch" value="{{employee.employeebranch}}">
+
+        <!-- Employee Information -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-id-card"></i>
+            <strong>Employee Information</strong>
+          </div>
+          <div class="nla-section-body">
+            <div class="row g-3 mb-3">
+
+              <div class="col-md-3">
+                <label class="form-label">Employee ID</label>
+                <input type="text" class="form-control uneditable" value="{{employee.employeeid}}" readonly>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Office</label>
+                <select name="office" id="officeSelect" class="form-select" required>
+                  <option value="{{office}}" selected>{{office}}</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">{{this.office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="employeelname" class="form-control" value="{{employee.employeelname}}" required>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">First Name</label>
+                <input type="text" name="employeefname" class="form-control" value="{{employee.employeefname}}" required>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Middle Name</label>
+                <input type="text" name="employeemi" class="form-control" value="{{employee.employeemi}}">
+              </div>
+
+              <div class="col-md-3">
+  <label class="form-label">Designation</label>
+  <select name="designationId" id="designationSelect" class="form-select" required>
+    <option value="" disabled>Select Designation</option>
+    {{#each designations}}
+      <option value="{{this.designation_id}}" data-designation="{{this.designation}}">
+        {{this.designation}}
+      </option>
+    {{/each}}
+  </select>
+  <input type="hidden" id="designationText" name="designation">
+  <input type="hidden" id="currentDesignationValue" value="{{employee.designation_id}}">
+</div>
+
+              <div class="col-md-3">
+                <label class="form-label">Ranking</label>
+                <select name="rank" id="rankSelect" class="form-select" required>
+                  <option value="" disabled>Select Rank</option>
+                  {{#each ranking}}
+                    <option value="{{this.rankid}}">{{this.rankname}}</option>
+                  {{/each}}
+                </select>
+                <input type="hidden" id="currentRankValue" value="{{employee.employeeranking}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Date Hired</label>
+                <input type="date" name="employeedateemp" class="form-control" value="{{employee.employeedateemp}}" required>
+              </div>
+
+            </div>
+
+            <div class="row g-3">
+
+              <div class="col-md-4">
+                <label class="form-label">Region / Division</label>
+                <select name="region" id="regionSelect" class="form-select" required>
+                  <option value="">Loading regions...</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Region / Division Manager</label>
+                <input type="text" id="regionManagerInput" class="form-control uneditable" readonly>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Area / Department</label>
+                <select name="area" id="areaSelect" class="form-select" required>
+                  <option value="">Select Area / Department</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Area / Department Manager</label>
+                <input type="text" id="areaManagerInput" class="form-control uneditable" readonly>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Branch</label>
+                <select name="branch" id="branchSelect" class="form-select">
+                  <option value="">Select Branch</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Employment Status -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-briefcase"></i>
+            <strong>Employment Status</strong>
+          </div>
+          <div class="nla-section-body">
+            <div class="row g-3">
+
+              <div class="col-md-4">
+                <label class="form-label">Employment Status</label>
+                <select name="employmentStatus" id="employmentStatusSelect" class="form-select" required>
+                  <option value="" disabled>Select Employment Status</option>
+                  {{#each employmentStatus}}
+                    <option value="{{this.status_id}}">{{this.status_name}}</option>
+                  {{/each}}
+                </select>
+                <input type="hidden" id="currentEmploymentStatusValue" value="{{employee.employment_status}}">
+              </div>
+
+              <div class="col-md-4" id="employmentRemarksWrapper" style="display:none;">
+  <label class="form-label">Employment Status Remarks</label>
+  <textarea name="employmentStatusRemarks" id="employmentStatusRemarks" class="form-control" rows="1">{{employee.employment_status_remarks}}</textarea>
+</div>
+
+              <div class="col-md-4">
+                <label class="form-label">Resigned Date</label>
+                <input type="date" name="resignedDate" id="resignedDate" class="form-control" value="{{employee.empresigndate}}">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Mobile No.</label>
+                <input type="text" name="employeecontactno" class="form-control" value="{{employee.employeecontactno}}">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">ML Wallet No.</label>
+                <input type="text" name="walletno" class="form-control" value="{{#if employee.walletno}}{{val employee.walletno}}{{else}}{{val employee.employeesalary}}{{/if}}">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Email</label>
+                <input type="email" name="employeeemail" class="form-control" value="{{employee.email}}">
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-user"></i>
+            <strong>Personal Information</strong>
+          </div>
+          <div class="nla-section-body">
+            <div class="row g-3">
+
+              <div class="col-md-4">
+                <label class="form-label">Gender</label>
+                <select name="employeegender" class="form-select" required>
+                  <option value="{{employee.employeegender}}" selected>{{employee.employeegender}}</option>
+                  <option value="MALE">MALE</option>
+                  <option value="FEMALE">FEMALE</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Civil Status</label>
+                <select name="civilStatus" class="form-select" required>
+                  <option value="{{employee.employeestatus}}" selected>{{employee.employeestatus}}</option>
+                  {{#each maritalStatuses}}
+                    <option value="{{this.status_name}}">{{this.status_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Birth Date</label>
+                <input type="date" name="employeebdate" class="form-control" value="{{employee.employeebdate}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Birth Place</label>
+                <input type="text" name="employeebplace" class="form-control" value="{{employee.employeebplace}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Religion</label>
+                <input type="text" name="employeereligion" class="form-control" value="{{employee.employeereligion}}">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <input type="text" name="employeeaddress" class="form-control" value="{{employee.employeeaddress}}">
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Background -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-people-roof"></i>
+            <strong>Family Background</strong>
+          </div>
+          <div class="nla-section-body">
+
+            <p class="nla-subsection-label">Spouse Information</p>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Spouse Name</label>
+                <input type="text" name="employeespouse" class="form-control" value="{{employee.employeespouse}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Spouse Occupation / Work</label>
+                <input type="text" name="employeespousework" class="form-control" value="{{employee.employeespousework}}">
+              </div>
+            </div>
+
+            <p class="nla-subsection-label">Father's Information</p>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Father's Name</label>
+                <input type="text" name="employeefathersname" class="form-control" value="{{employee.employeefathersname}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Father's Occupation / Work</label>
+                <input type="text" name="employeefatherswork" class="form-control" value="{{employee.employeefatherswork}}">
+              </div>
+            </div>
+
+            <p class="nla-subsection-label">Mother's Information</p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Mother's Name</label>
+                <input type="text" name="employeemothersname" class="form-control" value="{{employee.employeemothersname}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Mother's Occupation / Work</label>
+                <input type="text" name="employeemotherswork" class="form-control" value="{{employee.employeemotherswork}}">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Education Section - ADD THIS -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-graduation-cap"></i>
+            <strong>Education</strong>
+          </div>
+          <div class="nla-section-body">
+
+            <p class="nla-subsection-label">Grade School</p>
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label">School Name</label>
+                <input type="text" class="form-control" name="employeeschool1" value="{{employee.employeeschool1}}">
+              </div>
+              <div class="col-md-5">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" name="employeeaddress1" value="{{employee.employeeaddress1}}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Year Graduated</label>
+                <input type="text" class="form-control" name="employeescyear1" value="{{employee.employeescyear1}}">
+              </div>
+            </div>
+
+            <div class="nla-edu-divider"></div>
+
+            <p class="nla-subsection-label">High School</p>
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label">School Name</label>
+                <input type="text" class="form-control" name="employeeschool2" value="{{employee.employeeschool2}}">
+              </div>
+              <div class="col-md-5">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" name="employeeaddress2" value="{{employee.employeeaddress2}}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Year Graduated</label>
+                <input type="text" class="form-control" name="employeescyear2" value="{{employee.employeescyear2}}">
+              </div>
+            </div>
+
+            <div class="nla-edu-divider"></div>
+
+            <p class="nla-subsection-label">College</p>
+            <div class="row g-3 mb-3">
+              <div class="col-md-5">
+                <label class="form-label">School Name</label>
+                <input type="text" class="form-control" name="employeeschool3" value="{{employee.employeeschool3}}">
+              </div>
+              <div class="col-md-5">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" name="employeeaddress3" value="{{employee.employeeaddress3}}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Year Graduated</label>
+                <input type="text" class="form-control" name="employeescyear3" value="{{employee.employeescyear3}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Course</label>
+                <input type="text" class="form-control" name="employeeschool4" value="{{employee.employeeschool4}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Major</label>
+                <input type="text" class="form-control" name="employeeaddress4" value="{{employee.employeeaddress4}}">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Government IDs -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-id-badge"></i>
+            <strong>Government IDs</strong>
+          </div>
+          <div class="nla-section-body">
+            <div class="row g-3">
+
+              <div class="col-md-3">
+                <label class="form-label">SSS No.</label>
+                <input type="text" name="employeesss" class="form-control" value="{{employee.employeeSSS}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Pag-IBIG No.</label>
+                <input type="text" name="employeepagibig" class="form-control" value="{{employee.employeePagibig}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">PhilHealth No.</label>
+                <input type="text" name="employeephilhealth" class="form-control" value="{{employee.employeePhilhealth}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">TIN</label>
+                <input type="text" name="employeetin" class="form-control" value="{{employee.employeeTIN}}">
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="position:sticky; bottom:0; background:rgba(255,255,255,.97); border:1px solid #E3E6EB; border-radius:.65rem; padding:1rem 1.15rem; box-shadow:0 -4px 16px rgba(16,24,40,.06); display:flex; align-items:center; justify-content:flex-end; gap:.75rem; margin-top:.5rem;">
+          <a href="/employee/update" class="btn btn-outline-secondary" style="font-size:.9rem;">
+            <i class="fas fa-times me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn" style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-weight:500; font-size:.9rem; padding:.55rem 1.5rem;">
+            <i class="fas fa-save me-1"></i> Update Employee
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form                   = document.getElementById("employeeUpdateForm");
+  const office                 = "{{office}}";
+  const employeeId             = "{{employee.employeeid}}";
+  const selectedRegion         = document.getElementById("selectedRegion").value;
+  const selectedArea           = document.getElementById("selectedArea").value;
+  const selectedBranch         = document.getElementById("selectedBranch").value;
+  const regionSelect           = document.getElementById("regionSelect");
+  const areaSelect             = document.getElementById("areaSelect");
+  const branchSelect           = document.getElementById("branchSelect");
+  const regionManagerInput     = document.getElementById("regionManagerInput");
+  const areaManagerInput       = document.getElementById("areaManagerInput");
+  const rankSelect             = document.getElementById("rankSelect");
+  const employmentStatusSelect = document.getElementById("employmentStatusSelect");
+  const resignedDateInput      = document.getElementById("resignedDate");
+  const currentRankValue       = document.getElementById("currentRankValue")?.value || "";
+  const currentEmploymentStatusValue = document.getElementById("currentEmploymentStatusValue")?.value || "";
+  const currentDesignationValue      = document.getElementById("currentDesignationValue")?.value || "";
+const designationSelect            = document.getElementById("designationSelect");
+const designationText              = document.getElementById("designationText");
+  const officeSelect           = document.getElementById("officeSelect");
+
+  // Set office dropdown - default to vismin if no office
+  if (officeSelect) {
+    if (!office || office.trim() === '') {
+      officeSelect.value = "vismin";
+    }
+    
+    officeSelect.addEventListener("change", function() {
+      const selectedOffice = this.value;
+      // Reload regions when office changes
+      loadRegions(selectedOffice);
+      // Clear dependent fields
+      areaSelect.innerHTML = `<option value="">Select Area / Department</option>`;
+      branchSelect.innerHTML = `<option value="">Select Branch</option>`;
+      areaManagerInput.value = "";
+      regionManagerInput.value = "";
+    });
+  }
+
+  function normalize(value) {
+    return String(value || "").trim().toUpperCase();
+  }
+
+  const employmentRemarksWrapper = document.getElementById("employmentRemarksWrapper");
+const employmentStatusRemarks  = document.getElementById("employmentStatusRemarks");
+
+function toggleResignedDate() {
+  if (!employmentStatusSelect || !resignedDateInput) return;
+  const selectedText = employmentStatusSelect.options[employmentStatusSelect.selectedIndex]?.text?.trim().toUpperCase();
+  const isActive = selectedText === "ACTIVE";
+
+  // Resigned Date
+  if (isActive) {
+    resignedDateInput.disabled = true;
+    resignedDateInput.value    = "";
+    resignedDateInput.classList.add("uneditable");
+  } else {
+    resignedDateInput.disabled = false;
+    resignedDateInput.classList.remove("uneditable");
+  }
+
+  // Employment Status Remarks
+  if (employmentRemarksWrapper) {
+    if (isActive) {
+      employmentRemarksWrapper.style.display = "none";
+      employmentStatusRemarks.value = "";
+    } else {
+      employmentRemarksWrapper.style.display = "";
+    }
+  }
+}
+
+  async function loadRegions(officeParam) {
+    const officeValue = officeParam || office;
+    const res  = await fetch(`/employee/update/regions?office=${encodeURIComponent(officeValue)}`);
+    const data = await res.json();
+    regionSelect.innerHTML = `<option value="">Select Region / Division</option>`;
+    if (data.success && Array.isArray(data.regions)) {
+      data.regions.forEach((region) => {
+        const option           = document.createElement("option");
+        option.value           = region.regionid || region.region_id || region.region_name;
+        option.textContent     = region.regionname || region.region_name;
+        option.dataset.manager = region.region_manager || "";
+        if (String(option.value) === String(selectedRegion)) {
+          option.selected          = true;
+          regionManagerInput.value = option.dataset.manager || "";
+        }
+        regionSelect.appendChild(option);
+      });
+    }
+    if (selectedRegion) await loadAreas(selectedRegion);
+  }
+
+  async function loadAreas(region) {
+    const res  = await fetch(`/employee/update/areas?office=${encodeURIComponent(office)}&region=${encodeURIComponent(region)}`);
+    const data = await res.json();
+    areaSelect.innerHTML   = `<option value="">Select Area / Department</option>`;
+    branchSelect.innerHTML = `<option value="">Select Branch</option>`;
+    if (data.success && Array.isArray(data.areas)) {
+      data.areas.forEach((area) => {
+        const option           = document.createElement("option");
+        option.value           = area.areaid || area.id || area.area_id;
+        option.textContent     = area.area_name || area.areaname || area.name;
+        option.dataset.manager = area.area_manager || area.managerName || "";
+        if (String(option.value).trim() === String(selectedArea).trim()) {
+          option.selected        = true;
+          areaManagerInput.value = option.dataset.manager || "";
+        }
+        areaSelect.appendChild(option);
+      });
+    }
+    if (selectedArea) await loadBranches(region, selectedArea);
+  }
+
+  async function loadBranches(region, area) {
+    const res  = await fetch(`/employee/update/branches?office=${encodeURIComponent(office)}&region=${encodeURIComponent(region)}&area=${encodeURIComponent(area)}`);
+    const data = await res.json();
+    branchSelect.innerHTML = `<option value="">Select Branch</option>`;
+    console.log("selectedBranch:", JSON.stringify(selectedBranch));
+    console.log("branches from API:", data.branches);
+    if (data.success && Array.isArray(data.branches)) {
+      data.branches.forEach((branch) => {
+        const option       = document.createElement("option");
+        option.value       = branch.branchid;
+        option.textContent = branch.branch_name;
+        console.log(`Comparing option.value="${option.value}" vs selectedBranch="${selectedBranch}"`);
+        if (String(option.value).trim() === String(selectedBranch).trim()) option.selected = true;
+        branchSelect.appendChild(option);
+      });
+    }
+  }
+
+  regionSelect.addEventListener("change", function () {
+    regionManagerInput.value = this.options[this.selectedIndex].dataset.manager || "";
+    areaManagerInput.value   = "";
+    loadAreas(this.value);
+  });
+
+  areaSelect.addEventListener("change", function () {
+    areaManagerInput.value = this.options[this.selectedIndex].dataset.manager || "";
+    loadBranches(regionSelect.value, this.value);
+  });
+
+  employmentStatusSelect.addEventListener("change", toggleResignedDate);
+
+  if (rankSelect && currentRankValue) rankSelect.value = String(currentRankValue);
+  if (employmentStatusSelect && currentEmploymentStatusValue) employmentStatusSelect.value = currentEmploymentStatusValue;
+
+  if (designationSelect && currentDesignationValue) {
+  designationSelect.value = String(currentDesignationValue);
+}
+if (designationSelect && designationText) {
+  designationText.value = designationSelect.options[designationSelect.selectedIndex]?.dataset.designation || "";
+  designationSelect.addEventListener("change", function () {
+    designationText.value = this.options[this.selectedIndex]?.dataset.designation || "";
+  });
+}
+
+  toggleResignedDate();
+  loadRegions(office);
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const payload  = Object.fromEntries(formData.entries());
+    const selectedStatusOption = employmentStatusSelect.options[employmentStatusSelect.selectedIndex];
+    payload.employmentStatusText = selectedStatusOption?.text?.trim() || "";
+
+    try {
+      const response = await fetch(`/employee/update/save/${employeeId}`, {
+        method:  "PUT",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (result.success) {
+        await Swal.fire({ icon: "success", title: "Employee Updated", text: result.message || "Employee record updated successfully." });
+        window.location.href = "/employee/update";
+        return;
+      }
+      Swal.fire({ icon: "error", title: "Update Failed", text: result.message || "Unable to update employee." });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({ icon: "error", title: "Unexpected Error", text: "Something went wrong while updating employee." });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

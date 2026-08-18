@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    :root{
+      --ii-navy:      #16304A;
+      --ii-navy-deep: #0F2233;
+      --ii-blue:      #2E6F9E;
+      --ii-teal:      #1F7A6C;
+      --ii-gold:      #A8762A;
+      --ii-bg:        #F6F7F9;
+      --ii-surface:   #FFFFFF;
+      --ii-border:    #E3E6EB;
+      --ii-muted:     #6B7686;
+      --ii-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--ii-bg);
+    }
+
+    /* ---- Page header ---- */
+    .ii-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--ii-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .ii-title i{ color:var(--ii-blue); }
+    .ii-subtitle{ color:var(--ii-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Buttons ---- */
+    .btn-ii-teal{
+      background:var(--ii-teal); border-color:var(--ii-teal); color:#fff; font-weight:500;
+    }
+    .btn-ii-teal:hover{ background:#176255; border-color:#176255; color:#fff; }
+    .btn-ii-blue{
+      background:var(--ii-blue); border-color:var(--ii-blue); color:#fff; font-weight:500;
+    }
+    .btn-ii-blue:hover{ background:#255e87; border-color:#255e87; color:#fff; }
+    .btn-ii-outline{
+      background:var(--ii-surface); border-color:var(--ii-border); color:var(--ii-navy-deep);
+    }
+    .btn-ii-outline:hover{ background:var(--ii-bg); border-color:var(--ii-muted); color:var(--ii-navy-deep); }
+
+    .filter-section {
+      background: var(--ii-surface);
+      border: 1px solid var(--ii-border);
+      border-radius: .45rem;
+      padding: 1rem;
+    }
+    .stat-box {
+      background: var(--ii-surface);
+      border: 1px solid var(--ii-border);
+      border-radius: .5rem;
+      padding: .75rem 1rem;
+      text-align: center;
+    }
+    .stat-box .number {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .stat-box .label {
+      font-size: .75rem;
+      color: var(--ii-muted);
+      text-transform: uppercase;
+    }
+    .stat-box.in .number { color: var(--ii-teal); }
+    .stat-box.out .number { color: var(--ii-danger); }
+    
+    /* ---- Badges ---- */
+    .badge-received { background: rgba(31,122,108,.12); color: var(--ii-teal); padding: .25rem .75rem; border-radius: 1rem; font-size: .72rem; font-weight: 600; }
+    .badge-released { background: rgba(193,72,61,.12); color: var(--ii-danger); padding: .25rem .75rem; border-radius: 1rem; font-size: .72rem; font-weight: 600; }
+    .badge-adjustment { background: rgba(46,111,158,.12); color: var(--ii-blue); padding: .25rem .75rem; border-radius: 1rem; font-size: .72rem; font-weight: 600; }
+
+    /* ---- Data card ---- */
+    .ii-card{
+      border:1px solid var(--ii-border);
+      border-radius:.65rem;
+      background:var(--ii-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+    }
+    .ii-card-header{
+      padding:.85rem 1.15rem;
+      border-bottom:1px solid var(--ii-border);
+      display:flex;
+      align-items:center;
+      gap:.45rem;
+    }
+    .ii-card-header i{ color:var(--ii-blue); }
+    .ii-card-header .ii-card-title{
+      color:var(--ii-navy-deep);
+      font-weight:600;
+      font-size:.97rem;
+    }
+    .ii-card-header .ii-item-count{
+      color:var(--ii-muted);
+      font-weight:400;
+      font-size:.85rem;
+    }
+
+    /* ---- Table ---- */
+    .ii-card .table{ margin:0; font-size:.9rem; }
+    .ii-card .table thead th{
+      background:var(--ii-navy) !important;
+      color:#fff !important;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:600;
+      border-color:#1e3e5e;
+      padding:.75rem 1rem;
+      white-space:nowrap;
+    }
+    .ii-card .table tbody td{
+      padding:.65rem 1rem;
+      vertical-align:middle;
+      border-color:var(--ii-border);
+      color:var(--ii-navy-deep);
+    }
+    .ii-card .table tbody tr:hover{ background:var(--ii-bg); }
+
+    /* ---- Empty state ---- */
+    .ii-empty{
+      text-align:center;
+      color:var(--ii-muted);
+      padding:2.5rem 1rem;
+    }
+    .ii-empty i{
+      color:var(--ii-border);
+      font-size:1.5rem;
+      display:block;
+      margin-bottom:.5rem;
+    }
+
+    /* ---- Scrollable table container ---- */
+    .ii-table-scroll{
+      max-height:600px;
+      overflow-y:auto;
+    }
+    .ii-table-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .ii-table-scroll::-webkit-scrollbar-track {
+      background: var(--ii-bg);
+    }
+    .ii-table-scroll::-webkit-scrollbar-thumb {
+      background: var(--ii-border);
+      border-radius: 3px;
+    }
+    .ii-table-scroll::-webkit-scrollbar-thumb:hover {
+      background: var(--ii-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="ii-title">
+            <i class="fas fa-exchange-alt"></i> Inventory Movement Report
+          </h1>
+          <p class="ii-subtitle">Track all inventory transactions including requests and adjustments.</p>
+        </div>
+        <a href="/inventory/reports" class="btn btn-ii-outline">
+          <i class="fas fa-arrow-left me-1"></i> Back to Reports
+        </a>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-section mb-4">
+        <form method="GET" action="/inventory/reports/movement" class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label style="font-size:.8rem; font-weight:600; color:var(--ii-navy); display:block; margin-bottom:.35rem;">From Date</label>
+            <input type="date" name="startDate" class="form-control" value="{{filters.startDate}}" style="border-color:var(--ii-border);">
+          </div>
+          <div class="col-md-3">
+            <label style="font-size:.8rem; font-weight:600; color:var(--ii-navy); display:block; margin-bottom:.35rem;">To Date</label>
+            <input type="date" name="endDate" class="form-control" value="{{filters.endDate}}" style="border-color:var(--ii-border);">
+          </div>
+          <div class="col-md-2">
+            <label style="font-size:.8rem; font-weight:600; color:var(--ii-navy); display:block; margin-bottom:.35rem;">Item</label>
+            <select name="itemId" class="form-select" style="border-color:var(--ii-border);">
+              <option value="">All Items</option>
+              {{#each items}}
+                <option value="{{this.item_id}}" {{#if (eq ../filters.itemId this.item_id)}}selected{{/if}}>
+                  {{this.item_name}} ({{this.item_code}})
+                </option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label style="font-size:.8rem; font-weight:600; color:var(--ii-navy); display:block; margin-bottom:.35rem;">Type</label>
+            <select name="transactionType" class="form-select" style="border-color:var(--ii-border);">
+              <option value="">All Types</option>
+              <option value="received" {{#if (eq filters.transactionType "received")}}selected{{/if}}>Received (In)</option>
+              <option value="released" {{#if (eq filters.transactionType "released")}}selected{{/if}}>Released (Out)</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-ii-blue" style="flex:1;">
+              <i class="fas fa-filter me-1"></i> Generate
+            </button>
+            <a href="/inventory/reports/movement" class="btn btn-ii-outline">
+              <i class="fas fa-times"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Summary Statistics -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="stat-box">
+            <div class="number" style="color:var(--ii-blue);">{{report.transactions.length}}</div>
+            <div class="label">Total Transactions</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-box in">
+            <div class="number">{{report.summary.total_received}}</div>
+            <div class="label">Received (In)</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-box out">
+            <div class="number">{{report.summary.total_released}}</div>
+            <div class="label">Released (Out)</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-box">
+            <div class="number" style="color:var(--ii-muted);">
+              {{report.summary.received_count}} / {{report.summary.released_count}}
+            </div>
+            <div class="label">Transactions (In/Out)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="ii-card">
+        <div class="ii-card-header">
+          <i class="fas fa-list"></i>
+          <span class="ii-card-title">
+            Transaction History
+            <span class="ii-item-count">({{report.transactions.length}} records)</span>
+          </span>
+        </div>
+        <div class="ii-table-scroll">
+          <table class="table table-sm mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Item</th>
+                <th>Type</th>
+                <th class="text-center">Qty</th>
+                <th class="text-center">Previous</th>
+                <th class="text-center">New</th>
+                <th>Reference</th>
+                <th>User</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each report.transactions}}
+                <tr>
+                  <td style="font-size:.78rem; color:var(--ii-muted);">
+                    {{formatDate this.created_at}}
+                  </td>
+                  <td>
+                    <div style="font-weight:500; font-size:.85rem; color:var(--ii-navy-deep);">{{this.item_name}}</div>
+                    <div style="font-size:.7rem; color:var(--ii-muted);">{{this.item_code}}</div>
+                  </td>
+                  <td>
+                    <span class="{{#if (eq this.transaction_type "received")}}badge-received{{else}}badge-released{{/if}}">
+                      {{#if (eq this.transaction_type "received")}}
+                        <i class="fas fa-arrow-down"></i> Received
+                      {{else}}
+                        <i class="fas fa-arrow-up"></i> Released
+                      {{/if}}
+                    </span>
+                  </td>
+                  <td class="text-center" style="font-weight:600; color:var(--ii-navy-deep);">
+                    {{this.quantity}} {{this.item_unit}}
+                  </td>
+                  <td class="text-center">{{this.previous_count}}</td>
+                  <td class="text-center" style="font-weight:600; color:var(--ii-navy-deep);">{{this.new_count}}</td>
+                  <td style="font-size:.78rem; color:var(--ii-muted);">
+                    {{this.reference_type}}
+                    {{#if this.reference_id}}
+                      #{{this.reference_id}}
+                    {{/if}}
+                  </td>
+                  <td style="font-size:.78rem; color:var(--ii-navy-deep);">
+                    {{this.first_name}} {{this.last_name}}
+                  </td>
+                </tr>
+              {{else}}
+                <tr>
+                  <td colspan="8" class="ii-empty">
+                    <i class="fas fa-inbox"></i>
+                    No transactions found
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    #designationTable thead th {
+      background: #16304A;
+      color: #fff;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #1e3e5e;
+      padding: .75rem 1rem;
+    }
+    #designationTable tbody td {
+      font-size: .88rem;
+      color: #0F2233;
+      padding: .7rem 1rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+    #designationTable tbody tr:nth-child(odd) td { background: #F6F7F9; }
+    #designationTable tbody tr:nth-child(even) td { background: #fff; }
+    #designationTable tbody tr:hover td { background: #EBF3FA !important; }
+
+    .list-group-item {
+      border-color: #E3E6EB;
+      color: #0F2233;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+          <i class="fas fa-id-badge" style="color:#2E6F9E;"></i> Designation Management
+        </h1>
+        <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Add and manage designations used across employee records.</p>
+      </div>
+
+      <!-- Alert -->
+      <div id="formMessage" class="alert d-none mb-3" style="border-radius:.55rem; font-size:.9rem; border:none; border-left:4px solid transparent;"></div>
+
+      <!-- Add Form Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04); margin-bottom:1.25rem;">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-plus-circle" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Add Designation</strong>
+        </div>
+
+        <div style="padding:1.15rem;">
+          <form id="designationForm">
+            <div class="row g-3 align-items-start">
+
+              <div class="col-md-8">
+                <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">
+                  Designation Name <span style="color:#C1483D;">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="designationName"
+                  name="designation"
+                  placeholder="e.g. ACCOUNT COORDINATOR"
+                  autocomplete="off"
+                  required
+                  style="border-color:#E3E6EB;"
+                >
+                <div id="designationSuggestions" class="mt-2"></div>
+              </div>
+
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn w-100" id="designationSubmitBtn"
+                  style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-weight:500; font-size:.9rem;">
+                  <i class="fas fa-plus me-1"></i> Add Designation
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- List Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-table-list" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Existing Designations</strong>
+        </div>
+
+        <div style="padding:0;">
+          <div class="table-responsive">
+            <table class="table mb-0" id="designationTable">
+              <thead>
+                <tr>
+                  <th>Designation</th>
+                  <th style="width:20%; text-align:center;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="designationTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #E3E6EB; padding:.75rem 1.15rem; display:flex; align-items:center; justify-content:space-between; border-radius:0 0 .65rem .65rem;">
+          <button type="button" id="desigPrevBtn" class="btn btn-outline-secondary btn-sm" style="font-size:.82rem;">
+            <i class="fas fa-chevron-left me-1"></i> Previous
+          </button>
+          <span id="desigPageInfo" style="font-size:.82rem; color:#6B7686;"></span>
+          <button type="button" id="desigNextBtn" class="btn btn-outline-secondary btn-sm" style="font-size:.82rem;">
+            Next <i class="fas fa-chevron-right ms-1"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  let allDesignations = {{{json designations}}} || [];
+
+  const designationForm        = document.getElementById("designationForm");
+  const designationNameInput   = document.getElementById("designationName");
+  const designationSuggestions = document.getElementById("designationSuggestions");
+  const designationSubmitBtn   = document.getElementById("designationSubmitBtn");
+  const formMessage            = document.getElementById("formMessage");
+  const designationTableBody   = document.getElementById("designationTableBody");
+  const desigPrevBtn           = document.getElementById("desigPrevBtn");
+  const desigNextBtn           = document.getElementById("desigNextBtn");
+  const desigPageInfo          = document.getElementById("desigPageInfo");
+
+  const DESIG_PAGE_SIZE = 15;
+  let desigPage = 1;
+  let editingDesignationId = null;
+
+  function showMessage(type, message) {
+    const colorMap = {
+      success: { bg: 'rgba(31,122,108,.08)', border: '#1F7A6C', text: '#1F7A6C' },
+      danger:  { bg: 'rgba(193,72,61,.08)',  border: '#C1483D', text: '#C1483D' },
+      warning: { bg: 'rgba(168,118,42,.08)', border: '#A8762A', text: '#A8762A' },
+    };
+    const c = colorMap[type] || colorMap.danger;
+    formMessage.style.background    = c.bg;
+    formMessage.style.borderColor   = c.border;
+    formMessage.style.color         = c.text;
+    formMessage.textContent = message;
+    formMessage.classList.remove("d-none");
+  }
+
+  function clearMessage() {
+    formMessage.className = "alert d-none";
+    formMessage.textContent = "";
+  }
+
+  function normalizeDesignation(value) {
+    return String(value || "").trim().toUpperCase().replace(/\s+/g, " ");
+  }
+
+  function escapeAttr(value) {
+    return String(value || "").replace(/"/g, "&quot;");
+  }
+
+  function renderSuggestions(keyword) {
+    const term = normalizeDesignation(keyword);
+    if (!term) {
+      designationSuggestions.innerHTML = "";
+      designationSubmitBtn.disabled = false;
+      return;
+    }
+
+    const matches = allDesignations.filter(d =>
+      normalizeDesignation(d.designation).includes(term)
+    );
+
+    if (matches.length === 0) {
+      designationSuggestions.innerHTML = `
+        <div style="font-size:.82rem; color:#1F7A6C;">
+          <i class="fas fa-check-circle me-1"></i> No similar designation found.
+        </div>`;
+      designationSubmitBtn.disabled = false;
+      return;
+    }
+
+    const exactMatch = matches.find(d => normalizeDesignation(d.designation) === term);
+    let html = "";
+
+    if (exactMatch) {
+      html += `
+        <div style="font-size:.82rem; color:#A8762A; background:rgba(168,118,42,.08); border-left:3px solid #A8762A; border-radius:.35rem; padding:.5rem .75rem; margin-bottom:.5rem;">
+          <i class="fas fa-exclamation-triangle me-1"></i>
+          "<strong>${exactMatch.designation}</strong>" already exists.
+        </div>`;
+    } else {
+      html += `<div style="font-size:.78rem; color:#6B7686; margin-bottom:.35rem;">Similar designation(s) already exist:</div>`;
+    }
+
+    html += `<div class="list-group" style="border-radius:.45rem; overflow:hidden;">
+      ${matches.slice(0, 8).map(d => `
+        <div class="list-group-item py-1 px-3" style="font-size:.85rem;">${d.designation}</div>
+      `).join("")}
+    </div>`;
+
+    designationSuggestions.innerHTML = html;
+    designationSubmitBtn.disabled = !!exactMatch;
+  }
+
+  designationNameInput.addEventListener("input", function () {
+    renderSuggestions(this.value);
+  });
+
+  function renderDesignationPage() {
+    const totalPages = Math.max(1, Math.ceil(allDesignations.length / DESIG_PAGE_SIZE));
+    if (desigPage > totalPages) desigPage = totalPages;
+    if (desigPage < 1) desigPage = 1;
+
+    const start = (desigPage - 1) * DESIG_PAGE_SIZE;
+    const pageData = allDesignations.slice(start, start + DESIG_PAGE_SIZE);
+
+    if (pageData.length === 0) {
+      designationTableBody.innerHTML = `
+        <tr>
+          <td colspan="2" style="text-align:center; color:#6B7686; padding:2.5rem 1rem; font-size:.9rem;">
+            No designations added yet.
+          </td>
+        </tr>`;
+    } else {
+      designationTableBody.innerHTML = pageData.map(d => {
+        if (editingDesignationId === d.designation_id) {
+          return `
+            <tr>
+              <td>
+                <input type="text" class="form-control form-control-sm"
+                  id="editDesignationInput-${d.designation_id}"
+                  value="${escapeAttr(d.designation)}"
+                  style="border-color:#2E6F9E;">
+              </td>
+              <td style="text-align:center;">
+                <button type="button" class="btn btn-sm me-1"
+                  onclick="saveDesignationEdit(${d.designation_id})"
+                  style="background:#1F7A6C; border-color:#1F7A6C; color:#fff;" title="Save">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                  onclick="cancelDesignationEdit()" title="Cancel">
+                  <i class="fas fa-times"></i>
+                </button>
+              </td>
+            </tr>`;
+        }
+
+        return `
+          <tr>
+            <td>${d.designation}</td>
+            <td style="text-align:center;">
+              ${d.is_active
+                ? `<span style="background:rgba(31,122,108,.1); color:#1F7A6C; font-size:.75rem; font-weight:600; padding:.25rem .65rem; border-radius:1rem; display:inline-block;">Active</span>`
+                : `<span style="background:rgba(107,118,134,.1); color:#6B7686; font-size:.75rem; font-weight:600; padding:.25rem .65rem; border-radius:1rem; display:inline-block;">Inactive</span>`
+              }
+              <button type="button" class="btn btn-sm ms-1"
+                onclick="startDesignationEdit(${d.designation_id})"
+                style="background:transparent; border:1px solid #2E6F9E; color:#2E6F9E; font-size:.75rem;" title="Edit">
+                <i class="fas fa-pen"></i>
+              </button>
+            </td>
+          </tr>`;
+      }).join("");
+    }
+
+    desigPageInfo.textContent = `Page ${desigPage} of ${totalPages}`;
+    desigPrevBtn.disabled = desigPage === 1;
+    desigNextBtn.disabled = desigPage >= totalPages;
+  }
+
+  desigPrevBtn.addEventListener("click", function () {
+    if (desigPage > 1) { desigPage--; renderDesignationPage(); }
+  });
+
+  desigNextBtn.addEventListener("click", function () {
+    const totalPages = Math.ceil(allDesignations.length / DESIG_PAGE_SIZE);
+    if (desigPage < totalPages) { desigPage++; renderDesignationPage(); }
+  });
+
+  function addRowToTable(designationId, designationName) {
+    allDesignations.push({ designation_id: designationId, designation: designationName, is_active: 1 });
+    desigPage = Math.ceil(allDesignations.length / DESIG_PAGE_SIZE);
+    renderDesignationPage();
+  }
+
+  function startDesignationEdit(designationId) {
+    clearMessage();
+    editingDesignationId = designationId;
+    renderDesignationPage();
+  }
+
+  function cancelDesignationEdit() {
+    editingDesignationId = null;
+    renderDesignationPage();
+  }
+
+  async function saveDesignationEdit(designationId) {
+    const input = document.getElementById(`editDesignationInput-${designationId}`);
+    const newName = input.value.trim();
+    if (!newName) { showMessage("danger", "Designation name is required."); return; }
+
+    try {
+      const response = await fetch(`/records/designations/update/${designationId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ designation: newName }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        const target = allDesignations.find(d => d.designation_id === designationId);
+        if (target) target.designation = newName.toUpperCase();
+        editingDesignationId = null;
+        showMessage("success", result.message || "Designation successfully updated.");
+        renderDesignationPage();
+      } else {
+        showMessage("danger", result.message || "Failed to update designation.");
+      }
+    } catch (error) {
+      console.error(error);
+      showMessage("danger", "Unexpected error occurred while updating.");
+    }
+  }
+
+  designationForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    clearMessage();
+    const designationName = designationNameInput.value.trim();
+    if (!designationName) { showMessage("danger", "Designation name is required."); return; }
+
+    try {
+      const response = await fetch("/records/designations/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ designation: designationName }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        showMessage("success", result.message || "Designation successfully added.");
+        addRowToTable(result.designationId, designationName.toUpperCase());
+        designationForm.reset();
+        designationSuggestions.innerHTML = "";
+        designationSubmitBtn.disabled = false;
+      } else {
+        showMessage("danger", result.message || "Failed to save designation.");
+      }
+    } catch (error) {
+      console.error(error);
+      showMessage("danger", "Unexpected error occurred while saving.");
+    }
+  });
+
+  renderDesignationPage();
+</script>
+
+</body>
+</html>

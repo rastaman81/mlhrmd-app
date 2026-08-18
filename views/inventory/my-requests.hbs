@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --mr-navy:      #16304A;
+      --mr-navy-deep: #0F2233;
+      --mr-blue:      #2E6F9E;
+      --mr-teal:      #1F7A6C;
+      --mr-gold:      #A8762A;
+      --mr-bg:        #F6F7F9;
+      --mr-surface:   #FFFFFF;
+      --mr-border:    #E3E6EB;
+      --mr-muted:     #6B7686;
+      --mr-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--mr-bg);
+    }
+
+    /* ---- Page header ---- */
+    .mr-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--mr-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .mr-title i{ color:var(--mr-blue); }
+    .mr-subtitle{ color:var(--mr-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Buttons ---- */
+    .btn-mr-teal{
+      background:var(--mr-teal); border-color:var(--mr-teal); color:#fff; font-weight:500;
+    }
+    .btn-mr-teal:hover{ background:#176255; border-color:#176255; color:#fff; }
+    .btn-mr-blue{
+      background:var(--mr-blue); border-color:var(--mr-blue); color:#fff; font-weight:500;
+    }
+    .btn-mr-blue:hover{ background:#255e87; border-color:#255e87; color:#fff; }
+    .btn-mr-outline{
+      background:var(--mr-surface); border-color:var(--mr-border); color:var(--mr-navy-deep);
+    }
+    .btn-mr-outline:hover{ background:var(--mr-bg); border-color:var(--mr-muted); }
+
+    /* ---- Alert ---- */
+    #formMessage{
+      border-radius:.55rem;
+      font-size:.9rem;
+      border:none;
+      border-left:4px solid transparent;
+    }
+
+    /* ---- Stats cards ---- */
+    .stats-card{
+      background:var(--mr-surface);
+      border:1px solid var(--mr-border);
+      border-radius:.65rem;
+      padding:1rem 1.25rem;
+      transition:box-shadow .2s;
+    }
+    .stats-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,.06); }
+    .stats-number{ font-size:1.5rem; font-weight:700; color:var(--mr-navy-deep); }
+    .stats-label{
+      font-size:.78rem;
+      color:var(--mr-muted);
+      font-weight:500;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+    .stats-icon{ font-size:1.5rem; opacity:.6; }
+    .stat-total    .stats-number{ color:var(--mr-blue);   }
+    .stat-pending  .stats-number{ color:var(--mr-gold);   }
+    .stat-approved .stats-number{ color:var(--mr-teal);   }
+    .stat-rejected .stats-number{ color:var(--mr-danger); }
+
+    /* ---- Filter section ---- */
+    .mr-filter{
+      background:var(--mr-surface);
+      border:1px solid var(--mr-border);
+      border-radius:.65rem;
+      padding:1.1rem 1.15rem;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      margin-bottom:1.25rem;
+    }
+    .mr-filter .form-label{
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--mr-navy);
+      margin-bottom:.35rem;
+    }
+    .mr-filter .form-control,
+    .mr-filter .form-select{
+      border-color:var(--mr-border);
+    }
+    .mr-filter .form-control:focus,
+    .mr-filter .form-select:focus{
+      border-color:var(--mr-blue);
+      box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+    }
+
+    /* ---- Status badges ---- */
+    .status-badge{
+      padding:.25rem .75rem;
+      border-radius:1rem;
+      font-size:.72rem;
+      font-weight:600;
+      text-transform:uppercase;
+      display:inline-block;
+    }
+    .status-pending   { background:rgba(168,118,42,.12); color:var(--mr-gold);   }
+    .status-approved  { background:rgba(31,122,108,.12);  color:var(--mr-teal);   }
+    .status-rejected  { background:rgba(193,72,61,.12);   color:var(--mr-danger); }
+    .status-cancelled { background:rgba(108,117,125,.12); color:var(--mr-muted);  }
+
+    /* ---- Request cards ---- */
+    .request-card{
+      border:1px solid var(--mr-border);
+      border-radius:.65rem;
+      padding:1rem 1.25rem;
+      background:var(--mr-surface);
+      margin-bottom:.75rem;
+      transition:border-color .15s, box-shadow .15s;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+    }
+    .request-card:hover{
+      border-color:var(--mr-blue);
+      box-shadow:0 2px 8px rgba(46,111,158,.08);
+    }
+    .request-number{ font-weight:600; color:var(--mr-navy-deep); font-size:.95rem; }
+    .request-date  { font-size:.82rem; color:var(--mr-muted); margin-top:.15rem; }
+    .request-items { font-size:.85rem; color:var(--mr-muted); }
+    .request-detail{ font-size:.82rem; color:var(--mr-muted); margin-top:.15rem; }
+
+    .mr-approved-by{ font-size:.78rem; color:var(--mr-teal); }
+    .mr-rejected-by{ font-size:.78rem; color:var(--mr-danger); }
+    .mr-cancelled  { font-size:.78rem; color:var(--mr-muted); }
+    .mr-action-note{
+      font-size:.72rem;
+      color:var(--mr-muted);
+      margin-top:.2rem;
+    }
+    .mr-remarks{
+      font-size:.75rem;
+      color:var(--mr-muted);
+      margin-top:.25rem;
+    }
+
+    /* ---- Empty state ---- */
+    .mr-empty{
+      border:1px solid var(--mr-border);
+      border-radius:.65rem;
+      background:var(--mr-surface);
+      padding:3rem 1rem;
+      text-align:center;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+    }
+    .mr-empty i{
+      color:var(--mr-border);
+      font-size:2.5rem;
+      display:block;
+      margin-bottom:.5rem;
+    }
+    .mr-empty h5{ color:var(--mr-navy-deep); font-weight:600; }
+    .mr-empty p{ color:var(--mr-muted); margin:0; }
+    .mr-empty a{ color:var(--mr-blue); }
+
+    /* ---- Pagination ---- */
+    .mr-pagination{
+      margin-top:1.5rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:1rem;
+    }
+    .mr-page-info{ color:var(--mr-muted); font-size:.85rem; }
+    .pagination .page-link{ color:var(--mr-blue); border-color:var(--mr-border); }
+    .pagination .page-item.active .page-link{
+      background:var(--mr-navy); border-color:var(--mr-navy); color:#fff;
+    }
+    .pagination .page-item:not(.active) .page-link:hover{
+      background:var(--mr-bg); color:var(--mr-navy-deep);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="mr-title">
+            <i class="fas fa-clipboard-list"></i> My Requests
+          </h1>
+          <p class="mr-subtitle">Track the status of your item requests.</p>
+        </div>
+        <a href="/inventory/request" class="btn btn-mr-teal">
+          <i class="fas fa-plus me-1"></i> New Request
+        </a>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="formMessage" class="alert d-none mb-3"></div>
+
+      <!-- Statistics Cards -->
+      <div class="row g-3 mb-4">
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-total">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.total}}</div>
+                <div class="stats-label">Total Requests</div>
+              </div>
+              <i class="fas fa-clipboard-list stats-icon" style="color:var(--mr-blue);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-pending">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.pending}}</div>
+                <div class="stats-label">Pending</div>
+              </div>
+              <i class="fas fa-clock stats-icon" style="color:var(--mr-gold);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-approved">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.approved}}</div>
+                <div class="stats-label">Approved</div>
+              </div>
+              <i class="fas fa-check-circle stats-icon" style="color:var(--mr-teal);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-rejected">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.rejected}}</div>
+                <div class="stats-label">Rejected</div>
+              </div>
+              <i class="fas fa-times-circle stats-icon" style="color:var(--mr-danger);"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Filters -->
+      <div class="mr-filter">
+        <form method="GET" action="/inventory/my-requests" class="row g-3 align-items-end">
+
+          <div class="col-md-4">
+            <label class="form-label">Search</label>
+            <input
+              type="text"
+              name="search"
+              class="form-control"
+              placeholder="Request # or item..."
+              value="{{filters.search}}"
+            >
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option value="">All Status</option>
+              <option value="pending"   {{#if (eq filters.status "pending")}}selected{{/if}}>Pending</option>
+              <option value="approved"  {{#if (eq filters.status "approved")}}selected{{/if}}>Approved</option>
+              <option value="rejected"  {{#if (eq filters.status "rejected")}}selected{{/if}}>Rejected</option>
+              <option value="cancelled" {{#if (eq filters.status "cancelled")}}selected{{/if}}>Cancelled</option>
+            </select>
+          </div>
+
+          <div class="col-md-5 d-flex gap-2">
+            <button type="submit" class="btn btn-mr-blue flex-grow-1">
+              <i class="fas fa-filter me-1"></i> Apply Filters
+            </button>
+            <a href="/inventory/my-requests" class="btn btn-mr-outline" title="Clear filters">
+              <i class="fas fa-times"></i>
+            </a>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Requests List -->
+      {{#if requests.length}}
+        {{#each requests}}
+          <div class="request-card">
+            <div class="row align-items-center">
+
+              <!-- Request number + date -->
+              <div class="col-md-3">
+                <div class="request-number">{{this.request_number}}</div>
+                <div class="request-date">
+                  <i class="far fa-calendar-alt me-1"></i>{{formatDate this.created_at}}
+                </div>
+              </div>
+
+              <!-- Items summary -->
+              <div class="col-md-4">
+                <div class="request-items">
+                  <i class="fas fa-box me-1"></i>{{this.items_summary}}
+                </div>
+                <div class="request-detail">Total: {{this.total_items}} item(s)</div>
+              </div>
+
+              <!-- Status + remarks -->
+              <div class="col-md-2">
+                <span class="status-badge status-{{this.status}}">{{this.status}}</span>
+                {{#if this.remarks}}
+                  <div class="mr-remarks">
+                    <i class="fas fa-comment me-1"></i>{{this.remarks}}
+                  </div>
+                {{/if}}
+              </div>
+
+              <!-- Action / approval info -->
+              <div class="col-md-3 text-end">
+
+                {{#if (eq this.status "pending")}}
+                  <button
+                    onclick="cancelRequest({{this.request_id}}, '{{this.request_number}}')"
+                    class="btn btn-sm"
+                    style="background:var(--mr-danger); border-color:var(--mr-danger); color:#fff;"
+                  >
+                    <i class="fas fa-times me-1"></i> Cancel
+                  </button>
+                {{/if}}
+
+                {{#if (eq this.status "approved")}}
+                  <div class="mr-approved-by">
+                    <i class="fas fa-check-circle me-1"></i>
+                    Approved by {{this.approved_by_first}} {{this.approved_by_last}}
+                  </div>
+                  <div class="mr-action-note">{{formatDate this.approved_date}}</div>
+                {{/if}}
+
+                {{#if (eq this.status "rejected")}}
+                  <div class="mr-rejected-by">
+                    <i class="fas fa-times-circle me-1"></i>
+                    Rejected by {{this.rejected_by_first}} {{this.rejected_by_last}}
+                  </div>
+                  {{#if this.rejection_reason}}
+                    <div class="mr-action-note">Reason: {{this.rejection_reason}}</div>
+                  {{/if}}
+                {{/if}}
+
+                {{#if (eq this.status "cancelled")}}
+                  <div class="mr-cancelled">
+                    <i class="fas fa-ban me-1"></i> Cancelled
+                  </div>
+                {{/if}}
+
+              </div>
+
+            </div>
+          </div>
+        {{/each}}
+
+      {{else}}
+        <div class="mr-empty">
+          <i class="fas fa-inbox"></i>
+          <h5>No requests found</h5>
+          <p>
+            {{#if filters.search}}
+              No requests match your search criteria.
+            {{else}}
+              You haven't made any item requests yet.<br>
+              <a href="/inventory/request">Create your first request</a>
+            {{/if}}
+          </p>
+        </div>
+      {{/if}}
+
+      <!-- Pagination -->
+      {{#if (gt pagination.totalPages 1)}}
+        <div class="mr-pagination">
+          <div class="mr-page-info">
+            Page {{pagination.currentPage}} of {{pagination.totalPages}}
+            ({{pagination.totalItems}} total requests)
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+
+              <li class="page-item {{#if (eq pagination.currentPage 1)}}disabled{{/if}}">
+                <a class="page-link" href="?page={{dec pagination.currentPage 1}}&status={{filters.status}}&search={{filters.search}}">
+                  Previous
+                </a>
+              </li>
+
+              {{#each (range 1 pagination.totalPages)}}
+                <li class="page-item {{#if (eq this ../pagination.currentPage)}}active{{/if}}">
+                  <a class="page-link" href="?page={{this}}&status={{../filters.status}}&search={{../filters.search}}">
+                    {{this}}
+                  </a>
+                </li>
+              {{/each}}
+
+              <li class="page-item {{#if (eq pagination.currentPage pagination.totalPages)}}disabled{{/if}}">
+                <a class="page-link" href="?page={{inc pagination.currentPage 1}}&status={{filters.status}}&search={{filters.search}}">
+                  Next
+                </a>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
+      {{/if}}
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // =============================================
+  // CANCEL REQUEST
+  // =============================================
+
+  const formMessage = document.getElementById('formMessage');
+
+  function showMessage(type, message) {
+    const colorMap = {
+      success: { bg:'rgba(31,122,108,.08)',  border:'#1F7A6C', text:'#1F7A6C' },
+      danger:  { bg:'rgba(193,72,61,.08)',   border:'#C1483D', text:'#C1483D' },
+      warning: { bg:'rgba(168,118,42,.08)',  border:'#A8762A', text:'#A8762A' },
+      info:    { bg:'rgba(46,111,158,.08)',  border:'#2E6F9E', text:'#2E6F9E' },
+    };
+    const c = colorMap[type] || colorMap.info;
+    formMessage.style.background  = c.bg;
+    formMessage.style.borderColor = c.border;
+    formMessage.style.color       = c.text;
+    formMessage.textContent       = message;
+    formMessage.className         = 'alert mb-3 show';
+    formMessage.style.display     = 'block';
+
+    setTimeout(() => {
+      formMessage.className     = 'alert d-none';
+      formMessage.style.display = 'none';
+    }, 5000);
+  }
+
+  async function cancelRequest(requestId, requestNumber) {
+    const result = await Swal.fire({
+      title: 'Cancel Request?',
+      html: `<span style="color:#6B7686;">Are you sure you want to cancel <strong style="color:#0F2233;">${requestNumber}</strong>?<br>This action cannot be undone.</span>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, cancel it',
+      cancelButtonText: 'Keep it',
+      confirmButtonColor: '#C1483D',
+      cancelButtonColor: '#6B7686',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const response = await fetch(`/inventory/request/${requestId}/cancel`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showMessage('success', '✅ ' + data.message);
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        showMessage('danger', '❌ ' + data.message);
+      }
+
+    } catch (error) {
+      console.error('Cancel error:', error);
+      showMessage('danger', '❌ Failed to cancel request. Please try again.');
+    }
+  }
+</script>
+
+</body>
+</html>

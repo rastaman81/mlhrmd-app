@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    :root{
+      --ii-navy:      #16304A;
+      --ii-navy-deep: #0F2233;
+      --ii-blue:      #2E6F9E;
+      --ii-teal:      #1F7A6C;
+      --ii-gold:      #A8762A;
+      --ii-bg:        #F6F7F9;
+      --ii-surface:   #FFFFFF;
+      --ii-border:    #E3E6EB;
+      --ii-muted:     #6B7686;
+      --ii-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--ii-bg);
+    }
+
+    /* ---- Page header ---- */
+    .ii-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--ii-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .ii-title i{ color:var(--ii-blue); }
+    .ii-subtitle{ color:var(--ii-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Buttons ---- */
+    .btn-ii-teal{
+      background:var(--ii-teal); border-color:var(--ii-teal); color:#fff; font-weight:500;
+    }
+    .btn-ii-teal:hover{ background:#176255; border-color:#176255; color:#fff; }
+    .btn-ii-blue{
+      background:var(--ii-blue); border-color:var(--ii-blue); color:#fff; font-weight:500;
+    }
+    .btn-ii-blue:hover{ background:#255e87; border-color:#255e87; color:#fff; }
+    .btn-ii-outline{
+      background:var(--ii-surface); border-color:var(--ii-border); color:var(--ii-navy-deep);
+    }
+    .btn-ii-outline:hover{ background:var(--ii-bg); border-color:var(--ii-muted); color:var(--ii-navy-deep); }
+
+    .filter-section {
+      background: var(--ii-surface);
+      border: 1px solid var(--ii-border);
+      border-radius: .45rem;
+      padding: 1rem;
+    }
+    .stat-box {
+      background: var(--ii-surface);
+      border: 1px solid var(--ii-border);
+      border-radius: .5rem;
+      padding: .75rem 1rem;
+      text-align: center;
+    }
+    .stat-box .number {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .stat-box .label {
+      font-size: .75rem;
+      color: var(--ii-muted);
+      text-transform: uppercase;
+    }
+    .stat-box.total .number { color: var(--ii-blue); }
+    .stat-box.low .number { color: var(--ii-gold); }
+    .stat-box.out .number { color: var(--ii-danger); }
+    .stat-box.good .number { color: var(--ii-teal); }
+    
+    .status-low { color: var(--ii-gold); font-weight:600; }
+    .status-out { color: var(--ii-danger); font-weight:600; }
+    .status-good { color: var(--ii-teal); font-weight:600; }
+    .status-moderate { color: var(--ii-blue); font-weight:600; }
+    
+    .report-table th {
+      background: var(--ii-navy) !important;
+      color: #fff !important;
+      font-size: .75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      border-color: #1e3e5e;
+      padding: .75rem 1rem;
+      white-space: nowrap;
+    }
+    .report-table td {
+      font-size: .85rem;
+      vertical-align: middle;
+      padding: .65rem 1rem;
+      border-color: var(--ii-border);
+      color: var(--ii-navy-deep);
+    }
+    .report-table tbody tr:hover { background: var(--ii-bg); }
+
+    /* ---- Data card ---- */
+    .ii-card{
+      border:1px solid var(--ii-border);
+      border-radius:.65rem;
+      background:var(--ii-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+    }
+    .ii-card-header{
+      padding:.85rem 1.15rem;
+      border-bottom:1px solid var(--ii-border);
+      display:flex;
+      align-items:center;
+      gap:.45rem;
+    }
+    .ii-card-header i{ color:var(--ii-blue); }
+    .ii-card-header .ii-card-title{
+      color:var(--ii-navy-deep);
+      font-weight:600;
+      font-size:.97rem;
+    }
+    .ii-card-header .ii-item-count{
+      color:var(--ii-muted);
+      font-weight:400;
+      font-size:.85rem;
+    }
+
+    .ii-empty{
+      text-align:center;
+      color:var(--ii-muted);
+      padding:2.5rem 1rem;
+    }
+    .ii-empty i{
+      color:var(--ii-border);
+      font-size:1.5rem;
+      display:block;
+      margin-bottom:.5rem;
+    }
+
+    /* ---- Legend ---- */
+    .ii-legend{
+      padding:.75rem 1rem;
+      background:var(--ii-surface);
+      border-radius:.45rem;
+      border:1px solid var(--ii-border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="ii-title">
+            <i class="fas fa-warehouse"></i> Stock Status Report
+          </h1>
+          <p class="ii-subtitle">Current inventory levels with stock health indicators.</p>
+        </div>
+        <a href="/inventory/reports" class="btn btn-ii-outline">
+          <i class="fas fa-arrow-left me-1"></i> Back to Reports
+        </a>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-section mb-4">
+        <form method="GET" action="/inventory/reports/stock-status" class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label style="font-size:.8rem; font-weight:600; color:var(--ii-navy); display:block; margin-bottom:.35rem;">Min Stock</label>
+            <input type="number" name="minStock" class="form-control" placeholder="Show items with less than..." 
+                   value="{{filters.minStock}}" style="border-color:var(--ii-border);">
+          </div>
+          <div class="col-md-3">
+            <label style="font-size:.8rem; font-weight:600; color:var(--ii-navy); display:block; margin-bottom:.35rem;">Max Stock</label>
+            <input type="number" name="maxStock" class="form-control" placeholder="Show items with more than..." 
+                   value="{{filters.maxStock}}" style="border-color:var(--ii-border);">
+          </div>
+          <div class="col-md-3">
+            <label style="font-size:.8rem; font-weight:600; color:var(--ii-navy); display:block; margin-bottom:.35rem;">Show Inactive</label>
+            <select name="showInactive" class="form-select" style="border-color:var(--ii-border);">
+              <option value="false" {{#if (eq filters.showInactive "false")}}selected{{/if}}>Hide Inactive</option>
+              <option value="true" {{#if (eq filters.showInactive "true")}}selected{{/if}}>Show Inactive</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-ii-blue" style="flex:1;">
+              <i class="fas fa-filter me-1"></i> Generate
+            </button>
+            <a href="/inventory/reports/stock-status" class="btn btn-ii-outline">
+              <i class="fas fa-times"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Summary Statistics -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="stat-box total">
+            <div class="number">{{report.summary.total_items}}</div>
+            <div class="label">Total Items</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-box out">
+            <div class="number">{{report.summary.out_of_stock}}</div>
+            <div class="label">Out of Stock</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-box low">
+            <div class="number">{{report.summary.low_stock}}</div>
+            <div class="label">Low Stock</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-box good">
+            <div class="number">{{report.summary.total_units}}</div>
+            <div class="label">Total Units</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Status Table -->
+      <div class="ii-card">
+        <div class="ii-card-header">
+          <i class="fas fa-list"></i>
+          <span class="ii-card-title">
+            Stock Status
+            <span class="ii-item-count">({{report.items.length}} items)</span>
+          </span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm report-table mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th>Code</th>
+                <th>Unit</th>
+                <th class="text-center">Stock</th>
+                <th class="text-center">Order Level</th>
+                <th>Status</th>
+                <th>Last Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each report.items}}
+                <tr>
+                  <td style="color:var(--ii-muted); font-weight:500;">{{add @index 1}}</td>
+                  <td>
+                    <div style="font-weight:500; font-size:.85rem; color:var(--ii-navy-deep);">{{this.item_name}}</div>
+                    {{#if this.item_description}}
+                      <div style="font-size:.7rem; color:var(--ii-muted);">{{this.item_description}}</div>
+                    {{/if}}
+                  </td>
+                  <td><span style="color:var(--ii-muted); font-size:.82rem;">{{this.item_code}}</span></td>
+                  <td>{{this.item_unit}}</td>
+                  <td class="text-center" style="font-weight:600; font-size:1.05rem; color:var(--ii-navy-deep);">
+                    {{this.stock}}
+                    {{#if (eq this.stock 0)}}
+                      <span class="status-out">(Out)</span>
+                    {{else}}
+                      {{#if (lt this.stock this.item_order_level)}}
+                        <span class="status-low">(Low)</span>
+                      {{/if}}
+                    {{/if}}
+                  </td>
+                  <td class="text-center">{{this.item_order_level}}</td>
+                  <td>
+                    {{#if (eq this.stock_status "Out of Stock")}}
+                      <span class="status-out"><i class="fas fa-times-circle"></i> Out of Stock</span>
+                    {{else if (eq this.stock_status "Low Stock")}}
+                      <span class="status-low"><i class="fas fa-exclamation-triangle"></i> Low Stock</span>
+                    {{else if (eq this.stock_status "Moderate")}}
+                      <span class="status-moderate"><i class="fas fa-minus-circle"></i> Moderate</span>
+                    {{else}}
+                      <span class="status-good"><i class="fas fa-check-circle"></i> Good</span>
+                    {{/if}}
+                  </td>
+                  <td style="font-size:.78rem; color:var(--ii-muted);">
+                    {{#if this.updated_at}}
+                      {{formatDate this.updated_at}}
+                    {{else}}
+                      {{formatDate this.created_at}}
+                    {{/if}}
+                  </td>
+                </tr>
+              {{else}}
+                <tr>
+                  <td colspan="8" class="ii-empty">
+                    <i class="fas fa-box-open"></i>
+                    No items found matching your criteria
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="ii-legend" style="margin-top:1rem;">
+        <div class="row g-2">
+          <div class="col-auto">
+            <span class="status-good"><i class="fas fa-check-circle"></i> Good</span>
+            <span style="color:var(--ii-muted); font-size:.78rem;">- Stock above order level</span>
+          </div>
+          <div class="col-auto">
+            <span class="status-moderate"><i class="fas fa-minus-circle"></i> Moderate</span>
+            <span style="color:var(--ii-muted); font-size:.78rem;">- Stock at or below 2x order level</span>
+          </div>
+          <div class="col-auto">
+            <span class="status-low"><i class="fas fa-exclamation-triangle"></i> Low Stock</span>
+            <span style="color:var(--ii-muted); font-size:.78rem;">- Stock below order level</span>
+          </div>
+          <div class="col-auto">
+            <span class="status-out"><i class="fas fa-times-circle"></i> Out of Stock</span>
+            <span style="color:var(--ii-muted); font-size:.78rem;">- Zero stock available</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

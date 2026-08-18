@@ -1,0 +1,21 @@
+<!-- views/partials/menu.hbs -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">My System</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        {{#each menus}}
+          <li class="nav-item">
+            <a class="nav-link" href="{{this.url}}">
+              <i class="fas {{this.icon}}"></i>
+              {{this.menu_name}}
+            </a>
+          </li>
+        {{/each}}
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

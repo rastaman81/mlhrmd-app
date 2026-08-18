@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Payroll Utilities</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Type (same pairing used on the New Loan Application page) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!--
+      Page-specific styling for Payroll Utilities.
+      Scoped under .main-content / .pu- prefix, same convention as the
+      New Loan Application page, so it can't bleed into the header
+      partial or other pages. Safe to lift into its own stylesheet
+      (e.g. payrollUtilities.css) if you'd rather keep it out of the
+      template.
+    -->
+    <style>
+      :root{
+        --pu-navy: #16304A;
+        --pu-navy-deep: #0F2233;
+        --pu-blue: #2E6F9E;
+        --pu-teal: #1F7A6C;
+        --pu-gold: #A8762A;
+        --pu-bg: #F6F7F9;
+        --pu-surface: #FFFFFF;
+        --pu-border: #E3E6EB;
+        --pu-muted: #6B7686;
+        --pu-danger: #C1483D;
+      }
+
+      .main-content{
+        font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background:var(--pu-bg);
+      }
+
+      /* ---- Page header ---- */
+      .main-content .pu-page-head{
+        margin-bottom:1.5rem;
+      }
+      .main-content .pu-title{
+        font-size:1.5rem;
+        font-weight:700;
+        color:var(--pu-navy-deep);
+        margin:0;
+        display:flex;
+        align-items:center;
+        gap:.6rem;
+      }
+      .main-content .pu-title i{ color:var(--pu-blue); }
+      .main-content .pu-subtitle{
+        margin:.35rem 0 0;
+        color:var(--pu-muted);
+        font-size:.92rem;
+      }
+
+      /* ---- Form card ---- */
+      .main-content .search-card{
+        border:1px solid var(--pu-border);
+        border-radius:.65rem;
+        box-shadow:0 1px 2px rgba(16,24,40,.04);
+        padding:1.5rem;
+      }
+      /* The card already prints its own "Payroll Utilities" title via
+         the <h2> below — hide the duplicate intro to avoid saying the
+         same thing twice in a row. */
+      .main-content .search-card > h2{
+        font-size:1.05rem;
+        font-weight:600;
+        color:var(--pu-navy-deep);
+        margin-bottom:1.25rem;
+        padding-bottom:1rem;
+        border-bottom:1px solid var(--pu-border);
+      }
+      .main-content .search-card > h2 i{ color:var(--pu-blue); }
+
+      .main-content .form-label{
+        font-size:.8rem;
+        font-weight:600;
+        color:var(--pu-navy);
+        margin-bottom:.35rem;
+      }
+      .main-content .form-select,
+      .main-content .form-control{
+        border-color:var(--pu-border);
+      }
+      .main-content .form-select:focus,
+      .main-content .form-control:focus{
+        border-color:var(--pu-blue);
+        box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+      }
+
+      /* ---- Conditional sections (deduction / upload) ---- */
+      .main-content .pu-subsection{
+        background:var(--pu-bg);
+        border:1px solid var(--pu-border);
+        border-radius:.55rem;
+        padding:1.1rem 1.15rem .1rem;
+        margin-top:.25rem;
+      }
+
+      /* ---- Action buttons ---- */
+      .main-content .btn-pu-navy{
+        background:var(--pu-navy); border-color:var(--pu-navy); color:#fff;
+      }
+      .main-content .btn-pu-navy:hover{
+        background:var(--pu-navy-deep); border-color:var(--pu-navy-deep); color:#fff;
+      }
+      .main-content .btn-pu-outline{
+        color:var(--pu-navy);
+        border-color:var(--pu-border);
+        background:#fff;
+      }
+      .main-content .btn-pu-outline:hover{
+        background:var(--pu-bg);
+        border-color:var(--pu-muted);
+        color:var(--pu-navy-deep);
+      }
+
+      /* ---- Results table ---- */
+      .main-content .table-container{
+        border:1px solid var(--pu-border);
+        border-radius:.65rem;
+        box-shadow:0 1px 2px rgba(16,24,40,.04);
+        padding:1.25rem;
+      }
+      .main-content #resultsTitle{
+        font-size:1.05rem;
+        font-weight:600;
+        color:var(--pu-navy-deep);
+        margin:0;
+      }
+      .main-content #report-table thead th{
+        background:var(--pu-navy-deep) !important;
+        color:#fff !important;
+        font-size:.72rem;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+        font-weight:600;
+        border:none;
+      }
+      .main-content #report-table tbody td{
+        vertical-align:middle;
+        border-color:var(--pu-border);
+      }
+      .main-content #exportBtn{
+        color:var(--pu-blue);
+        border-color:var(--pu-blue);
+      }
+      .main-content #exportBtn:hover{
+        background:var(--pu-blue);
+        border-color:var(--pu-blue);
+        color:#fff;
+      }
+
+      /* ---- Loading + error states ---- */
+      .main-content #report-loading .spinner-border{
+        color:var(--pu-blue) !important;
+      }
+      .main-content #error-message{
+        border-radius:.55rem;
+        border-left:4px solid var(--pu-danger);
+        background:#FBEDEB;
+        color:var(--pu-danger);
+      }
+
+      /* ---- Flatpickr: align the calendar with the page palette ---- */
+      .flatpickr-day.selected,
+      .flatpickr-day.startRange,
+      .flatpickr-day.endRange{
+        background:var(--pu-blue) !important;
+        border-color:var(--pu-blue) !important;
+      }
+      .flatpickr-day.inRange{
+        background:rgba(46,111,158,.12) !important;
+        border-color:rgba(46,111,158,.12) !important;
+        box-shadow: -5px 0 0 rgba(46,111,158,.12), 5px 0 0 rgba(46,111,158,.12) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+      <!-- Navbar Section (Top Bar) -->
+      {{> header}}
+
+      <!-- Main Content Section -->
+      <div class="main-content">
+
+        <div class="pu-page-head">
+          <h1 class="pu-title"><i class="fas fa-calculator"></i> Payroll Utilities</h1>
+          <p class="pu-subtitle">Run payroll tasks, upload data, and review results for a selected office and region.</p>
+        </div>
+
+        <!-- Payroll Utilities Card -->
+        <div class="search-card">
+          <h2>
+            <i class="fas fa-sliders me-2"></i>
+            Task Configuration
+          </h2>
+
+          <!-- Payroll Utilities Form -->
+          <form id="payrollUtilitiesForm">
+            <div class="row g-3 mb-3">
+              <!-- Date Range Picker -->
+              <div class="col-md-3">
+                <label for="dateRange" class="form-label">Date Range</label>
+                <input
+                  type="text"
+                  id="dateRange"
+                  class="form-control datepicker"
+                  placeholder="Select date range"
+                  readonly
+                />
+              </div>
+
+              <!-- Office Selection -->
+              <div class="col-md-3">
+                <label for="officeSelect" class="form-label">Office</label>
+                <select
+                  name="office"
+                  id="officeSelect"
+                  class="form-select"
+                  required
+                >
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">
+                      {{this.office_name}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Utility/Task Selection -->
+              <div class="col-md-3">
+                <label for="utilityName" class="form-label">Tasks</label>
+                <select
+                  name="utilityName"
+                  id="utilityName"
+                  class="form-select"
+                  required
+                >
+                  <option value="" disabled selected>Select Task</option>
+                  {{#each utilities}}
+                    <option value="{{this.utility_name}}">
+                      {{this.utility_name}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Region Selection -->
+              <div class="col-md-3">
+                <label for="regionSelect" class="form-label">Region</label>
+                <select
+                  name="region"
+                  id="regionSelect"
+                  class="form-select"
+
+                >
+                  <option value="" selected>All Regions</option>
+                  {{#each regions}}
+                    <option value="{{this.region_name}}">
+                      {{this.region_name}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+
+            </div>
+
+            <div class="row g-3 mb-3 justify-content-center">
+
+            <!-- Hidden Section (initially hidden) -->
+            <div class="row g-3 mb-3 justify-content-center pu-subsection" id="deductionFields" style="display: none;">
+              <div class="col-md-4">
+                <label id="descriptionLabel" for="description" class="form-label">Description</label>
+                <input
+                  type="text"
+                  id="description"
+                  class="form-control"
+                  placeholder="Enter description"
+                  name="description"
+                />
+              </div>
+              <div class="col-md-3">
+                <label for="amount" class="form-label">Amount</label>
+                <input
+                  type="number"
+                  id="amount"
+                  class="form-control"
+                  placeholder="Enter amount"
+                  step="0.01"
+                  name="amount"
+                />
+              </div>
+
+            </div>
+
+            <!-- Upload Payroll Data Section -->
+<div class="row g-3 mb-3 justify-content-center pu-subsection" id="uploadFields" style="display: none;">
+  <div class="col-md-6">
+    <label for="fileUpload" class="form-label">Upload Payroll File</label>
+    <input
+      type="file"
+      id="fileUpload"
+      name="file"
+      class="form-control"
+      accept=".xlsx, .csv"
+    />
+  </div>
+</div>
+
+            <!-- Action Buttons -->
+            <div class="row g-3 mb-3 justify-content-center">
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-pu-navy me-2 flex-grow-1">
+                  <i class="fas fa-play me-2"></i>Execute Task
+                </button>
+                <button type="button" class="btn btn-pu-outline flex-grow-1" id="resetBtn">
+                  <i class="fas fa-redo me-2"></i>Reset
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Results Container -->
+        <div class="table-container mt-4" id="reportResults" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 id="resultsTitle">Task Results</h3>
+            <button class="btn btn-sm btn-pu-outline" id="exportBtn">
+              <i class="fas fa-download me-1"></i>Export to Excel
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table id="report-table" class="table table-striped">
+              <thead>
+                <tr>
+                  <!-- Dynamic headers will be inserted here -->
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Results will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="report-loading" class="text-center my-5" style="display: none">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 text-muted">Processing task...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div
+          id="error-message"
+          class="alert alert-danger mt-4"
+          style="display: none"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Required JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/scripts.js"></script>
+
+    <!-- Custom JavaScript for this page -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date range picker
+        flatpickr("#dateRange", {
+          mode: "range",
+          dateFormat: "Y-m-d",
+          allowInput: true
+        });
+
+        // Form submission handler
+        document.getElementById('payrollUtilitiesForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          executeTask();
+        });
+
+        // Reset button handler
+        document.getElementById('resetBtn').addEventListener('click', function() {
+          document.getElementById('payrollUtilitiesForm').reset();
+          document.getElementById('reportResults').style.display = 'none';
+          document.getElementById('error-message').style.display = 'none';
+        });
+
+        // Export button handler
+        document.getElementById('exportBtn').addEventListener('click', function() {
+          exportToExcel();
+        });
+
+        // Office selection change handler
+        document.getElementById('officeSelect').addEventListener('change', async function() {
+          const office = this.value;
+          const regionSelect = document.getElementById('regionSelect');
+
+          if (!office) {
+            regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+            return;
+          }
+
+          try {
+            // Show loading state
+            regionSelect.disabled = true;
+            const originalValue = regionSelect.value;
+            regionSelect.innerHTML = '<option value="">Loading regions...</option>';
+
+            const response = await fetch(`/payroll/utilities/regions?office=${encodeURIComponent(office)}`);
+            const data = await response.json();
+
+            if (data.success) {
+              // Populate regions dropdown
+              regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+              data.regions.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region.region_name;
+                option.textContent = region.region_name;
+                regionSelect.appendChild(option);
+              });
+
+              // Restore original value if it exists in new options
+              if (originalValue) {
+                const optionExists = Array.from(regionSelect.options).some(
+                  opt => opt.value === originalValue
+                );
+                if (optionExists) {
+                  regionSelect.value = originalValue;
+                }
+              }
+            } else {
+              showError(data.message || 'Failed to load regions');
+              regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+            }
+          } catch (error) {
+            console.error('Error loading regions:', error);
+            showError('Failed to load regions');
+            regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+          } finally {
+            regionSelect.disabled = false;
+          }
+        });
+      });
+
+      async function executeTask() {
+  const form = document.getElementById('payrollUtilitiesForm');
+  const formData = new FormData(form);
+
+  const utilityName = document.getElementById('utilityName').value || '';
+  const dateRange = document.getElementById('dateRange').value;
+
+  // Append dateRange manually (since it's not inside form input)
+  if (dateRange) {
+    formData.append('dateRange', dateRange);
+  }
+
+  const isUploadTask = utilityName.toLowerCase().includes('upload payroll data');
+
+  // Debug: see what's inside FormData
+  for (let pair of formData.entries()) {
+    console.log(pair[0] + ':', pair[1]);
+  }
+
+  // UI states
+  document.getElementById('report-loading').style.display = 'block';
+  document.getElementById('reportResults').style.display = 'none';
+  document.getElementById('error-message').style.display = 'none';
+
+  try {
+    const response = await fetch('/payroll/utilities/execute-task', {
+      method: 'POST',
+      body: formData // ✅ ALWAYS use FormData now (supports file + normal fields)
+    });
+
+    const data = await response.json();
+
+    console.log('Response:', data);
+
+    if (data.success) {
+      // 🔹 Show alert depending on issues
+      if (data.hasIssues) {
+        Swal.fire({
+          title: 'Issues Found!',
+          html: `<div style="color: #d33; font-weight: bold;">${data.message}</div>`,
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
+      } else {
+        Swal.fire({
+          title: 'Success!',
+          text: data.message,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+      }
+
+      // 🔹 Display results (if not upload OR if upload returns preview data)
+      if (data.results && data.results.length > 0) {
+        displayResults(data.results, utilityName, data.message);
+      }
+
+    } else {
+      showError(data.message || 'Error executing task');
+    }
+
+  } catch (error) {
+    console.error('Execute Task Error:', error);
+    showError('Failed to execute task: ' + error.message);
+  } finally {
+    document.getElementById('report-loading').style.display = 'none';
+  }
+}
+
+      function displayResults(results, utilityName, message) {
+        const tableContainer = document.getElementById('reportResults');
+        const tableBody = document.querySelector('#report-table tbody');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const tableHeader = document.querySelector('#report-table thead');
+
+        // Set title based on utility name
+        resultsTitle.textContent = utilityName + ' Results';
+
+        // Clear existing data
+        tableBody.innerHTML = '';
+
+        // Show the table container
+        tableContainer.style.display = 'block';
+
+        const task = utilityName.toLowerCase();
+
+        // Set appropriate headers based on utility type
+
+        let headers = '';
+
+        // ===============================
+        // 🔥 CASE: UPLOAD PAYROLL DATA
+        // ===============================
+        if (task.includes('upload payroll data')) {
+    headers = `
+      <tr>
+        <th>Region</th>
+        <th>No. of Employees</th>
+        <th>Total Net</th>
+      </tr>
+    `;
+    tableHeader.innerHTML = headers;
+
+    // ===============================
+    // 🔥 GROUP BY REGION (FRONTEND TEMP SOLUTION)
+    // ===============================
+    const grouped = {};
+
+    results.forEach(result => {
+  const row = document.createElement('tr');
+
+  row.innerHTML = `
+    <td>${result.region || 'N/A'}</td>
+    <td>${result.employeeCount || 0}</td>
+    ${result.totalNet 
+  ? Number(result.totalNet).toLocaleString('en-PH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) 
+  : '0.00'}
+  `;
+
+  tableBody.appendChild(row);
+});
+
+    // ===============================
+    // 🔥 RENDER GROUPED DATA
+    // ===============================
+    Object.keys(grouped).forEach(region => {
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td>${region}</td>
+        <td>${grouped[region].employeeCount}</td>
+        <td>${grouped[region].totalNet.toFixed(2)}</td>
+      `;
+
+      tableBody.appendChild(row);
+    });
+
+    return; // 🔥 stop here (important)
+  }
+
+
+
+        console.log("task: ", task, 1)
+        if (task.includes('excess no. of days')) {
+          headers = `
+            <tr>
+              <th>Region</th>
+              <th>Employee Name</th>
+              <th>No. of Days</th>
+            </tr>
+          `;
+        } else if (task.includes('negative amount')) {
+          console.log('else')
+          headers = `
+            <tr>
+              <th>Region</th>
+              <th>Employee Name</th>
+              <th>Amount</th>
+              <th>Pay Period</th>
+            </tr>
+          `;
+        } else {
+          // Default headers for other utilities
+          headers = `
+            <tr>
+              <th>Region</th>
+              <th>Employee Name</th>
+              <th>Value</th>
+            </tr>
+          `;
+        }
+
+        tableHeader.innerHTML = headers;
+
+        // Populate table rows
+        results.forEach(result => {
+          const row = document.createElement('tr');
+          console.log(utilityName);
+          // Highlight problematic values in red
+          if (task.includes('excess no. of days')) {
+            row.innerHTML = `
+              <td>${result.region || 'N/A'}</td>
+              <td>${result.ename || 'N/A'}</td>
+              <td style="${result.noOfdays > 1 ? 'color: #d33; font-weight: bold;' : ''}">
+                ${result.noOfdays || 0}
+              </td>
+            `;
+          } else if (task.includes('negative amount')) {
+            console.log('negative amount', result)
+            row.innerHTML = `
+              <td>${result.region || 'N/A'}</td>
+              <td>${result.ename || 'N/A'}</td>
+              <td style="${result.totalnet < 0 ? 'color: #d33; font-weight: bold;' : ''}">
+                ${result.totalnet ? result.totalnet.toFixed(2) : '0.00'}
+              </td>
+              <td>${result.pay_period || 'N/A'}</td>
+            `;
+          } else {
+            // Default row format for other utilities
+            row.innerHTML = `
+              <td>${result.region || 'N/A'}</td>
+              <td>${result.ename || 'N/A'}</td>
+              <td>${result.value || 'N/A'}</td>
+            `;
+          }
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+
+        // Also show with SweetAlert if available
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'Error!',
+            text: message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+      }
+
+      function exportToExcel() {
+        // Basic export functionality - can be enhanced with a library like SheetJS
+        const table = document.getElementById('report-table');
+        const html = table.outerHTML;
+        const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'payroll-utility-results.xls';
+        a.click();
+
+        Swal.fire({
+          title: 'Export Started',
+          text: 'Your Excel file download should begin shortly',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+
+  document.addEventListener('DOMContentLoaded', function() {
+  // Task selection change handler
+  document.getElementById('utilityName').addEventListener('change', function() {
+  const selectedTask = this.value.toLowerCase();
+
+  const deductionFields = document.getElementById('deductionFields');
+  const uploadFields = document.getElementById('uploadFields');
+  const regionSelectWrapper = document.getElementById('regionSelect').parentElement;
+  const regionSelect = document.getElementById('regionSelect');
+
+  const descriptionLabel = document.getElementById('descriptionLabel');
+  const amountLabel = document.getElementById('amountLabel'); // optional if exists
+
+  // Tasks that should show deduction/income fields
+  const showFieldsTasks = [
+    'update deduction 1',
+    'update deduction 2',
+    'update income 1',
+    'update income'
+  ];
+
+  const shouldShowFields = showFieldsTasks.some(task =>
+    selectedTask.includes(task.toLowerCase())
+  );
+
+  const shouldShowUpload = selectedTask.includes('upload') && selectedTask.includes('payroll');
+
+  // Toggle deduction and upload sections
+  deductionFields.style.display = shouldShowFields ? 'flex' : 'none';
+  uploadFields.style.display = shouldShowUpload ? 'flex' : 'none';
+
+  // Toggle region dropdown
+  if (shouldShowUpload) {
+    regionSelectWrapper.style.display = 'none';
+    regionSelect.value = ''; // reset when hidden
+  } else {
+    regionSelectWrapper.style.display = 'block';
+  }
+
+  // Update labels dynamically if deduction/income fields are shown
+  if (shouldShowFields) {
+    const typeMatch = selectedTask.match(/update\s(deduction|income)/i);
+    const numberMatch = selectedTask.match(/\d+/);
+
+    if (typeMatch) {
+      const type = typeMatch[1].toLowerCase();
+      const number = numberMatch ? numberMatch[0] : '';
+
+      descriptionLabel.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} ${number} Description`;
+      if (amountLabel) {
+        amountLabel.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} ${number} Amount`;
+      }
+    }
+  } else {
+    // Reset to default labels when fields are hidden
+    descriptionLabel.textContent = 'Description';
+    if (amountLabel) {
+      amountLabel.textContent = 'Amount';
+    }
+  }
+});
+});
+    </script>
+  </body>
+</html>

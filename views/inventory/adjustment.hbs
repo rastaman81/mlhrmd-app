@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --sa-navy:      #16304A;
+      --sa-navy-deep: #0F2233;
+      --sa-blue:      #2E6F9E;
+      --sa-teal:      #1F7A6C;
+      --sa-gold:      #A8762A;
+      --sa-bg:        #F6F7F9;
+      --sa-surface:   #FFFFFF;
+      --sa-border:    #E3E6EB;
+      --sa-muted:     #6B7686;
+      --sa-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--sa-bg);
+    }
+
+    /* ---- Page header ---- */
+    .sa-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--sa-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .sa-title i{ color:var(--sa-blue); }
+    .sa-subtitle{ color:var(--sa-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Buttons ---- */
+    .btn-sa-teal{
+      background:var(--sa-teal); border-color:var(--sa-teal); color:#fff; font-weight:500;
+    }
+    .btn-sa-teal:hover{ background:#176255; border-color:#176255; color:#fff; }
+    .btn-sa-outline{
+      background:var(--sa-surface); border-color:var(--sa-border); color:var(--sa-navy-deep); font-weight:500;
+    }
+    .btn-sa-outline:hover{ background:var(--sa-bg); border-color:var(--sa-muted); color:var(--sa-navy-deep); }
+
+    /* ---- Stats cards ---- */
+    .stats-card{
+      background:var(--sa-surface);
+      border:1px solid var(--sa-border);
+      border-radius:.65rem;
+      padding:1rem 1.25rem;
+      transition:box-shadow .2s;
+    }
+    .stats-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,.06); }
+    .stats-number{
+      font-size:1.5rem;
+      font-weight:700;
+      color:var(--sa-navy-deep);
+    }
+    .stats-label{
+      font-size:.78rem;
+      color:var(--sa-muted);
+      font-weight:500;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+    .stats-icon{ font-size:1.5rem; opacity:.6; }
+    .stat-pending  .stats-number{ color:var(--sa-gold);  }
+    .stat-approved .stats-number{ color:var(--sa-teal);  }
+    .stat-rejected .stats-number{ color:var(--sa-danger);}
+    .stat-total    .stats-number{ color:var(--sa-blue);  }
+
+    /* ---- Alert / form message ---- */
+    #formMessage{
+      border-radius:.55rem;
+      font-size:.9rem;
+      border:none;
+      border-left:4px solid transparent;
+    }
+
+    /* ---- Main cards ---- */
+    .sa-card{
+      border:1px solid var(--sa-border);
+      border-radius:.65rem;
+      background:var(--sa-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      margin-bottom:1.25rem;
+      overflow:hidden;
+    }
+    .sa-card-header{
+      border-bottom:1px solid var(--sa-border);
+      padding:.85rem 1.15rem;
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+    }
+    .sa-card-header i{ color:var(--sa-blue); }
+    .sa-card-header strong{ color:var(--sa-navy-deep); font-weight:600; font-size:.97rem; }
+    .sa-card-header .sa-header-note{
+      margin-left:auto;
+      font-size:.78rem;
+      color:var(--sa-muted);
+    }
+    .sa-card-body{ padding:1.15rem; }
+
+    /* ---- Form field labels ---- */
+    .sa-label{
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--sa-navy);
+      display:block;
+      margin-bottom:.35rem;
+    }
+    .sa-required{ color:var(--sa-danger); }
+    .form-control,
+    .form-select{
+      border-color:var(--sa-border);
+    }
+    .form-control:focus,
+    .form-select:focus{
+      border-color:var(--sa-blue);
+      box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+    }
+
+    /* ---- Item search dropdown ---- */
+    .search-results{
+      max-height:250px;
+      overflow-y:auto;
+      background:var(--sa-surface);
+      border:1px solid var(--sa-border);
+      border-radius:.45rem;
+      box-shadow:0 4px 12px rgba(0,0,0,.08);
+      display:none;
+      position:absolute;
+      width:100%;
+      z-index:1000;
+    }
+    .search-result-item{
+      padding:.6rem .8rem;
+      cursor:pointer;
+      border-bottom:1px solid #f0f0f0;
+      transition:background .15s;
+    }
+    .search-result-item:hover{ background:#EBF3FA; }
+    .search-result-item:last-child{ border-bottom:none; }
+    .search-result-item .item-name{ font-weight:600; color:var(--sa-navy-deep); }
+    .search-result-item .item-detail{ font-size:.78rem; color:var(--sa-muted); }
+    .stock-badge{
+      font-size:.7rem;
+      padding:.15rem .5rem;
+      border-radius:1rem;
+      background:rgba(31,122,108,.1);
+      color:var(--sa-teal);
+    }
+    .stock-low{ background:rgba(193,72,61,.1); color:var(--sa-danger); }
+
+    /* ---- Selected item panel ---- */
+    .selected-item-info{
+      background:var(--sa-bg);
+      border:1px solid var(--sa-border);
+      border-radius:.45rem;
+      padding:.6rem .8rem;
+      font-size:.85rem;
+    }
+    .item-name-display{ font-weight:600; color:var(--sa-navy-deep); font-size:.95rem; }
+    .item-detail-display{ color:var(--sa-muted); font-size:.82rem; }
+    .stock-display{ font-weight:600; color:var(--sa-teal); }
+    .stock-display.low-stock{ color:var(--sa-danger); }
+
+    /* ---- Add / Subtract toggle buttons ---- */
+    .adjustment-type-btn{
+      padding:.6rem 1.5rem;
+      border:2px solid var(--sa-border);
+      background:var(--sa-surface);
+      border-radius:.45rem;
+      font-weight:500;
+      cursor:pointer;
+      transition:all .15s;
+      width:100%;
+    }
+    .adjustment-type-btn:hover{ border-color:var(--sa-blue); background:var(--sa-bg); }
+    .adjustment-type-btn.active-add{
+      border-color:var(--sa-teal);
+      background:rgba(31,122,108,.08);
+      color:var(--sa-teal);
+    }
+    .adjustment-type-btn.active-subtract{
+      border-color:var(--sa-danger);
+      background:rgba(193,72,61,.08);
+      color:var(--sa-danger);
+    }
+    .adjustment-type-btn i{ margin-right:.5rem; }
+
+    /* ---- Recent adjustments table ---- */
+    #adjustmentTable thead th{
+      background:var(--sa-navy) !important;
+      color:#fff !important;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:600;
+      border-color:#1e3e5e;
+      padding:.75rem 1rem;
+      white-space:nowrap;
+    }
+    #adjustmentTable tbody td{
+      font-size:.88rem;
+      color:var(--sa-navy-deep);
+      padding:.7rem 1rem;
+      vertical-align:middle;
+      border-color:var(--sa-border);
+    }
+    #adjustmentTable tbody tr:hover{ background:var(--sa-bg); }
+
+    /* ---- Status badges ---- */
+    .status-badge{
+      padding:.25rem .75rem;
+      border-radius:1rem;
+      font-size:.72rem;
+      font-weight:600;
+      text-transform:uppercase;
+      display:inline-block;
+    }
+    .status-pending{  background:rgba(168,118,42,.12); color:var(--sa-gold);   }
+    .status-approved{ background:rgba(31,122,108,.12);  color:var(--sa-teal);   }
+    .status-rejected{ background:rgba(193,72,61,.12);   color:var(--sa-danger); }
+
+    /* ---- Empty state ---- */
+    .sa-empty{ text-align:center; color:var(--sa-muted); padding:2rem 1rem; font-size:.9rem; }
+    .sa-empty i{ color:var(--sa-border); font-size:1.5rem; display:block; margin-bottom:.5rem; }
+
+    /* ---- "View All" link in card header ---- */
+    .sa-view-all{ color:var(--sa-blue); font-size:.85rem; text-decoration:none; }
+    .sa-view-all:hover{ text-decoration:underline; color:var(--sa-navy); }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="sa-title">
+            <i class="fas fa-arrows-alt-h"></i> Stock Adjustment
+          </h1>
+          <p class="sa-subtitle">Adjust inventory stock levels with proper tracking and approval.</p>
+        </div>
+        <a href="/inventory/adjustments" class="btn btn-sa-outline">
+          <i class="fas fa-history me-1"></i> View History
+        </a>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="row g-3 mb-4">
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-total">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.total}}</div>
+                <div class="stats-label">Total Adjustments</div>
+              </div>
+              <i class="fas fa-clipboard-list stats-icon" style="color:var(--sa-blue);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-pending">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.pending}}</div>
+                <div class="stats-label">Pending</div>
+              </div>
+              <i class="fas fa-clock stats-icon" style="color:var(--sa-gold);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-approved">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.approved}}</div>
+                <div class="stats-label">Approved</div>
+              </div>
+              <i class="fas fa-check-circle stats-icon" style="color:var(--sa-teal);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-rejected">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.rejected}}</div>
+                <div class="stats-label">Rejected</div>
+              </div>
+              <i class="fas fa-times-circle stats-icon" style="color:var(--sa-danger);"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Alert / Form Message -->
+      <div id="formMessage" class="alert d-none mb-3"></div>
+
+      <!-- Adjustment Form Card -->
+      <div class="sa-card">
+        <div class="sa-card-header">
+          <i class="fas fa-plus-circle"></i>
+          <strong>New Stock Adjustment</strong>
+          <span class="sa-header-note">
+            <i class="fas fa-info-circle me-1"></i>Adjustments require approval
+          </span>
+        </div>
+
+        <div class="sa-card-body">
+          <form id="adjustmentForm">
+            <div class="row g-3">
+
+              <!-- Item Search -->
+              <div class="col-md-5">
+                <label class="sa-label">
+                  Search Item <span class="sa-required">*</span>
+                </label>
+                <div class="position-relative">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="itemSearch"
+                    placeholder="Type item name, code, or description..."
+                    autocomplete="off"
+                  >
+                  <div class="search-results" id="searchResults"></div>
+                </div>
+                <div id="selectedItemInfo" class="selected-item-info mt-2" style="display:none;">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <div class="item-name-display" id="selectedItemName"></div>
+                      <div class="item-detail-display" id="selectedItemDetails"></div>
+                      <div class="mt-1">
+                        <span style="font-size:.8rem; color:var(--sa-muted);">Current Stock:</span>
+                        <span class="stock-display" id="selectedStock"></span>
+                      </div>
+                    </div>
+                    <button type="button" id="clearSelectedItem" class="btn btn-sm" style="color:var(--sa-muted);">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Adjustment Type -->
+              <div class="col-md-2">
+                <label class="sa-label">
+                  Type <span class="sa-required">*</span>
+                </label>
+                <div class="d-flex gap-2">
+                  <button type="button" id="addTypeBtn" class="adjustment-type-btn active-add" data-type="add">
+                    <i class="fas fa-plus-circle"></i> Add
+                  </button>
+                  <button type="button" id="subtractTypeBtn" class="adjustment-type-btn" data-type="subtract">
+                    <i class="fas fa-minus-circle"></i> Subtract
+                  </button>
+                </div>
+                <input type="hidden" id="adjustmentType" name="adjustment_type" value="add">
+              </div>
+
+              <!-- Quantity -->
+              <div class="col-md-2">
+                <label class="sa-label">
+                  Quantity <span class="sa-required">*</span>
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="quantity"
+                  value="1"
+                  min="1"
+                >
+                <small id="stockInfo" style="color:var(--sa-muted); font-size:.72rem;"></small>
+              </div>
+
+              <!-- Reason -->
+              <div class="col-md-3">
+                <label class="sa-label">
+                  Reason <span class="sa-required">*</span>
+                </label>
+                <select class="form-select" id="reasonSelect">
+                  <option value="">Select reason...</option>
+                  {{#each reasons}}
+                    <option value="{{this.reason_id}}" data-type="{{this.adjustment_type}}">
+                      {{this.reason_name}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Submit -->
+              <div class="col-md-12 mt-3">
+                <div class="d-flex gap-2">
+                  <button type="submit" id="submitBtn" class="btn btn-sa-teal" style="padding:.6rem 2rem;">
+                    <i class="fas fa-save me-1"></i> Submit Adjustment
+                  </button>
+                  <button type="reset" class="btn btn-sa-outline" style="padding:.6rem 2rem;">
+                    <i class="fas fa-undo me-1"></i> Reset
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Recent Adjustments Card -->
+      <div class="sa-card">
+        <div class="sa-card-header">
+          <i class="fas fa-clock"></i>
+          <strong>Recent Adjustments</strong>
+          <a href="/inventory/adjustments" class="sa-view-all ms-auto">
+            View All <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table mb-0" id="adjustmentTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th class="text-center">Type</th>
+                <th class="text-center">Qty</th>
+                <th class="text-center">Previous</th>
+                <th class="text-center">New</th>
+                <th>Reason</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Date</th>
+              </tr>
+            </thead>
+            <tbody id="recentAdjustmentsBody">
+              <tr>
+                <td colspan="9" class="sa-empty">
+                  <i class="fas fa-inbox"></i>
+                  No recent adjustments
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // =============================================
+  // STATE MANAGEMENT
+  // =============================================
+
+  const state = {
+    selectedItem: null,
+    adjustmentType: 'add',
+    searchTimeout: null
+  };
+
+  // =============================================
+  // DOM REFERENCES
+  // =============================================
+
+  const itemSearch         = document.getElementById('itemSearch');
+  const searchResults      = document.getElementById('searchResults');
+  const selectedItemInfo   = document.getElementById('selectedItemInfo');
+  const selectedItemName   = document.getElementById('selectedItemName');
+  const selectedItemDetails= document.getElementById('selectedItemDetails');
+  const selectedStock      = document.getElementById('selectedStock');
+  const clearSelectedItem  = document.getElementById('clearSelectedItem');
+  const quantityInput      = document.getElementById('quantity');
+  const stockInfo          = document.getElementById('stockInfo');
+  const reasonSelect       = document.getElementById('reasonSelect');
+  const addTypeBtn         = document.getElementById('addTypeBtn');
+  const subtractTypeBtn    = document.getElementById('subtractTypeBtn');
+  const adjustmentType     = document.getElementById('adjustmentType');
+  const form               = document.getElementById('adjustmentForm');
+  const formMessage        = document.getElementById('formMessage');
+  const submitBtn          = document.getElementById('submitBtn');
+
+  // =============================================
+  // UTILITY FUNCTIONS
+  // =============================================
+
+  function showMessage(type, message) {
+    const colorMap = {
+      success: { bg:'rgba(31,122,108,.08)',  border:'#1F7A6C', text:'#1F7A6C' },
+      danger:  { bg:'rgba(193,72,61,.08)',   border:'#C1483D', text:'#C1483D' },
+      warning: { bg:'rgba(168,118,42,.08)',  border:'#A8762A', text:'#A8762A' },
+      info:    { bg:'rgba(46,111,158,.08)',  border:'#2E6F9E', text:'#2E6F9E' },
+    };
+    const c = colorMap[type] || colorMap.info;
+    formMessage.style.background    = c.bg;
+    formMessage.style.borderColor   = c.border;
+    formMessage.style.color         = c.text;
+    formMessage.textContent         = message;
+    formMessage.className           = 'alert mb-3 show';
+    formMessage.style.display       = 'block';
+
+    setTimeout(() => {
+      formMessage.className     = 'alert d-none';
+      formMessage.style.display = 'none';
+    }, 5000);
+  }
+
+  function clearMessage() {
+    formMessage.className     = 'alert d-none';
+    formMessage.style.display = 'none';
+    formMessage.textContent   = '';
+  }
+
+  // =============================================
+  // ITEM SEARCH
+  // =============================================
+
+  async function searchItems(query) {
+    if (!query || query.trim().length < 2) {
+      searchResults.style.display = 'none';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/inventory/items/search?q=${encodeURIComponent(query.trim())}`);
+      const data = await response.json();
+
+      if (!data.items || data.items.length === 0) {
+        searchResults.innerHTML = `
+          <div style="padding:.8rem; color:var(--sa-muted); text-align:center;">
+            <i class="fas fa-search"></i> No items found
+          </div>
+        `;
+        searchResults.style.display = 'block';
+        return;
+      }
+
+      let html = '';
+      data.items.forEach(item => {
+        const isLowStock = item.stock <= item.item_order_level;
+        html += `
+          <div class="search-result-item" onclick="selectItem(${item.item_id})">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="item-name">${item.item_name}</span>
+              <span class="stock-badge ${isLowStock ? 'stock-low' : ''}">
+                ${item.stock} ${item.item_unit}
+              </span>
+            </div>
+            <div class="item-detail">
+              ${item.item_code}
+              ${item.item_description ? `| ${item.item_description}` : ''}
+              ${isLowStock ? '| ⚠️ Low stock' : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      searchResults.innerHTML = html;
+      searchResults.style.display = 'block';
+
+    } catch (error) {
+      console.error('Search error:', error);
+      searchResults.innerHTML = `
+        <div style="padding:.8rem; color:var(--sa-danger); text-align:center;">
+          <i class="fas fa-exclamation-circle"></i> Error searching items
+        </div>
+      `;
+      searchResults.style.display = 'block';
+    }
+  }
+
+  // =============================================
+  // ITEM SELECTION
+  // =============================================
+
+  async function selectItem(itemId) {
+    try {
+      const response = await fetch(`/inventory/items/${itemId}`);
+      const data = await response.json();
+
+      if (!data.item) {
+        showMessage('danger', 'Item not found');
+        return;
+      }
+
+      state.selectedItem = data.item;
+
+      selectedItemName.textContent     = data.item.item_name;
+      selectedItemDetails.textContent  = `${data.item.item_code} | ${data.item.item_unit}`;
+      const isLowStock = data.item.stock <= data.item.item_order_level;
+      selectedStock.textContent  = `${data.item.stock} ${data.item.item_unit}`;
+      selectedStock.className    = `stock-display${isLowStock ? ' low-stock' : ''}`;
+      selectedItemInfo.style.display = 'block';
+
+      stockInfo.textContent = `${data.item.stock} ${data.item.item_unit} available`;
+      stockInfo.style.color = isLowStock ? '#C1483D' : '#6B7686';
+      if (isLowStock) stockInfo.textContent += ' ⚠️ Low stock';
+
+      quantityInput.max   = data.item.stock;
+      quantityInput.value = 1;
+
+      searchResults.style.display = 'none';
+      itemSearch.value = data.item.item_name;
+
+      filterReasons();
+      clearMessage();
+
+    } catch (error) {
+      console.error('Error selecting item:', error);
+      showMessage('danger', 'Failed to load item details');
+    }
+  }
+
+  // =============================================
+  // FILTER REASONS BY ADJUSTMENT TYPE
+  // =============================================
+
+  function filterReasons() {
+    const type = state.adjustmentType;
+    const options = reasonSelect.options;
+
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+      if (option.value === '') continue;
+      const optionType = option.dataset.type;
+      option.style.display = (optionType === 'both' || optionType === type) ? '' : 'none';
+    }
+
+    if (reasonSelect.value) {
+      const sel = reasonSelect.options[reasonSelect.selectedIndex];
+      if (sel && sel.style.display === 'none') reasonSelect.value = '';
+    }
+  }
+
+  // =============================================
+  // EVENT LISTENERS
+  // =============================================
+
+  itemSearch.addEventListener('input', function() {
+    clearTimeout(state.searchTimeout);
+    const query = this.value.trim();
+
+    if (!query) {
+      searchResults.style.display = 'none';
+      if (state.selectedItem) {
+        state.selectedItem = null;
+        selectedItemInfo.style.display = 'none';
+        stockInfo.textContent = '';
+        clearMessage();
+      }
+      return;
+    }
+
+    state.searchTimeout = setTimeout(() => searchItems(query), 300);
+  });
+
+  clearSelectedItem.addEventListener('click', function() {
+    state.selectedItem = null;
+    selectedItemInfo.style.display = 'none';
+    itemSearch.value = '';
+    stockInfo.textContent = '';
+    quantityInput.value = 1;
+    searchResults.style.display = 'none';
+    clearMessage();
+    itemSearch.focus();
+  });
+
+  addTypeBtn.addEventListener('click', function() {
+    state.adjustmentType   = 'add';
+    adjustmentType.value   = 'add';
+    addTypeBtn.className      = 'adjustment-type-btn active-add';
+    subtractTypeBtn.className = 'adjustment-type-btn';
+    filterReasons();
+    updateStockDisplay();
+  });
+
+  subtractTypeBtn.addEventListener('click', function() {
+    state.adjustmentType   = 'subtract';
+    adjustmentType.value   = 'subtract';
+    subtractTypeBtn.className = 'adjustment-type-btn active-subtract';
+    addTypeBtn.className      = 'adjustment-type-btn';
+    filterReasons();
+    updateStockDisplay();
+  });
+
+  function updateStockDisplay() {
+    if (!state.selectedItem) return;
+    const stock = state.selectedItem.stock;
+    stockInfo.textContent = `${stock} ${state.selectedItem.item_unit} available`;
+    if (state.adjustmentType === 'subtract') {
+      quantityInput.max = stock;
+      if (parseInt(quantityInput.value) > stock) quantityInput.value = stock;
+    }
+  }
+
+  quantityInput.addEventListener('input', function() {
+    if (state.adjustmentType === 'subtract' && state.selectedItem) {
+      const max = state.selectedItem.stock;
+      if (parseInt(this.value) > max) {
+        this.value = max;
+        showMessage('warning', `Maximum available: ${max} ${state.selectedItem.item_unit}`);
+      }
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.position-relative')) {
+      searchResults.style.display = 'none';
+    }
+  });
+
+  // =============================================
+  // FORM SUBMISSION
+  // =============================================
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    if (!state.selectedItem) {
+      showMessage('warning', 'Please search and select an item.');
+      itemSearch.focus();
+      return;
+    }
+
+    const quantity = parseInt(quantityInput.value);
+    if (!quantity || quantity < 1) {
+      showMessage('warning', 'Please enter a valid quantity.');
+      quantityInput.focus();
+      return;
+    }
+
+    if (state.adjustmentType === 'subtract' && quantity > state.selectedItem.stock) {
+      showMessage('danger', `Only ${state.selectedItem.stock} ${state.selectedItem.item_unit} available.`);
+      quantityInput.focus();
+      return;
+    }
+
+    const reasonId = parseInt(reasonSelect.value);
+    if (!reasonId) {
+      showMessage('warning', 'Please select a reason.');
+      reasonSelect.focus();
+      return;
+    }
+
+    const typeLabel  = state.adjustmentType === 'add' ? 'ADD' : 'SUBTRACT';
+    const newStock   = state.adjustmentType === 'add'
+      ? state.selectedItem.stock + quantity
+      : state.selectedItem.stock - quantity;
+    const reasonText = reasonSelect.options[reasonSelect.selectedIndex].text;
+
+    // SweetAlert2 confirmation — replaces the native confirm()
+    const confirmed = await Swal.fire({
+      title: `Confirm ${typeLabel} Adjustment`,
+      html: `
+        <div style="text-align:left; font-size:.9rem; line-height:1.8;">
+          <div><strong>Item:</strong> ${state.selectedItem.item_name}</div>
+          <div><strong>Type:</strong> ${typeLabel}</div>
+          <div><strong>Quantity:</strong> ${quantity} ${state.selectedItem.item_unit}</div>
+          <div><strong>Reason:</strong> ${reasonText}</div>
+          <hr style="border-color:#E3E6EB; margin:.6rem 0;">
+          <div><strong>Current Stock:</strong> ${state.selectedItem.stock} ${state.selectedItem.item_unit}</div>
+          <div><strong>New Stock:</strong> ${newStock} ${state.selectedItem.item_unit}</div>
+        </div>
+        <p style="font-size:.82rem; color:#6B7686; margin-top:.75rem;">This adjustment requires approval before it takes effect.</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: `Yes, submit`,
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#1F7A6C',
+      cancelButtonColor: '#6B7686',
+    });
+
+    if (!confirmed.isConfirmed) return;
+
+    const formData = {
+      item_id: state.selectedItem.item_id,
+      quantity: quantity,
+      reason_id: reasonId,
+      adjustment_type: state.adjustmentType,
+      remarks: document.getElementById('remarks')?.value || null
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Submitting...';
+
+    try {
+      const response = await fetch('/inventory/adjustment/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        await Swal.fire({
+          title: 'Submitted!',
+          text: result.message,
+          icon: 'success',
+          confirmButtonColor: '#1F7A6C',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        // Reset form
+        state.selectedItem             = null;
+        selectedItemInfo.style.display = 'none';
+        itemSearch.value               = '';
+        stockInfo.textContent          = '';
+        quantityInput.value            = 1;
+        reasonSelect.value             = '';
+        if (document.getElementById('remarks')) {
+          document.getElementById('remarks').value = '';
+        }
+
+        loadRecentAdjustments();
+
+      } else {
+        Swal.fire({ title: 'Error', text: result.message, icon: 'error', confirmButtonColor: '#C1483D' });
+      }
+
+    } catch (error) {
+      console.error('Submit error:', error);
+      Swal.fire({ title: 'Error', text: 'Failed to submit adjustment. Please try again.', icon: 'error', confirmButtonColor: '#C1483D' });
+    } finally {
+      submitBtn.disabled  = false;
+      submitBtn.innerHTML = '<i class="fas fa-save me-1"></i> Submit Adjustment';
+    }
+  });
+
+  // =============================================
+  // LOAD RECENT ADJUSTMENTS
+  // =============================================
+
+  async function loadRecentAdjustments() {
+    try {
+      const dataResponse = await fetch('/inventory/adjustments?limit=5&format=json');
+      const data = await dataResponse.json();
+      const tbody = document.getElementById('recentAdjustmentsBody');
+
+      if (!data.adjustments || data.adjustments.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="sa-empty">
+              <i class="fas fa-inbox"></i>
+              No recent adjustments
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let html = '';
+      data.adjustments.forEach((adj, index) => {
+        const typeIcon = adj.adjustment_type === 'add'
+          ? `<i class="fas fa-plus-circle" style="color:var(--sa-teal);"></i>`
+          : `<i class="fas fa-minus-circle" style="color:var(--sa-danger);"></i>`;
+
+        html += `
+          <tr>
+            <td style="font-weight:600; color:var(--sa-muted);">${index + 1}</td>
+            <td>
+              <div style="font-weight:600;">${adj.item_name}</div>
+              <div style="font-size:.78rem; color:var(--sa-muted);">${adj.item_code}</div>
+            </td>
+            <td class="text-center">${typeIcon}</td>
+            <td class="text-center" style="font-weight:600;">${adj.quantity}</td>
+            <td class="text-center">${adj.previous_count}</td>
+            <td class="text-center" style="font-weight:600;">${adj.new_count}</td>
+            <td style="font-size:.85rem;">${adj.reason_name}</td>
+            <td class="text-center">
+              <span class="status-badge status-${adj.status}">${adj.status}</span>
+            </td>
+            <td class="text-center" style="font-size:.82rem; color:var(--sa-muted);">
+              ${new Date(adj.created_at).toLocaleDateString()}
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+
+    } catch (error) {
+      console.error('Error loading recent adjustments:', error);
+    }
+  }
+
+  // =============================================
+  // INITIALIZATION
+  // =============================================
+
+  itemSearch.focus();
+  loadRecentAdjustments();
+
+  // Remarks field — added dynamically, same as before
+  const formContainer = document.querySelector('#adjustmentForm .row.g-3');
+  if (formContainer) {
+    const remarksDiv = document.createElement('div');
+    remarksDiv.className = 'col-md-12';
+    remarksDiv.innerHTML = `
+      <label class="sa-label">Remarks <span style="font-weight:400; color:var(--sa-muted);">(Optional)</span></label>
+      <input
+        type="text"
+        class="form-control"
+        id="remarks"
+        placeholder="Add any additional notes..."
+      >
+    `;
+    const submitRow = formContainer.querySelector('.col-md-12.mt-3');
+    if (submitRow) formContainer.insertBefore(remarksDiv, submitRow);
+  }
+</script>
+
+</body>
+</html>

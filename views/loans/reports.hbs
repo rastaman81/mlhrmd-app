@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --nla-navy: #16304A;
+      --nla-navy-deep: #0F2233;
+      --nla-blue: #2E6F9E;
+      --nla-teal: #1F7A6C;
+      --nla-gold: #A8762A;
+      --nla-bg: #F6F7F9;
+      --nla-surface: #FFFFFF;
+      --nla-border: #E3E6EB;
+      --nla-muted: #6B7686;
+      --nla-danger: #C1483D;
+      --nla-slate: #64748B;
+      --nla-violet: #7C5CBF;
+      --nla-rust: #C2703D;
+      --nla-indigo: #4F6FBA;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--nla-bg);
+    }
+
+    .main-content .nla-page-head{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      flex-wrap:wrap; gap:.75rem; margin-bottom:1.75rem;
+    }
+    .main-content .nla-title{
+      font-size:1.65rem; font-weight:700; color:var(--nla-navy-deep); margin:0;
+      display:flex; align-items:center; gap:.6rem;
+    }
+    .main-content .nla-title i{ color:var(--nla-blue); }
+    .main-content .nla-subtitle{ margin:.35rem 0 0; color:var(--nla-muted); font-size:.92rem; }
+
+    .main-content .nla-card{
+      border:1px solid var(--nla-border); border-radius:.65rem;
+      background:var(--nla-surface); box-shadow:0 1px 2px rgba(16,24,40,.04);
+      margin-bottom:1.25rem;
+    }
+    .main-content .nla-card .card-header{
+      background:var(--nla-surface); border-bottom:1px solid var(--nla-border);
+      padding:.65rem 1rem; display:flex; align-items:center; gap:.55rem;
+      border-radius:.65rem .65rem 0 0;
+    }
+    .main-content .nla-card .card-header i{ color:var(--nla-blue); }
+    .main-content .nla-card .card-header strong{
+      color:var(--nla-navy-deep); font-weight:600; font-size:.92rem;
+    }
+    .main-content .nla-card .card-body{ padding:1rem; }
+
+    .main-content .form-label{
+      font-size:.75rem; font-weight:600; color:var(--nla-navy); margin-bottom:.25rem;
+    }
+    .main-content .form-select, .main-content .form-control{
+      border-color:var(--nla-border); font-size:.875rem; padding:.35rem .65rem;
+    }
+    .main-content .form-select:focus, .main-content .form-control:focus{
+      border-color:var(--nla-blue); box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+    }
+
+    /* Time input styling */
+    input[type="time"] {
+      padding: 0.35rem 0.65rem;
+      border-color: var(--nla-border);
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      height: 38px;
+      width: 100%;
+      background: var(--nla-surface);
+    }
+    input[type="time"]:focus {
+      border-color: var(--nla-blue);
+      box-shadow: 0 0 0 0.2rem rgba(46, 111, 158, 0.12);
+      outline: none;
+    }
+
+    /* Status badges */
+    .badge{ font-weight:600; font-size:.72rem; padding:.3rem .6rem; border-radius:.4rem; }
+    .badge.nla-badge-approved      { background:var(--nla-teal);   color:#fff; }
+    .badge.nla-badge-cancelled     { background:var(--nla-gold);   color:#fff; }
+    .badge.nla-badge-disapproved   { background:var(--nla-danger); color:#fff; }
+    .badge.nla-badge-pending       { background:var(--nla-slate);  color:#fff; }
+    .badge.nla-badge-signature     { background:var(--nla-violet); color:#fff; }
+    .badge.nla-badge-hold          { background:var(--nla-rust);   color:#fff; }
+    .badge.nla-badge-verification  { background:var(--nla-indigo); color:#fff; }
+
+    /* Table */
+    .table-responsive{ max-height:500px; overflow-y:auto; }
+    .table{ --bs-table-border-color: var(--nla-border); font-size:.875rem; }
+    .table thead th{
+      background:var(--nla-navy-deep);
+      color:var(--nla-surface);
+      font-size:.7rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:600;
+      white-space:nowrap;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .table tbody tr:hover{ background:var(--nla-bg); }
+    .table td{ vertical-align:middle; }
+
+    /* Pagination */
+    #pageNumbers span{
+      padding:0.25rem 0.5rem;
+      border-radius:0.25rem;
+      transition:all 0.2s ease;
+      cursor:pointer;
+    }
+    #pageNumbers span:hover:not(.fw-bold){ background-color:var(--nla-bg); }
+    #pageNumbers .fw-bold{
+      background-color:var(--nla-blue);
+      color:white !important;
+    }
+    #resultCount{ font-size:0.85rem; }
+
+    /* Toast */
+    .toast-container{ z-index:1080; }
+    #appToast{
+      border-radius:.55rem;
+      box-shadow:0 8px 24px rgba(15,34,51,.18);
+      color:#fff;
+      min-width:280px;
+    }
+    #appToast.toast-success{ background:var(--nla-teal); }
+    #appToast.toast-warning{ background:var(--nla-gold); }
+    #appToast.toast-danger { background:var(--nla-danger); }
+    #appToast.toast-info   { background:var(--nla-navy); }
+
+    /* Loading spinner */
+    .spinner-overlay{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+      color:var(--nla-muted);
+    }
+
+    /* Empty state */
+    .empty-state{
+      text-align:center;
+      padding:2.5rem 1rem;
+      color:var(--nla-muted);
+    }
+    .empty-state i{ font-size:2.25rem; color:var(--nla-border); margin-bottom:.75rem; display:block; }
+
+    /* Action buttons */
+    .main-content .btn-nla-navy{
+      background:var(--nla-navy); border-color:var(--nla-navy); color:#fff;
+    }
+    .main-content .btn-nla-navy:hover{
+      background:var(--nla-navy-deep); border-color:var(--nla-navy-deep); color:#fff;
+    }
+    .main-content .btn-outline-secondary{
+      border-color:var(--nla-border); color:var(--nla-muted);
+    }
+    .main-content .btn-outline-secondary:hover{
+      background:var(--nla-bg); color:var(--nla-navy);
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-3">
+
+      <!-- PAGE HEADER -->
+      <div class="nla-page-head">
+        <div>
+          <h1 class="nla-title"><i class="fas fa-chart-bar"></i> Loan Reports</h1>
+          <p class="nla-subtitle">Select filters and click "Generate Report" to view loan data.</p>
+        </div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="nla-card">
+        <div class="card-header">
+          <i class="fas fa-filter"></i>
+          <strong>Filters</strong>
+        </div>
+        <div class="card-body">
+          <form id="reportForm" autocomplete="off">
+            <div class="row g-3">
+              <!-- Date From with Time -->
+              <div class="col-md-3">
+                <label class="form-label">Date From</label>
+                <input type="date" class="form-control" id="startDate" name="startDate">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Time From</label>
+                <input type="time" class="form-control" id="startTime" name="startTime" value="00:00">
+              </div>
+              
+              <!-- Date To with Time -->
+              <div class="col-md-3">
+                <label class="form-label">Date To</label>
+                <input type="date" class="form-control" id="endDate" name="endDate">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Time To</label>
+                <input type="time" class="form-control" id="endTime" name="endTime" value="23:59">
+              </div>
+
+              <!-- Provider -->
+              <div class="col-md-2">
+                <label class="form-label">Provider</label>
+                <select class="form-select" id="providerFilter" name="provider">
+                  <option value="">All Providers</option>
+                  {{#each providers}}
+                    <option value="{{provider_code}}">{{provider_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Office -->
+              <div class="col-md-3">
+                <label class="form-label">Office</label>
+                <select class="form-select" id="officeFilter" name="office">
+                  <option value="">All Offices</option>
+                  {{#each offices}}
+                    <option value="{{office_name}}">{{office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Loan Type (dynamically filtered by provider) -->
+              <div class="col-md-3">
+                <label class="form-label">Loan Type</label>
+                <select class="form-select" id="loanTypeFilter" name="loanType">
+                  <option value="">All Types</option>
+                  {{#each loanTypes}}
+                    <option value="{{loanname}}">{{loanname}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Status -->
+              <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select class="form-select" id="statusFilter" name="status">
+                  <option value="">All Status</option>
+                  {{#each statuses}}
+                    <option value="{{loan_status}}">{{loan_status}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- Sort By -->
+<div class="col-md-2">
+  <label class="form-label">Sort By</label>
+  <select class="form-select" id="sortBy">
+    <option value="datereceived">Date Received</option>
+    <option value="dateforwarded">Date Approved</option>
+    <option value="controlno">Control No</option>
+    <option value="loanamount">Loan Amount</option>
+    <option value="netproceeds">Net Proceeds</option>
+    <option value="lastname">Last Name</option>
+    <option value="firstname">First Name</option>
+    <option value="loantype">Loan Type</option>
+    <option value="STATUS">Status</option>
+  </select>
+</div>
+
+
+              <!-- Action Buttons -->
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-nla-navy w-100" id="btnGenerate">
+                  <i class="fas fa-search me-1"></i> Generate
+                </button>
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-secondary w-100" id="btnExportCSV">
+                  <i class="fas fa-file-csv me-1"></i> Export CSV
+                </button>
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+  <button type="button" class="btn btn-outline-secondary w-100" id="btnExportPDF">
+    <i class="fas fa-file-pdf me-1"></i> Export PDF
+  </button>
+</div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-secondary w-100" id="btnClear">
+                  <i class="fas fa-eraser me-1"></i> Clear
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- RESULTS TABLE -->
+      <div class="nla-card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-table"></i>
+            <strong>Loan Records</strong>
+          </div>
+          <span class="text-muted small" id="resultCount">0 results found</span>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Control No</th>
+                  <th>Employee</th>
+                  <th>Loan Type</th>
+                  <th>Amount</th>
+                  <th>Deduction</th>
+                  <th>Net Proceeds</th>
+                  <th>Date/Time</th>
+                  <th>Status</th>
+                  <th>Office</th>
+                </tr>
+              </thead>
+              <tbody id="reportResults">
+                <tr>
+                  <td colspan="9" class="text-center text-muted py-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Select filters and click "Generate Report" to view data.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <button class="btn btn-outline-secondary btn-sm" id="prevPage" disabled>
+              <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <span id="pageNumbers" class="small"></span>
+            <button class="btn btn-outline-secondary btn-sm" id="nextPage" disabled>
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="appToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i id="appToastIcon" class="fas fa-circle-check"></i>
+          <span id="appToastMessage">Message</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ─────────────────────────────────────────────
+  // STATE
+  // ─────────────────────────────────────────────
+  let currentPage = 1;
+  let totalPages = 1;
+  let currentTotal = 0;
+  let currentData = [];
+
+  const STATUS_BADGE_CLASS = {
+    'approved': 'nla-badge-approved',
+    'cancelled': 'nla-badge-cancelled',
+    'canceled': 'nla-badge-cancelled',
+    'disapproved': 'nla-badge-disapproved',
+    'disapprove': 'nla-badge-disapproved',
+    'pending': 'nla-badge-pending',
+    'for signature': 'nla-badge-signature',
+    'temporary hold': 'nla-badge-hold',
+    'for verification': 'nla-badge-verification',
+  };
+
+  // ─────────────────────────────────────────────
+  // TOAST NOTIFICATIONS
+  // ─────────────────────────────────────────────
+  const appToastEl = document.getElementById('appToast');
+  const appToast = bootstrap.Toast.getOrCreateInstance(appToastEl, { delay: 3500 });
+  const appToastIcon = document.getElementById('appToastIcon');
+  const appToastMessage = document.getElementById('appToastMessage');
+
+  const TOAST_ICON = {
+    success: 'fas fa-circle-check',
+    warning: 'fas fa-triangle-exclamation',
+    danger: 'fas fa-circle-xmark',
+    info: 'fas fa-circle-info',
+  };
+
+  function showToast(message, type = 'info') {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    appToastEl.classList.remove('toast-success', 'toast-warning', 'toast-danger', 'toast-info');
+    appToastEl.classList.add(`toast-${type}`);
+    appToastIcon.className = TOAST_ICON[type] || TOAST_ICON.info;
+    appToastMessage.textContent = message.replace(/^[✅⚠️❌🔄]\s*/u, '');
+    appToast.show();
+  }
+
+  // ─────────────────────────────────────────────
+  // ELEMENTS
+  // ─────────────────────────────────────────────
+  const providerFilter = document.getElementById('providerFilter');
+  const loanTypeFilter = document.getElementById('loanTypeFilter');
+  const btnGenerate = document.getElementById('btnGenerate');
+  const btnExportCSV = document.getElementById('btnExportCSV');
+  const btnClear = document.getElementById('btnClear');
+  const reportResults = document.getElementById('reportResults');
+  const resultCount = document.getElementById('resultCount');
+  const pageNumbers = document.getElementById('pageNumbers');
+  const prevPage = document.getElementById('prevPage');
+  const nextPage = document.getElementById('nextPage');
+  const startDate = document.getElementById('startDate');
+  const startTime = document.getElementById('startTime');
+  const endDate = document.getElementById('endDate');
+  const endTime = document.getElementById('endTime');
+  const officeFilter = document.getElementById('officeFilter');
+  const statusFilter = document.getElementById('statusFilter');
+
+  // ─────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function formatCurrency(value) {
+    if (value === null || value === undefined || isNaN(value)) return '₱0.00';
+    return `₱${parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  function formatDateTime(value) {
+    if (!value) return '---';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return '---';
+    return d.toLocaleString('en-PH', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+
+  function applyStatusBadge(status) {
+    const key = (status || '').toLowerCase().trim();
+    const cssClass = STATUS_BADGE_CLASS[key] || 'nla-badge-pending';
+    return `<span class="badge ${cssClass}">${escapeHtml(status || '---')}</span>`;
+  }
+
+  function showMessageRow(message, variant = 'muted') {
+    reportResults.innerHTML = '';
+    const row = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 9;
+    td.className = `text-center text-${variant} py-3`;
+    td.innerHTML = message;
+    row.appendChild(td);
+    reportResults.appendChild(row);
+  }
+
+  // ─────────────────────────────────────────────
+  // LOAD LOAN TYPES BY PROVIDER
+  // ─────────────────────────────────────────────
+  async function loadLoanTypesByProvider(providerCode) {
+    try {
+      const url = new URL('/loan/reports/loan-types-by-provider', window.location.origin);
+      if (providerCode) {
+        url.searchParams.append('provider', providerCode);
+      }
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to load loan types');
+      }
+
+      // Clear and repopulate loan type dropdown
+      loanTypeFilter.innerHTML = '<option value="">All Types</option>';
+      data.loanTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.loanname;
+        option.textContent = type.loanname;
+        loanTypeFilter.appendChild(option);
+      });
+
+    } catch (err) {
+      console.error('Error loading loan types:', err);
+      showToast('❌ Error loading loan types: ' + err.message, 'danger');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // PROVIDER CHANGE HANDLER
+  // ─────────────────────────────────────────────
+  providerFilter.addEventListener('change', function() {
+    const providerCode = this.value;
+    loadLoanTypesByProvider(providerCode);
+  });
+
+  // ─────────────────────────────────────────────
+  // GENERATE REPORT
+  // ─────────────────────────────────────────────
+  async function generateReport() {
+    const startDateVal = startDate.value;
+    const startTimeVal = startTime.value;
+    const endDateVal = endDate.value;
+    const endTimeVal = endTime.value;
+    const office = officeFilter.value;
+    const provider = providerFilter.value;
+    const loanType = loanTypeFilter.value;
+    const status = statusFilter.value;
+
+    const sortBy = document.getElementById('sortBy').value;
+
+
+    // Validate date range
+    if (startDateVal && endDateVal && startDateVal > endDateVal) {
+      showToast('⚠️ Start date must be before end date.', 'warning');
+      return;
+    }
+
+    // Validate if same date but time range is invalid
+    if (startDateVal === endDateVal && startTimeVal && endTimeVal && startTimeVal > endTimeVal) {
+      showToast('⚠️ Start time must be before end time.', 'warning');
+      return;
+    }
+
+    btnGenerate.disabled = true;
+    btnGenerate.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+
+    try {
+      const url = new URL('/loan/reports/data', window.location.origin);
+      url.searchParams.append('page', currentPage);
+      url.searchParams.append('limit', 20);
+      
+      if (startDateVal) url.searchParams.append('startDate', startDateVal);
+      if (startTimeVal) url.searchParams.append('startTime', startTimeVal);
+      if (endDateVal) url.searchParams.append('endDate', endDateVal);
+      if (endTimeVal) url.searchParams.append('endTime', endTimeVal);
+      if (office) url.searchParams.append('office', office);
+      if (provider) url.searchParams.append('provider', provider);
+      if (loanType) url.searchParams.append('loanType', loanType);
+      if (status) url.searchParams.append('status', status);
+
+
+// Inside the URL construction:
+url.searchParams.append('sortBy', sortBy);
+
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to generate report');
+      }
+
+      currentData = data.data || [];
+      currentTotal = data.pagination?.total || 0;
+      totalPages = data.pagination?.totalPages || 1;
+      currentPage = data.pagination?.page || 1;
+
+      renderResults(currentData);
+      updatePagination();
+
+      if (currentData.length === 0) {
+        resultCount.textContent = '0 results found';
+      }
+
+      showToast(`✅ Report generated. ${currentTotal} records found.`, 'success');
+
+    } catch (err) {
+      console.error('Report generation error:', err);
+      showToast(`❌ ${err.message}`, 'danger');
+      showMessageRow('Something went wrong. Please try again.', 'danger');
+    } finally {
+      btnGenerate.disabled = false;
+      btnGenerate.innerHTML = '<i class="fas fa-search me-1"></i> Generate';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // RENDER FUNCTIONS
+  // ─────────────────────────────────────────────
+  function renderResults(data) {
+    reportResults.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      showMessageRow('No records found matching your filters.');
+      return;
+    }
+
+    data.forEach((loan) => {
+      const row = document.createElement('tr');
+      
+      row.innerHTML = `
+        <td><strong>${escapeHtml(loan.controlno)}</strong></td>
+        <td>${escapeHtml(loan.lastname || '')}, ${escapeHtml(loan.firstname || '')}</td>
+        <td>${escapeHtml(loan.loantype || '---')}</td>
+        <td>${formatCurrency(loan.loanamount)}</td>
+        <td>${formatCurrency(loan.loandeduction)}</td>
+        <td><strong>${formatCurrency(loan.netproceeds)}</strong></td>
+        <td>${formatDateTime(loan.datereceived)}</td>
+        <td>${applyStatusBadge(loan.STATUS)}</td>
+        <td>${escapeHtml(loan.office || '---')}</td>
+      `;
+      reportResults.appendChild(row);
+    });
+  }
+
+  function updatePagination() {
+    if (currentTotal === 0) {
+      pageNumbers.textContent = '';
+      prevPage.disabled = true;
+      nextPage.disabled = true;
+      return;
+    }
+
+    const start = (currentPage - 1) * 20 + 1;
+    const end = Math.min(currentPage * 20, currentTotal);
+    resultCount.textContent = `Showing ${start}-${end} of ${currentTotal} results`;
+
+    let html = '';
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) html += `<span class="px-1">...</span>`;
+    for (let i = startPage; i <= endPage; i++) {
+      const activeClass = i === currentPage ? 'fw-bold text-primary' : '';
+      html += `<span class="px-1 ${activeClass}" style="cursor:pointer" data-page="${i}">${i}</span>`;
+    }
+    if (endPage < totalPages) html += `<span class="px-1">...</span>`;
+
+    pageNumbers.innerHTML = html;
+    pageNumbers.querySelectorAll('span[data-page]').forEach(el => {
+      el.addEventListener('click', () => {
+        const page = parseInt(el.dataset.page);
+        if (page !== currentPage) {
+          currentPage = page;
+          generateReport();
+        }
+      });
+    });
+
+    prevPage.disabled = currentPage <= 1;
+    nextPage.disabled = currentPage >= totalPages;
+  }
+
+  // ─────────────────────────────────────────────
+  // EXPORT CSV
+  // ─────────────────────────────────────────────
+  async function exportCSV() {
+    const startDateVal = startDate.value;
+    const startTimeVal = startTime.value;
+    const endDateVal = endDate.value;
+    const endTimeVal = endTime.value;
+    const office = officeFilter.value;
+    const provider = providerFilter.value;
+    const loanType = loanTypeFilter.value;
+    const status = statusFilter.value;
+
+    try {
+      const url = new URL('/loan/reports/export', window.location.origin);
+      if (startDateVal) url.searchParams.append('startDate', startDateVal);
+      if (startTimeVal) url.searchParams.append('startTime', startTimeVal);
+      if (endDateVal) url.searchParams.append('endDate', endDateVal);
+      if (endTimeVal) url.searchParams.append('endTime', endTimeVal);
+      if (office) url.searchParams.append('office', office);
+      if (provider) url.searchParams.append('provider', provider);
+      if (loanType) url.searchParams.append('loanType', loanType);
+      if (status) url.searchParams.append('status', status);
+
+      // Open in new tab for download
+      window.open(url, '_blank');
+      showToast('📥 CSV export started.', 'info');
+
+    } catch (err) {
+      console.error('Export error:', err);
+      showToast(`❌ ${err.message}`, 'danger');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // CLEAR FILTERS
+  // ─────────────────────────────────────────────
+  function clearFilters() {
+    startDate.value = '';
+    startTime.value = '00:00';
+    endDate.value = '';
+    endTime.value = '23:59';
+    officeFilter.value = '';
+    providerFilter.value = '';
+    statusFilter.value = 'Approved';
+    currentPage = 1;
+    
+    // Reset loan types to all
+    loadLoanTypesByProvider(null);
+    
+    showMessageRow('Select filters and click "Generate Report" to view data.');
+    resultCount.textContent = '0 results found';
+    pageNumbers.textContent = '';
+    prevPage.disabled = true;
+    nextPage.disabled = true;
+    
+    showToast('🔄 Filters cleared.', 'info');
+  }
+
+  // ─────────────────────────────────────────────
+  // EVENT LISTENERS
+  // ─────────────────────────────────────────────
+  btnGenerate.addEventListener('click', () => {
+    currentPage = 1;
+    generateReport();
+  });
+
+  btnExportCSV.addEventListener('click', exportCSV);
+  btnClear.addEventListener('click', clearFilters);
+
+  prevPage.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      generateReport();
+    }
+  });
+
+  nextPage.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      generateReport();
+    }
+  });
+
+  // Enter key support
+  document.getElementById('reportForm').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      currentPage = 1;
+      generateReport();
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────
+  // Set default date range (current month)
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  //startDate.value = firstDay.toISOString().split('T')[0];
+  //endDate.value = now.toISOString().split('T')[0];
+  
+//startDate.value = formatDateLocal(firstDay);
+startDate.value = formatDateLocal(now);
+endDate.value = formatDateLocal(now);
+
+  // Set default times
+  startTime.value = '00:00';
+  endTime.value = '23:59';
+
+  statusFilter.value = 'Approved';
+
+  // Load initial loan types (all)
+  loadLoanTypesByProvider(null);
+
+  // Do NOT auto-generate - user must click Generate button
+  showMessageRow('Select filters and click "Generate Report" to view data.');
+
+});
+
+document.getElementById('btnExportPDF').addEventListener('click', function() {
+  // Gather filters directly from the DOM (this listener lives outside the
+  // DOMContentLoaded closure, so it can't reuse those local variables)
+  const startDateVal = document.getElementById('startDate').value;
+  const startTimeVal = document.getElementById('startTime').value;
+  const endDateVal   = document.getElementById('endDate').value;
+  const endTimeVal   = document.getElementById('endTime').value;
+  const office       = document.getElementById('officeFilter').value;
+  const provider     = document.getElementById('providerFilter').value;
+  const loanType     = document.getElementById('loanTypeFilter').value;
+  const status       = document.getElementById('statusFilter').value;
+  const sortBy       = document.getElementById('sortBy').value;
+
+  const url = new URL('/loan/reports/pdf', window.location.origin);
+  if (startDateVal) url.searchParams.append('startDate', startDateVal);
+  if (startTimeVal) url.searchParams.append('startTime', startTimeVal);
+  if (endDateVal)   url.searchParams.append('endDate', endDateVal);
+  if (endTimeVal)   url.searchParams.append('endTime', endTimeVal);
+  if (office)       url.searchParams.append('office', office);
+  if (provider)     url.searchParams.append('provider', provider);
+  if (loanType)     url.searchParams.append('loanType', loanType);
+  if (status)       url.searchParams.append('status', status);
+  if (sortBy)       url.searchParams.append('sortBy', sortBy);
+
+  window.open(url, '_blank');
+});
+function formatDateLocal(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+</script>
+
+</body>
+</html>

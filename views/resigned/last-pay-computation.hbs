@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+  <style>
+    :root{
+      --rb-navy:      #16304A;
+      --rb-navy-deep: #0F2233;
+      --rb-blue:      #2E6F9E;
+      --rb-teal:      #1F7A6C;
+      --rb-gold:      #A8762A;
+      --rb-bg:        #F6F7F9;
+      --rb-surface:   #FFFFFF;
+      --rb-border:    #E3E6EB;
+      --rb-muted:     #6B7686;
+      --rb-danger:    #C1483D;
+    }
+
+    .main-content{ font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--rb-bg); }
+
+    .rb-title{ font-size:1.65rem; font-weight:700; color:var(--rb-navy-deep); display:flex; align-items:center; gap:.6rem; margin:0; }
+    .rb-title i{ color:var(--rb-blue); }
+    .rb-subtitle{ color:var(--rb-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    .rb-card{ border:1px solid var(--rb-border); border-radius:.65rem; background:var(--rb-surface); box-shadow:0 1px 2px rgba(16,24,40,.04); margin-bottom:1.25rem; overflow:hidden; }
+    .rb-card-header{ border-bottom:1px solid var(--rb-border); padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; }
+    .rb-card-header i{ color:var(--rb-blue); }
+    .rb-card-header strong{ color:var(--rb-navy-deep); font-weight:600; font-size:.97rem; }
+    .rb-card-header-between{ justify-content:space-between; }
+    .rb-card-count{ font-size:.82rem; color:var(--rb-muted); }
+    .rb-card-body{ padding:1.15rem; }
+    .rb-card-footer{ border-top:1px solid var(--rb-border); padding:1rem 1.15rem; }
+
+    .form-label{ font-size:.8rem; font-weight:600; color:var(--rb-navy); margin-bottom:.35rem; }
+    .form-control, .form-select{ border-color:var(--rb-border); font-size:.9rem; }
+    .form-control:focus, .form-select:focus{ border-color:var(--rb-blue); box-shadow:0 0 0 .2rem rgba(46,111,158,.12); }
+    .rb-help{ font-size:.82rem; color:var(--rb-muted); margin:0; }
+
+    .btn-rb-blue{ background:var(--rb-blue); border-color:var(--rb-blue); color:#fff; font-weight:500; font-size:.9rem; }
+    .btn-rb-blue:hover{ background:#255e87; border-color:#255e87; color:#fff; }
+
+    #loading .spinner-border{ color:var(--rb-blue) !important; width:2rem; height:2rem; }
+    #loading p{ color:var(--rb-muted); font-size:.9rem; }
+    #errorMessage{ border:none !important; border-left:4px solid var(--rb-danger) !important; border-radius:.55rem !important; font-size:.9rem; background:rgba(193,72,61,.07); color:var(--rb-danger); }
+
+    #existingRecordBanner{
+      border-left:4px solid var(--rb-blue) !important;
+      background:rgba(46,111,158,.07);
+      color:var(--rb-navy-deep);
+      border-radius:.55rem;
+      font-size:.88rem;
+      border:none;
+    }
+
+    .employee-card{ cursor:pointer; transition:all .2s ease; border:1px solid var(--rb-border); border-radius:8px; padding:10px 15px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+    .employee-card:hover{ background-color:#EBF3FA; border-color:var(--rb-blue); transform:translateX(3px); }
+    .employee-card.selected{ background-color:#EBF3FA; border-color:var(--rb-blue); border-left:4px solid var(--rb-blue); }
+    .employee-card .badge-resigned{ background:var(--rb-danger); color:#fff; font-size:.7rem; padding:2px 8px; border-radius:12px; }
+    .employee-card .rb-chevron{ color:#C1C7CD; margin-left:10px; }
+    .employee-badge{ font-size:.75rem; color:var(--rb-muted); }
+    #employeeList{ max-height:300px; overflow-y:auto; }
+    #employeeList::-webkit-scrollbar{ width:6px; }
+    #employeeList::-webkit-scrollbar-track{ background:#F1F1F1; border-radius:3px; }
+    #employeeList::-webkit-scrollbar-thumb{ background:#C1C7CD; border-radius:3px; }
+    #employeeList::-webkit-scrollbar-thumb:hover{ background:#A0A7AE; }
+    .rb-emp-name{ font-weight:600; font-size:1rem; color:var(--rb-navy-deep); }
+    .rb-emp-meta{ display:flex; flex-wrap:wrap; gap:8px 15px; margin-top:4px; }
+
+    .info-grid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:6px 24px;
+      background:var(--rb-bg);
+      padding:12px 16px;
+      border-radius:8px;
+      border:1px solid var(--rb-border);
+    }
+    @media (max-width:768px){ .info-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:480px){ .info-grid{ grid-template-columns:1fr; } }
+    .info-item{ display:flex; align-items:baseline; padding:2px 0; gap:6px; }
+    .info-label{ font-weight:600; color:var(--rb-muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; flex-shrink:0; }
+    .info-value{ color:var(--rb-navy-deep); font-size:.88rem; font-weight:600; word-break:break-word; }
+
+    .lp-sticky{ position:sticky; top:1rem; }
+
+    .income-field-group{ border:1px solid var(--rb-border); border-radius:8px; padding:12px 14px; background:var(--rb-bg); }
+    .income-field-group .form-label{ margin-bottom:.5rem; }
+    .income-field-group.has-error{ border-color:var(--rb-danger); background:rgba(193,72,61,.05); }
+    .income-error-text{ display:none; font-size:.78rem; color:var(--rb-danger); margin-top:5px; }
+    .income-field-group.has-error .income-error-text{ display:block; }
+
+    .required-field-group{ border:1px solid var(--rb-gold); border-radius:8px; padding:12px 14px; background:#FBF6EC; margin-bottom:1rem; }
+    .required-field-group .form-label::after{ content:" *"; color:var(--rb-danger); }
+    .required-field-group.has-error{ border-color:var(--rb-danger); background:rgba(193,72,61,.05); }
+    .required-field-group .income-error-text{ display:none; font-size:.78rem; color:var(--rb-danger); margin-top:5px; }
+    .required-field-group.has-error .income-error-text{ display:block; }
+
+    /* Length of Service Pay — segmented toggle */
+    .los-card{
+      border:1px solid var(--rb-border);
+      border-radius:10px;
+      background:var(--rb-bg);
+      padding:14px 16px;
+      margin-bottom:1rem;
+    }
+    .los-card-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:.7rem;
+    }
+    .los-card-header .form-label{ margin-bottom:0; }
+
+    .los-badge{
+      font-size:.66rem;
+      font-weight:700;
+      padding:3px 10px;
+      border-radius:999px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      white-space:nowrap;
+    }
+    .los-badge-eligible{ background:rgba(31,122,108,.12); color:var(--rb-teal); }
+    .los-badge-ineligible{ background:rgba(193,72,61,.1); color:var(--rb-danger); }
+
+    .los-toggle{
+      display:flex;
+      gap:4px;
+      background:var(--rb-surface);
+      border:1px solid var(--rb-border);
+      border-radius:9px;
+      padding:4px;
+    }
+    .los-radio{
+      position:absolute;
+      opacity:0;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+    }
+    .los-option{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+      padding:10px 12px;
+      border-radius:7px;
+      font-size:.85rem;
+      font-weight:600;
+      color:var(--rb-muted);
+      cursor:pointer;
+      transition:background .15s ease, color .15s ease, box-shadow .15s ease;
+      user-select:none;
+    }
+    .los-option i{ font-size:.8rem; }
+    .los-option:hover{ color:var(--rb-navy-deep); }
+
+    .los-radio:checked + .los-option-yes{
+      background:var(--rb-teal);
+      color:#fff;
+      box-shadow:0 1px 3px rgba(31,122,108,.35);
+    }
+    .los-radio:checked + .los-option-no{
+      background:var(--rb-navy);
+      color:#fff;
+      box-shadow:0 1px 3px rgba(22,48,74,.3);
+    }
+    .los-radio:focus-visible + .los-option{
+      outline:2px solid var(--rb-blue);
+      outline-offset:2px;
+    }
+    .los-radio:disabled + .los-option{
+      opacity:.4;
+      cursor:not-allowed;
+    }
+    .los-radio:disabled + .los-option:hover{ color:var(--rb-muted); }
+
+    .los-formula-note{
+      font-size:.82rem;
+      color:var(--rb-muted);
+      margin:10px 0 0;
+      padding:8px 10px;
+      background:var(--rb-surface);
+      border:1px dashed var(--rb-border);
+      border-radius:6px;
+    }
+    .los-formula-note:empty{ display:none; }
+
+
+    #deductionTable{ width:100%; font-size:.85rem; border-collapse:collapse; }
+    #deductionTable thead th{ background:var(--rb-navy) !important; color:#fff !important; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; font-weight:600; padding:.5rem; text-align:right; }
+    #deductionTable thead th:first-child{ text-align:left; }
+    #deductionTable tbody td{ padding:.5rem; border-bottom:1px solid var(--rb-border); text-align:right; }
+    #deductionTable tbody td:first-child{ text-align:left; font-weight:500; }
+    #deductionTable tbody tr:nth-child(odd) td{ background:var(--rb-bg); }
+    .rb-remove-row{ color:var(--rb-danger); cursor:pointer; border:none; background:none; font-size:.85rem; }
+
+    .summary-list{ width:100%; }
+    .summary-row{ display:flex; justify-content:space-between; padding:5px 0; font-size:.88rem; color:var(--rb-muted); }
+    .summary-row .value{ font-weight:600; color:var(--rb-navy-deep); }
+    .summary-row.total{ border-top:2px solid var(--rb-border); margin-top:6px; padding-top:10px; font-weight:700; font-size:1.05rem; color:var(--rb-navy-deep); }
+    .summary-row.total .value{ color:var(--rb-blue); font-size:1.2rem; }
+    .summary-row.negative .value{ color:var(--rb-danger); }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h1 class="rb-title"><i class="fas fa-file-invoice-dollar"></i> Last Pay Computation</h1>
+        <p class="rb-subtitle">Search for a resigned employee to compute their last pay.</p>
+      </div>
+
+      <!-- Search Card -->
+      <div class="rb-card">
+        <div class="rb-card-header">
+          <i class="fas fa-search"></i>
+          <strong>Search Resigned Employee</strong>
+        </div>
+        <div class="rb-card-body">
+          <form id="searchForm">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Office</label>
+                <select name="office" id="officeSelect" class="form-select" required>
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">{{this.office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">ID Number</label>
+                <input type="text" id="idno" class="form-control" placeholder="Enter ID Number">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" id="lastName" class="form-control" placeholder="Enter Last Name">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">First Name</label>
+                <input type="text" id="firstName" class="form-control" placeholder="Enter First Name">
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+              <p class="rb-help"><i class="fas fa-circle-info me-1"></i>Search by ID number OR by name (resigned employees only)</p>
+              <div class="d-flex gap-2">
+                <button type="button" id="resetBtn" class="btn btn-outline-secondary" style="font-size:.9rem;"><i class="fas fa-redo me-1"></i> Reset</button>
+                <button type="submit" class="btn btn-rb-blue"><i class="fas fa-search me-1"></i> Search</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading" class="text-center py-4" style="display:none;">
+        <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+        <p class="mt-2">Loading...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="errorMessage" class="alert mt-3" style="display:none;"></div>
+
+      <!-- Employee List -->
+      <div id="employeeListContainer" class="rb-card" style="display:none;">
+        <div class="rb-card-header rb-card-header-between">
+          <div class="d-flex align-items-center gap-2"><i class="fas fa-users"></i><strong>Select Resigned Employee</strong></div>
+          <span id="employeeCount" class="rb-card-count"></span>
+        </div>
+        <div class="rb-card-body"><div id="employeeList"></div></div>
+      </div>
+
+      <!-- =====================================================
+           LAST PAY PANEL
+           Layout: employee info (full width) → two columns:
+           left = form, right = sticky summary
+      ====================================================== -->
+      <div id="lastPayPanel" style="display:none;">
+
+        <!-- Existing record banner -->
+        <div id="existingRecordBanner" class="alert mb-3" style="display:none;">
+          <i class="fas fa-pen-to-square me-1"></i>
+          <span id="existingRecordMessage"></span>
+        </div>
+
+        <!-- Employee Info — compact strip -->
+        <div class="rb-card">
+          <div class="rb-card-header rb-card-header-between">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-id-badge"></i>
+              <strong>Employee Information</strong>
+            </div>
+            <button id="showListBtn" class="btn btn-sm btn-outline-secondary" style="display:none; font-size:.82rem;">
+              <i class="fas fa-arrow-left me-1"></i> Back to List
+            </button>
+          </div>
+          <div class="rb-card-body pb-2">
+            <div class="info-grid" id="employeeInfo">
+              <div class="info-item"><span class="info-label">ID No</span><span class="info-value" id="employeeId"></span></div>
+              <div class="info-item"><span class="info-label">Name</span><span class="info-value" id="employeeName"></span></div>
+              <div class="info-item"><span class="info-label">Designation</span><span class="info-value" id="employeeDesignation"></span></div>
+              <div class="info-item"><span class="info-label">Date Hired</span><span class="info-value" id="employeeDateHired"></span></div>
+              <div class="info-item"><span class="info-label">Date Resigned</span><span class="info-value" id="employeeDateResigned"></span></div>
+              <div class="info-item"><span class="info-label">Length of Service</span><span class="info-value" id="employeeLos"></span></div>
+              <div class="info-item"><span class="info-label">Monthly Rate</span><span class="info-value" id="employeeMonthlyRate"></span></div>
+              <div class="info-item"><span class="info-label">13th Month</span><span class="info-value" id="employeeThirteenth"></span></div>
+              <div class="info-item"><span class="info-label">Region</span><span class="info-value" id="employeeRegion"></span></div>
+              <div class="info-item"><span class="info-label">Department</span><span class="info-value" id="employeeDepartment"></span></div>
+              <div class="info-item"><span class="info-label">Branch</span><span class="info-value" id="employeeBranch"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-column layout -->
+        <div class="row g-3 align-items-start">
+
+          <!-- LEFT: Input form -->
+          <div class="col-lg-8">
+            <div class="rb-card mb-0">
+              <div class="rb-card-header">
+                <i class="fas fa-pencil-alt"></i>
+                <strong>Computation Details</strong>
+              </div>
+              <div class="rb-card-body">
+
+                <!-- Resignation Type (required) -->
+                <div class="required-field-group" id="resignationTypeGroup">
+                  <label class="form-label">Resignation Type</label>
+                  <select id="resignationTypeSelect" class="form-select form-select-sm">
+                    <option value="" selected disabled>Select Resignation Type</option>
+                  </select>
+                  <div class="income-error-text" id="resignationTypeError">Please select a resignation type.</div>
+                  
+                  <!-- Remarks field (hidden by default) -->
+                  <div id="remarksContainer" style="display: none; margin-top: 10px;">
+                    <label class="form-label">Remarks</label>
+                    <input type="text" id="resignationRemarks" class="form-control form-control-sm" placeholder="Please specify the resignation type">
+                    <div class="income-error-text" id="remarksError">Please provide remarks for 'Others' resignation type.</div>
+                  </div>
+                </div>
+
+                <!-- 13th Month Pay editable field -->
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <div class="income-field-group" id="thirteenthMonthGroup">
+                      <label class="form-label">13th Month Pay</label>
+                      <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text">₱</span>
+                        <input type="text" id="thirteenthMonthAmount" class="form-control" value="0.00">
+                      </div>
+                      <div class="income-error-text" id="thirteenthMonthError">Please enter a valid amount.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- LOS toggle -->
+                <div class="los-card">
+                  <div class="los-card-header">
+                    <label class="form-label">Length of Service Pay</label>
+                    <span class="los-badge" id="losEligibilityBadge" style="display:none;"></span>
+                  </div>
+
+                  <div class="los-toggle" role="radiogroup" aria-label="Length of Service Pay option">
+                    <input class="los-radio" type="radio" name="losOption" id="losYes" value="yes"
+                           title="Available for employees with at least 5 years of service">
+                    <label class="los-option los-option-yes" for="losYes">
+                      <i class="fas fa-circle-check"></i>
+                      <span>Include LOS Pay</span>
+                    </label>
+
+                    <input class="los-radio" type="radio" name="losOption" id="losNo" value="no" checked>
+                    <label class="los-option los-option-no" for="losNo">
+                      <i class="fas fa-ban"></i>
+                      <span>Exclude LOS Pay</span>
+                    </label>
+                  </div>
+
+                  <p class="los-formula-note" id="losFormulaNote"></p>
+                </div>
+
+                <!-- Salary + Other Income -->
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <div class="income-field-group" id="salaryGroup">
+                      <label class="form-label">Salary</label>
+                      <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text">₱</span>
+                        <input type="text" id="salaryAmount" class="form-control" value="0.00">
+                      </div>
+                      <input type="text" id="salaryDescription" class="form-control form-control-sm" placeholder="e.g., Last salary for March 31, 2025">
+                      <div class="income-error-text" id="salaryError">Please describe this amount.</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="income-field-group" id="otherIncomeGroup">
+                      <label class="form-label">Other Income</label>
+                      <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text">₱</span>
+                        <input type="text" id="otherIncomeAmount" class="form-control" value="0.00">
+                      </div>
+                      <input type="text" id="otherIncomeDescription" class="form-control form-control-sm" placeholder="e.g., Overtime, allowance, reimbursement">
+                      <div class="income-error-text" id="otherIncomeError">Please describe this amount.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr>
+
+                <!-- Deductions -->
+                <label class="form-label d-block mb-2">Deductions</label>
+                <div class="row g-2 align-items-end mb-3">
+                  <div class="col-md-3">
+                    <label class="form-label">Type</label>
+                    <select id="dedTypeSelect" class="form-select form-select-sm"></select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Note (optional)</label>
+                    <input type="text" id="dedNote" class="form-control form-control-sm" placeholder="Optional note">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Outstanding</label>
+                    <input type="text" id="dedOutstanding" class="form-control form-control-sm" value="0.00">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Deduction</label>
+                    <input type="text" id="dedDeduction" class="form-control form-control-sm" value="0.00">
+                  </div>
+                  <div class="col-md-2">
+                    <button type="button" id="addDeductionBtn" class="btn btn-rb-blue btn-sm w-100">
+                      <i class="fas fa-plus me-1"></i>Add
+                    </button>
+                  </div>
+                </div>
+
+                <table id="deductionTable" class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Outstanding</th>
+                      <th>Deduction</th>
+                      <th>Balance</th>
+                      <th style="width:40px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="deductionBody">
+                    <tr id="noDeductionsRow"><td colspan="5" class="text-center text-muted">No deductions added</td></tr>
+                  </tbody>
+                </table>
+
+              </div>
+            </div>
+          </div><!-- /col-lg-8 -->
+
+          <!-- RIGHT: Sticky summary + actions -->
+          <div class="col-lg-4">
+            <div class="rb-card mb-0 lp-sticky">
+              <div class="rb-card-header">
+                <i class="fas fa-calculator"></i>
+                <strong>Summary</strong>
+              </div>
+              <div class="rb-card-body">
+                <div class="summary-list">
+                  <div class="summary-row"><span>LOS Pay</span><span class="value" id="sumLos">0.00</span></div>
+                  <div class="summary-row"><span>Salary</span><span class="value" id="sumSalary">0.00</span></div>
+                  <div class="summary-row"><span>Other Income</span><span class="value" id="sumOtherIncome">0.00</span></div>
+                  <div class="summary-row"><span>13th Month</span><span class="value" id="sumThirteenth">0.00</span></div>
+                  <div class="summary-row" style="border-top:1px solid var(--rb-border); padding-top:8px; margin-top:4px; font-weight:600;">
+                    <span>Gross</span><span class="value" id="sumGross">0.00</span>
+                  </div>
+                  <div class="summary-row mt-2"><span>Total Outstanding</span><span class="value" id="sumOutstanding">0.00</span></div>
+                  <div class="summary-row"><span>Total Deduction</span><span class="value" id="sumDeduction">0.00</span></div>
+                  <div class="summary-row"><span>Total Balance</span><span class="value" id="sumBalance">0.00</span></div>
+                  <!-- In the summary section - add this after the NET PAY row -->
+<div class="summary-row total" id="sumNetRow">
+  <span>NET PAY</span><span class="value" id="sumNet">0.00</span>
+</div>
+
+<!-- NEW: Notes field -->
+<div class="mt-3">
+  <label for="notesInput" class="form-label" style="font-size:.8rem; font-weight:600; color:var(--rb-navy); margin-bottom:.35rem;">
+    <i class="fas fa-pen me-1"></i> Notes / Remarks
+  </label>
+  <textarea id="notesInput" class="form-control" rows="2" placeholder="Enter any additional notes or remarks..." style="font-size:.85rem; resize:vertical;"></textarea>
+</div>
+                </div>
+              </div>
+              <div class="rb-card-footer">
+                <p class="rb-help mb-3" id="actionHelpText"></p>
+                <button id="printBtn" class="btn btn-rb-blue w-100">
+                  <i class="fas fa-save me-1"></i> Save & Generate PDF
+                </button>
+              </div>
+            </div>
+          </div><!-- /col-lg-4 -->
+
+        </div><!-- /row -->
+
+      </div><!-- /#lastPayPanel -->
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const searchForm = document.getElementById('searchForm');
+  const officeSelect = document.getElementById('officeSelect');
+  const idnoInput = document.getElementById('idno');
+  const lastNameInput = document.getElementById('lastName');
+  const firstNameInput = document.getElementById('firstName');
+  const resetBtn = document.getElementById('resetBtn');
+  const loading = document.getElementById('loading');
+  const errorMessage = document.getElementById('errorMessage');
+  const employeeListContainer = document.getElementById('employeeListContainer');
+  const employeeList = document.getElementById('employeeList');
+  const employeeCount = document.getElementById('employeeCount');
+  const lastPayPanel = document.getElementById('lastPayPanel');
+  const printBtn = document.getElementById('printBtn');
+  const showListBtn = document.getElementById('showListBtn');
+  const addDeductionBtn = document.getElementById('addDeductionBtn');
+  const dedTypeSelect = document.getElementById('dedTypeSelect');
+  const dedNote = document.getElementById('dedNote');
+  const dedOutstanding = document.getElementById('dedOutstanding');
+  const dedDeduction = document.getElementById('dedDeduction');
+  const deductionBody = document.getElementById('deductionBody');
+  const salaryAmountInput = document.getElementById('salaryAmount');
+  const salaryDescriptionInput = document.getElementById('salaryDescription');
+  const salaryGroup = document.getElementById('salaryGroup');
+  const salaryError = document.getElementById('salaryError');
+  const otherIncomeAmountInput = document.getElementById('otherIncomeAmount');
+  const otherIncomeDescriptionInput = document.getElementById('otherIncomeDescription');
+  const otherIncomeGroup = document.getElementById('otherIncomeGroup');
+  const otherIncomeError = document.getElementById('otherIncomeError');
+  const losYesRadio = document.getElementById('losYes');
+  const losNoRadio = document.getElementById('losNo');
+  const losFormulaNote = document.getElementById('losFormulaNote');
+  const losEligibilityBadge = document.getElementById('losEligibilityBadge');
+  const resignationTypeSelect = document.getElementById('resignationTypeSelect');
+  const resignationTypeGroup = document.getElementById('resignationTypeGroup');
+  const resignationTypeError = document.getElementById('resignationTypeError');
+  const existingRecordBanner = document.getElementById('existingRecordBanner');
+  const existingRecordMessage = document.getElementById('existingRecordMessage');
+  const actionHelpText = document.getElementById('actionHelpText');
+  
+  // New elements for 13th month and remarks
+  const thirteenthMonthInput = document.getElementById('thirteenthMonthAmount');
+  const thirteenthMonthGroup = document.getElementById('thirteenthMonthGroup');
+  const thirteenthMonthError = document.getElementById('thirteenthMonthError');
+  const resignationRemarks = document.getElementById('resignationRemarks');
+  const remarksContainer = document.getElementById('remarksContainer');
+  const remarksError = document.getElementById('remarksError');
+
+  let selectedEmployeeId = null;
+  let selectedOffice = null;
+  let currentDisplayYear = null;
+  let currentDetails = null;
+  let deductionRows = [];
+  let isEditingExisting = false;
+
+  // ------------------------------------------------------------------
+  // Search
+  // ------------------------------------------------------------------
+  searchForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    await searchEmployees();
+  });
+
+  resetBtn.addEventListener('click', function () {
+    searchForm.reset();
+    employeeListContainer.style.display = 'none';
+    lastPayPanel.style.display = 'none';
+    errorMessage.style.display = 'none';
+    selectedEmployeeId = null;
+    selectedOffice = null;
+    currentDisplayYear = null;
+    deductionRows = [];
+    isEditingExisting = false;
+    existingRecordBanner.style.display = 'none';
+    employeeList.innerHTML = '';
+    if (showListBtn) showListBtn.style.display = 'none';
+    remarksContainer.style.display = 'none';
+    resignationRemarks.value = '';
+  });
+
+  if (showListBtn) {
+    showListBtn.addEventListener('click', function () {
+      employeeListContainer.style.display = 'block';
+      lastPayPanel.style.display = 'none';
+      showListBtn.style.display = 'none';
+      employeeListContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  async function searchEmployees() {
+    const office = officeSelect.value;
+    const idno = idnoInput.value.trim();
+    const lastName = lastNameInput.value.trim();
+    const firstName = firstNameInput.value.trim();
+
+    if (!office) {
+      showError('Please select an office');
+      return;
+    }
+    if (!idno && !lastName && !firstName) {
+      showError('Please enter at least one search criteria');
+      return;
+    }
+
+    loading.style.display = 'block';
+    employeeListContainer.style.display = 'none';
+    lastPayPanel.style.display = 'none';
+    errorMessage.style.display = 'none';
+
+    try {
+      const params = new URLSearchParams({ office });
+      if (idno) params.append('idno', idno);
+      if (lastName) params.append('lastName', lastName);
+      if (firstName) params.append('firstName', firstName);
+
+      const response = await fetch(`/resigned/resigned-employee/search?${params.toString()}`);
+      const result = await response.json();
+
+      if (result.success && result.data.length > 0) {
+        displayEmployeeList(result.data);
+      } else {
+        showError('No resigned employees found matching your criteria');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error searching employees');
+    } finally {
+      loading.style.display = 'none';
+    }
+  }
+
+  function displayEmployeeList(employees) {
+    employeeList.innerHTML = '';
+    employeeCount.textContent = 'Found ' + employees.length + ' employee(s)';
+
+    employees.forEach((emp) => {
+      const card = document.createElement('div');
+      card.className = 'employee-card';
+      card.innerHTML = `
+        <div>
+          <div class="rb-emp-name">${emp.lastname || ''}, ${emp.firstname || ''}</div>
+          <div class="rb-emp-meta">
+            <span class="employee-badge"><strong>ID:</strong> ${emp.idno}</span>
+            <span class="employee-badge"><strong>Region:</strong> ${emp.region || 'N/A'}</span>
+            <span class="employee-badge"><strong>Resigned:</strong> ${formatDate(emp.dateresign)}</span>
+          </div>
+        </div>
+        <div><span class="badge-resigned">Resigned</span><i class="fas fa-chevron-right rb-chevron"></i></div>
+      `;
+      card.dataset.idno = emp.idno;
+      card.addEventListener('click', () => selectEmployee(emp.idno));
+      employeeList.appendChild(card);
+    });
+
+    employeeListContainer.style.display = 'block';
+  }
+
+  // ------------------------------------------------------------------
+  // Employee selection -> load Last Pay details
+  // ------------------------------------------------------------------
+  async function selectEmployee(idno, forceYear = null) {
+    selectedEmployeeId = idno;
+    selectedOffice = officeSelect.value;
+    currentDisplayYear = forceYear;
+    deductionRows = [];
+    isEditingExisting = false;
+    salaryAmountInput.value = '0.00';
+    salaryDescriptionInput.value = '';
+    otherIncomeAmountInput.value = '0.00';
+    otherIncomeDescriptionInput.value = '';
+    thirteenthMonthInput.value = '0.00';
+    resignationRemarks.value = '';
+    remarksContainer.style.display = 'none';
+    salaryGroup.classList.remove('has-error');
+    otherIncomeGroup.classList.remove('has-error');
+    thirteenthMonthGroup.classList.remove('has-error');
+    resignationTypeSelect.value = '';
+    resignationTypeGroup.classList.remove('has-error');
+    // Add this in the selectEmployee function where other fields are reset
+document.getElementById('notesInput').value = '';
+
+    document.querySelectorAll('.employee-card').forEach((card) => {
+      card.classList.toggle('selected', card.dataset.idno === idno);
+    });
+
+    employeeListContainer.style.display = 'none';
+    loading.style.display = 'block';
+    lastPayPanel.style.display = 'none';
+    errorMessage.style.display = 'none';
+
+    try {
+      let url = `/resigned/last-pay/details?office=${encodeURIComponent(selectedOffice)}&idno=${encodeURIComponent(idno)}`;
+      if (forceYear) url += `&year=${forceYear}`;
+
+      const response = await fetch(url);
+      const result = await response.json();
+
+      if (result.needsYearSelection && result.data && result.data.availableYears) {
+        loading.style.display = 'none';
+        const availableYear = result.data.availableYears[0];
+        const currentYear = result.data.currentYear;
+
+        const yearResult = await Swal.fire({
+          title: 'No Data for Current Year',
+          html: 'No payroll data found for <strong>' + currentYear + '</strong>. View data from <strong>' + availableYear + '</strong> instead?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, view ' + availableYear,
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#2E6F9E',
+          cancelButtonColor: '#6B7686',
+        });
+
+        if (yearResult.isConfirmed) {
+          await selectEmployee(idno, availableYear);
+        } else {
+          showError('No payroll data available for the selected year');
+          employeeListContainer.style.display = 'block';
+        }
+        return;
+      }
+
+      if (result.success) {
+        currentDetails = result.data;
+        currentDisplayYear = result.data.currentYear;
+        await loadDeductionTypes();
+        populatePanel(result.data);
+
+        if (result.data.existingComputation) {
+          await handleExistingComputationChoice(result.data);
+        } else {
+          isEditingExisting = false;
+          existingRecordBanner.style.display = 'none';
+          printBtn.innerHTML = '<i class="fas fa-save me-1"></i> Save & Generate PDF';
+          actionHelpText.innerHTML =
+            '<i class="fas fa-circle-info me-1"></i>Review the details, then save to record this computation.';
+          recalculate();
+          lastPayPanel.style.display = 'block';
+          lastPayPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (showListBtn) showListBtn.style.display = 'inline-block';
+        }
+      } else {
+        showError(result.message || 'Error loading employee details');
+        employeeListContainer.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error loading last pay details: ' + error.message);
+      employeeListContainer.style.display = 'block';
+    } finally {
+      loading.style.display = 'none';
+    }
+  }
+
+  function populatePanel(data) {
+    const { employee, lengthOfService } = data;
+
+    setText('employeeId', employee.idno || 'N/A');
+    setText('employeeName', employee.fullname || 'N/A');
+    setText('employeeDesignation', employee.designation || 'N/A');
+    setText('employeeDateHired', formatDate(employee.datehired));
+    setText('employeeDateResigned', formatDate(employee.dateresign));
+    setText('employeeLos', lengthOfService ? lengthOfService.actualLabel : 'N/A');
+    setText('employeeMonthlyRate', formatCurrency(data.monthlyRate));
+    setText('employeeThirteenth', '₱' + formatCurrency(data.thirteenthMonth || 0));
+    setText('employeeRegion', employee.region || 'N/A');
+    setText('employeeDepartment', employee.department || 'N/A');
+    setText('employeeBranch', employee.branch || 'N/A');
+
+    // Set 13th month editable field
+    thirteenthMonthInput.value = formatCurrency(data.thirteenthMonth || 0);
+
+    const qualifies = lengthOfService && lengthOfService.roundedYears >= 5;
+    losYesRadio.disabled = !qualifies;
+    losNoRadio.checked = true;
+
+    if (losEligibilityBadge) {
+      losEligibilityBadge.style.display = 'inline-block';
+      if (qualifies) {
+        losEligibilityBadge.textContent = 'Eligible';
+        losEligibilityBadge.className = 'los-badge los-badge-eligible';
+      } else {
+        losEligibilityBadge.textContent = 'Not Eligible (5-yr min)';
+        losEligibilityBadge.className = 'los-badge los-badge-ineligible';
+      }
+    }
+
+    updateLosFormulaNote();
+  }
+
+  async function handleExistingComputationChoice(data) {
+    const saved = data.existingComputation;
+
+    const choice = await Swal.fire({
+      title: 'Already Processed',
+      html: 'This employee\'s Last Pay Computation was already saved on <strong>' + formatDate(saved.transDate) + '</strong> (Status: ' + (saved.status || 'PROCESSED') + ').<br><br>What would you like to do?',
+      icon: 'info',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Edit / Update',
+      denyButtonText: 'Print / Download PDF',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2E6F9E',
+      denyButtonColor: '#1F7A6C',
+      cancelButtonColor: '#6B7686',
+    });
+
+    if (choice.isConfirmed) {
+      isEditingExisting = true;
+      applyExistingValuesForEdit(saved, data.existingDetails || []);
+
+      existingRecordMessage.textContent = 'Editing a record originally saved on ' + formatDate(saved.transDate) + (saved.transactionupdated ? ', last updated ' + formatDate(saved.transactionupdated) : '') + '.';
+      existingRecordBanner.style.display = 'block';
+
+      printBtn.innerHTML = '<i class="fas fa-save me-1"></i> Update & Download PDF';
+      actionHelpText.innerHTML =
+        '<i class="fas fa-pen me-1"></i>You are editing a previously saved record. Updating will overwrite the saved figures.';
+
+      recalculate();
+      lastPayPanel.style.display = 'block';
+      lastPayPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (showListBtn) showListBtn.style.display = 'inline-block';
+    } else if (choice.isDenied) {
+      await downloadSavedPDF();
+      employeeListContainer.style.display = 'block';
+    } else {
+      employeeListContainer.style.display = 'block';
+    }
+  }
+
+  function applyExistingValuesForEdit(saved, savedDetails) {
+    resignationTypeSelect.value = '';
+    const savedTypeOption = Array.from(resignationTypeSelect.options).find(
+      (o) => o.textContent === saved.separationtype
+    );
+    if (savedTypeOption) {
+      resignationTypeSelect.value = savedTypeOption.value;
+      // Check if it's "Others" and show remarks
+      if (savedTypeOption.textContent === 'Others') {
+        remarksContainer.style.display = 'block';
+        if (saved.separationtype_remarks) {
+          resignationRemarks.value = saved.separationtype_remarks;
+        }
+      }
+    }
+
+      // Add this to load saved notes
+  const notesInput = document.getElementById('notesInput');
+  if (saved.notes) {
+    notesInput.value = saved.notes;
+  } else {
+    notesInput.value = '';
+  }
+
+    const losIncluded = parseFloat(saved.losAmount) > 0;
+    losYesRadio.checked = losIncluded;
+    losNoRadio.checked = !losIncluded;
+    updateLosFormulaNote();
+
+    salaryAmountInput.value = formatCurrency(saved.otherincomeamount);
+    salaryDescriptionInput.value = saved.otherincome || '';
+    otherIncomeAmountInput.value = formatCurrency(saved.otherincomeamount2);
+    otherIncomeDescriptionInput.value = saved.otherincome2 || '';
+    thirteenthMonthInput.value = formatCurrency(saved.thriteenthMonth || 0);
+
+    deductionRows = (savedDetails || []).map((d) => ({
+      type: d.deduction_type,
+      note: '',
+      outstanding: parseFloat(d.outstanding) || 0,
+      deduction: parseFloat(d.deduction) || 0,
+      balance: parseFloat(d.balance) || 0,
+      savedLabel: d.deductiontype,
+    }));
+    renderDeductionTable();
+  }
+
+  async function loadDeductionTypes() {
+    if (!currentDetails) return;
+    dedTypeSelect.innerHTML = '';
+    (currentDetails.deductionTypes || []).forEach((t) => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      dedTypeSelect.appendChild(opt);
+    });
+
+    resignationTypeSelect.innerHTML = '<option value="" selected disabled>Select Resignation Type</option>';
+    (currentDetails.resignationTypes || []).forEach((rt) => {
+      const opt = document.createElement('option');
+      opt.value = rt.id;
+      opt.textContent = rt.resignation_type;
+      resignationTypeSelect.appendChild(opt);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Resignation Type change handler
+  // ------------------------------------------------------------------
+  resignationTypeSelect.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const isOthers = selectedOption && selectedOption.textContent === 'Others';
+    
+    remarksContainer.style.display = isOthers ? 'block' : 'none';
+    
+    if (!isOthers) {
+      resignationRemarks.value = '';
+      remarksContainer.classList.remove('has-error');
+    }
+    
+    resignationTypeGroup.classList.remove('has-error');
+  });
+
+  // ------------------------------------------------------------------
+  // Remarks validation
+  // ------------------------------------------------------------------
+  resignationRemarks.addEventListener('blur', function() {
+    if (resignationTypeSelect.value) {
+      const selectedOption = resignationTypeSelect.options[resignationTypeSelect.selectedIndex];
+      if (selectedOption && selectedOption.textContent === 'Others') {
+        const hasRemarks = this.value.trim().length > 0;
+        remarksContainer.classList.toggle('has-error', !hasRemarks);
+      }
+    }
+  });
+
+  // ------------------------------------------------------------------
+  // LOS toggle
+  // ------------------------------------------------------------------
+  [losYesRadio, losNoRadio].forEach((r) => r.addEventListener('change', function() {
+    updateLosFormulaNote();
+    recalculate();
+  }));
+
+  function updateLosFormulaNote() {
+    if (!currentDetails) return;
+    if (losYesRadio.checked && currentDetails.lengthOfService) {
+      const years = currentDetails.lengthOfService.roundedYears;
+      const rate = currentDetails.monthlyRate || 0;
+      const days = getDaysForLOSYears(years);
+      if (years >= 5) {
+        losFormulaNote.textContent = 'Formula: ' + formatCurrency(rate) + ' / 30 days x ' + days + ' days x ' + years + ' year(s)';
+      } else {
+        losFormulaNote.textContent = 'Employee does not meet the 5-year minimum for LOS pay.';
+      }
+    } else {
+      losFormulaNote.textContent = '';
+    }
+  }
+
+  function getDaysForLOSYears(years) {
+    if (years < 5) return 0;
+    if (years <= 9) return 17;
+    if (years <= 14) return 22;
+    if (years <= 19) return 27;
+    return 30;
+  }
+
+  function computeLosAmount() {
+    if (!losYesRadio.checked || !currentDetails || !currentDetails.lengthOfService) return 0;
+    const years = currentDetails.lengthOfService.roundedYears;
+    if (years < 5) return 0;
+    const rate = currentDetails.monthlyRate || 0;
+    const days = getDaysForLOSYears(years);
+    return (rate / 30) * days * years;
+  }
+
+  // ------------------------------------------------------------------
+  // 13th Month input
+  // ------------------------------------------------------------------
+  thirteenthMonthInput.addEventListener('input', recalculate);
+  thirteenthMonthInput.addEventListener('blur', function() {
+    this.value = formatCurrency(parseAmount(this.value));
+    validateThirteenthMonth();
+    recalculate();
+  });
+
+  function validateThirteenthMonth() {
+    const amount = parseAmount(thirteenthMonthInput.value);
+    const valid = amount >= 0;
+    thirteenthMonthGroup.classList.toggle('has-error', !valid);
+    return valid;
+  }
+
+  // ------------------------------------------------------------------
+  // Salary and Other Income inputs
+  // ------------------------------------------------------------------
+  salaryAmountInput.addEventListener('input', recalculate);
+  salaryAmountInput.addEventListener('blur', function() {
+    salaryAmountInput.value = formatCurrency(parseAmount(salaryAmountInput.value));
+    const amount = parseAmount(salaryAmountInput.value);
+    if (amount > 0 && !salaryDescriptionInput.value.trim()) {
+      salaryDescriptionInput.focus();
+    }
+    validateIncomePair(salaryAmountInput, salaryDescriptionInput, salaryGroup, salaryError);
+    recalculate();
+  });
+  salaryDescriptionInput.addEventListener('input', function() {
+    validateIncomePair(salaryAmountInput, salaryDescriptionInput, salaryGroup, salaryError);
+  });
+
+  otherIncomeAmountInput.addEventListener('input', recalculate);
+  otherIncomeAmountInput.addEventListener('blur', function() {
+    otherIncomeAmountInput.value = formatCurrency(parseAmount(otherIncomeAmountInput.value));
+    const amount = parseAmount(otherIncomeAmountInput.value);
+    if (amount > 0 && !otherIncomeDescriptionInput.value.trim()) {
+      otherIncomeDescriptionInput.focus();
+    }
+    validateIncomePair(otherIncomeAmountInput, otherIncomeDescriptionInput, otherIncomeGroup, otherIncomeError);
+    recalculate();
+  });
+  otherIncomeDescriptionInput.addEventListener('input', function() {
+    validateIncomePair(otherIncomeAmountInput, otherIncomeDescriptionInput, otherIncomeGroup, otherIncomeError);
+  });
+
+  function validateIncomePair(amountInput, descInput, groupEl, errorEl) {
+    const amount = parseAmount(amountInput.value);
+    const description = descInput.value.trim();
+    const invalid = (amount > 0 && !description) || (!amount && description);
+    groupEl.classList.toggle('has-error', invalid);
+    if (invalid && amount > 0 && !description) {
+      errorEl.textContent = 'Please describe this amount.';
+    } else if (invalid) {
+      errorEl.textContent = 'Please enter an amount for this description.';
+    }
+    return !invalid;
+  }
+
+  function validateResignationType() {
+    const selectedOption = resignationTypeSelect.options[resignationTypeSelect.selectedIndex];
+    const isOthers = selectedOption && selectedOption.textContent === 'Others';
+    const hasRemarks = resignationRemarks.value.trim().length > 0;
+    
+    const typeValid = !!resignationTypeSelect.value;
+    resignationTypeGroup.classList.toggle('has-error', !typeValid);
+    
+    if (isOthers) {
+      remarksContainer.classList.toggle('has-error', !hasRemarks);
+      return typeValid && hasRemarks;
+    }
+    
+    return typeValid;
+  }
+
+  function validateAllIncomeFields() {
+    const salaryValid = validateIncomePair(salaryAmountInput, salaryDescriptionInput, salaryGroup, salaryError);
+    const otherValid = validateIncomePair(otherIncomeAmountInput, otherIncomeDescriptionInput, otherIncomeGroup, otherIncomeError);
+    const thirteenthValid = validateThirteenthMonth();
+    const resignationValid = validateResignationType();
+    
+    return salaryValid && otherValid && thirteenthValid && resignationValid;
+  }
+
+  // ------------------------------------------------------------------
+// Outstanding -> auto-fill Deduction + Enter to focus Deduction
+// ------------------------------------------------------------------
+dedOutstanding.addEventListener('input', function() {
+  dedDeduction.value = this.value;
+});
+
+dedOutstanding.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    dedDeduction.focus();
+    dedDeduction.select(); // optional: highlights the value so the user can immediately overwrite it
+  }
+});
+
+  // ------------------------------------------------------------------
+  // Deduction rows
+  // ------------------------------------------------------------------
+  addDeductionBtn.addEventListener('click', function() {
+    const type = dedTypeSelect.value;
+    const note = dedNote.value.trim();
+    const outstanding = parseAmount(dedOutstanding.value);
+    const deduction = parseAmount(dedDeduction.value);
+
+    if (!type) {
+      showError('Please select a deduction type');
+      return;
+    }
+    if (outstanding <= 0) {
+      showError('Please input an outstanding balance greater than 0');
+      dedOutstanding.focus();
+      return;
+    }
+
+    if (deductionRows.some((r) => r.type === type && r.note === note)) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Already added',
+        text: 'This deduction type has already been added.',
+        confirmButtonColor: '#2E6F9E',
+      });
+      return;
+    }
+
+    deductionRows.push({ type, note, outstanding, deduction, balance: outstanding - deduction });
+    renderDeductionTable();
+    recalculate();
+
+    dedNote.value = '';
+    dedOutstanding.value = '0.00';
+    dedDeduction.value = '0.00';
+  });
+
+  document.getElementById('dedDeduction').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('addDeductionBtn').click();
+    }
+  });
+
+  function renderDeductionTable() {
+    deductionBody.innerHTML = '';
+    if (deductionRows.length === 0) {
+      deductionBody.innerHTML = '<tr id="noDeductionsRow"><td colspan="5" class="text-center text-muted">No deductions added</td></tr>';
+      return;
+    }
+    deductionRows.forEach((row, idx) => {
+      const displayLabel = row.savedLabel || (row.note ? row.type + ' - ' + row.note : row.type);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${displayLabel}</td>
+        <td>${formatCurrency(row.outstanding)}</td>
+        <td>${formatCurrency(row.deduction)}</td>
+        <td>${formatCurrency(row.balance)}</td>
+        <td><button type="button" class="rb-remove-row" data-idx="${idx}"><i class="fas fa-trash"></i></button></td>
+      `;
+      deductionBody.appendChild(tr);
+    });
+
+    deductionBody.querySelectorAll('.rb-remove-row').forEach((btn) => {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.idx, 10);
+        deductionRows.splice(idx, 1);
+        renderDeductionTable();
+        recalculate();
+      });
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Totals
+  // ------------------------------------------------------------------
+  function recalculate() {
+    const losAmount = computeLosAmount();
+    const salaryAmount = parseAmount(salaryAmountInput.value);
+    const otherIncomeAmount = parseAmount(otherIncomeAmountInput.value);
+    const thirteenth = parseAmount(thirteenthMonthInput.value);
+
+    const gross = losAmount + salaryAmount + otherIncomeAmount + thirteenth;
+
+    let totalOutstanding = 0;
+    let totalDeduction = 0;
+    let totalBalance = 0;
+    deductionRows.forEach((r) => {
+      totalOutstanding += r.outstanding;
+      totalDeduction += r.deduction;
+      totalBalance += r.balance;
+    });
+
+    const netAmount = gross - (totalDeduction + totalBalance);
+
+    setText('sumLos', formatCurrency(losAmount));
+    setText('sumSalary', formatCurrency(salaryAmount));
+    setText('sumOtherIncome', formatCurrency(otherIncomeAmount));
+    setText('sumThirteenth', formatCurrency(thirteenth));
+    setText('sumGross', formatCurrency(gross));
+    setText('sumOutstanding', formatCurrency(totalOutstanding));
+    setText('sumDeduction', formatCurrency(totalDeduction));
+    setText('sumBalance', formatCurrency(totalBalance));
+    setText('sumNet', formatCurrency(netAmount));
+
+    document.getElementById('sumNetRow').classList.toggle('negative', netAmount < 0);
+  }
+
+  // ------------------------------------------------------------------
+  // PDF preview / download
+  // ------------------------------------------------------------------
+  printBtn.addEventListener('click', async function() {
+    if (!selectedEmployeeId) {
+      showError('Please select an employee first');
+      return;
+    }
+
+    if (!validateAllIncomeFields()) {
+      showError('Please complete all required fields highlighted in red before saving.');
+      return;
+    }
+
+    const confirmResult = await Swal.fire({
+      title: isEditingExisting ? 'Update this computation?' : 'Save this computation?',
+      html: isEditingExisting
+        ? 'This will <strong>overwrite</strong> the previously saved figures for this employee. Continue?'
+        : 'This will save this employee\'s Last Pay Computation. Continue?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: isEditingExisting ? 'Yes, update it' : 'Yes, save it',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2E6F9E',
+      cancelButtonColor: '#6B7686',
+    });
+
+    if (!confirmResult.isConfirmed) return;
+
+      const notes = document.getElementById('notesInput').value.trim();
+console.log(notes)
+    // Get remarks if "Others" is selected
+    const selectedOption = resignationTypeSelect.options[resignationTypeSelect.selectedIndex];
+    const isOthers = selectedOption && selectedOption.textContent === 'Others';
+    const remarks = isOthers ? resignationRemarks.value.trim() : '';
+
+    loading.style.display = 'block';
+    try {
+      const body = {
+        office: selectedOffice,
+        idno: selectedEmployeeId,
+        year: currentDisplayYear || undefined,
+        losIncluded: losYesRadio.checked,
+        resignationTypeId: resignationTypeSelect.value,
+        resignationRemarks: remarks,
+        salaryAmount: parseAmount(salaryAmountInput.value),
+        salaryDescription: salaryDescriptionInput.value.trim(),
+        otherIncomeAmount: parseAmount(otherIncomeAmountInput.value),
+        otherIncomeDescription: otherIncomeDescriptionInput.value.trim(),
+          thirteenthMonthAmount: parseAmount(thirteenthMonthInput.value), // Make sure this is included
+        deductions: deductionRows,
+              notes: notes, // ADD THIS
+      };
+
+      const endpoint = isEditingExisting ? '/resigned/last-pay/update' : '/resigned/last-pay/save';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        downloadBlob(blob, 'Last_Pay_Computation_' + selectedEmployeeId + '_' + new Date().toISOString().slice(0, 10) + '.pdf');
+
+        await Swal.fire({
+          icon: 'success',
+          title: isEditingExisting ? 'Updated' : 'Saved',
+          text: isEditingExisting
+            ? 'This Last Pay Computation has been updated.'
+            : 'This Last Pay Computation has been saved.',
+          confirmButtonColor: '#2E6F9E',
+        });
+
+        if (!isEditingExisting) {
+          isEditingExisting = true;
+          existingRecordMessage.textContent =
+            'This record was just saved. Selecting this employee again later will offer Edit/Update or Print/Download.';
+          existingRecordBanner.style.display = 'block';
+          printBtn.innerHTML = '<i class="fas fa-save me-1"></i> Update & Download PDF';
+          actionHelpText.innerHTML =
+            '<i class="fas fa-pen me-1"></i>You are editing a previously saved record. Updating will overwrite the saved figures.';
+        }
+      } else {
+        const text = await response.text();
+        let parsed = {};
+        try { parsed = JSON.parse(text); } catch (e) { parsed = {}; }
+
+        if (response.status === 409 || parsed.code === 'ALREADY_EXISTS') {
+          await Swal.fire({
+            icon: 'info',
+            title: 'Already Saved',
+            text: parsed.message || 'This employee already has a saved computation.',
+            confirmButtonColor: '#2E6F9E',
+          });
+          await selectEmployee(selectedEmployeeId, currentDisplayYear);
+        } else {
+          showError(parsed.message || 'Error saving computation');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error saving computation: ' + error.message);
+    } finally {
+      loading.style.display = 'none';
+    }
+  });
+
+  async function downloadSavedPDF() {
+    loading.style.display = 'block';
+    try {
+      const response = await fetch('/resigned/last-pay/download-saved-pdf?idno=' + encodeURIComponent(selectedEmployeeId));
+      if (response.ok) {
+        const blob = await response.blob();
+        downloadBlob(blob, 'Last_Pay_Computation_' + selectedEmployeeId + '_' + new Date().toISOString().slice(0, 10) + '.pdf');
+      } else {
+        const text = await response.text();
+        let msg = 'Error downloading saved PDF';
+        try { msg = JSON.parse(text).message || msg; } catch (e) { msg = text || msg; }
+        showError(msg);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error downloading saved PDF: ' + error.message);
+    } finally {
+      loading.style.display = 'none';
+    }
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  // ------------------------------------------------------------------
+  // Helpers
+  // ------------------------------------------------------------------
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function formatDate(date) {
+    if (!date) return 'N/A';
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function formatCurrency(amount) {
+    if (amount === null || amount === undefined || isNaN(amount)) {
+      return '0.00';
+    }
+    return parseFloat(amount).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  function parseAmount(value) {
+    if (value === null || value === undefined || value === '') return 0;
+    if (typeof value !== 'string') {
+      return parseFloat(value) || 0;
+    }
+    const cleaned = value.replace(/[^0-9.]/g, '');
+    const result = parseFloat(cleaned);
+    return isNaN(result) ? 0 : result;
+  }
+
+  function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    setTimeout(function() {
+      errorMessage.style.display = 'none';
+    }, 5000);
+  }
+});
+</script>
+
+</body>
+</html>

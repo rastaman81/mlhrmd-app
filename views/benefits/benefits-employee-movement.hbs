@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    /* Flatpickr tweak to match our input style */
+    .flatpickr-input {
+      border-color: #E3E6EB !important;
+    }
+    .flatpickr-input:focus {
+      border-color: #2E6F9E !important;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12) !important;
+    }
+
+    /* Table header — override Bootstrap table-dark with our navy */
+    #movementTable thead th {
+      background: #16304A !important;
+      color: #fff !important;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #1e3e5e !important;
+      padding: .75rem 1rem;
+      white-space: nowrap;
+    }
+
+    #movementTable tbody td {
+      font-size: .88rem;
+      color: #0F2233;
+      padding: .7rem 1rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+
+    #movementTable tbody tr:nth-child(odd) td {
+      background-color: #F6F7F9;
+    }
+
+    #movementTable tbody tr:nth-child(even) td {
+      background-color: #fff;
+    }
+
+    #movementTable tbody tr:hover td {
+      background-color: #EBF3FA !important;
+    }
+
+    /* Keep your existing danger row override */
+    #movementTable tbody tr.table-danger td,
+    #movementTable tbody tr.table-danger:nth-child(odd) td,
+    #movementTable tbody tr.table-danger:nth-child(even) td {
+      background-color: #dc3545 !important;
+      color: #fff !important;
+    }
+
+    /* Pagination matches navy/blue theme */
+    #pagination-controls .page-link {
+      color: #2E6F9E;
+      border: none;
+      border-radius: .35rem;
+      margin: 0 .15rem;
+      font-size: .82rem;
+    }
+    #pagination-controls .page-item.active .page-link {
+      background: #2E6F9E;
+      color: #fff;
+    }
+    #pagination-controls .page-item:not(.active) .page-link:hover {
+      background: rgba(46,111,158,.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-arrows-rotate" style="color:#2E6F9E;"></i> Benefits Employee Movement
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Filter by date range and office to view employee movement records.</p>
+        </div>
+      </div>
+
+      <!-- Filter Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04); margin-bottom:1.25rem;">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-filter" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Search Filters</strong>
+        </div>
+
+        <div style="padding:1.15rem;">
+          <form id="benefitsEmployeeMovementForm">
+            <div class="row g-3 align-items-end">
+
+              <div class="col-md-4">
+                <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">
+                  Date Range
+                </label>
+                <input
+                  type="text"
+                  id="dateRange"
+                  class="form-control datepicker"
+                  placeholder="Select date range"
+                  readonly
+                  style="border-color:#E3E6EB;"
+                >
+              </div>
+
+              <div class="col-md-4">
+                <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">
+                  Office
+                </label>
+                <select name="office" id="officeSelect" class="form-select" style="border-color:#E3E6EB;">
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">{{this.office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-4 d-flex gap-2 align-items-end">
+                <button type="submit" class="btn flex-fill" style="background:#2E6F9E; border-color:#2E6F9E; color:#fff; font-weight:500; font-size:.9rem;">
+                  <i class="fas fa-search me-1"></i> View
+                </button>
+                <button type="button" id="resetBtn" class="btn btn-outline-secondary" style="font-size:.9rem;">
+                  <i class="fas fa-redo me-1"></i> Reset
+                </button>
+              </div>
+
+            </div>
+
+            <p style="font-size:.82rem; color:#6B7686; margin:.75rem 0 0;">
+              <i class="fas fa-circle-info me-1"></i>Select a date range and office, then click <strong>View</strong> to load results.
+            </p>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Loading -->
+      <div id="report-loading" class="text-center py-5" style="display:none;">
+        <div class="spinner-border" role="status" style="color:#2E6F9E; width:2.5rem; height:2.5rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2" style="color:#6B7686; font-size:.9rem;">Loading employee movement...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error-message" class="alert border-0 mt-3" style="display:none; border-left:4px solid #C1483D !important; border-radius:.55rem; font-size:.9rem;"></div>
+
+      <!-- Results Card -->
+      <div id="results-container" style="display:none; border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; justify-content:space-between; border-radius:.65rem .65rem 0 0;">
+          <div style="display:flex; align-items:center; gap:.55rem;">
+            <i class="fas fa-table-list" style="color:#2E6F9E;"></i>
+            <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Movement Results</strong>
+          </div>
+          <span id="record-count" style="font-size:.8rem; color:#6B7686; background:#F6F7F9; border:1px solid #E3E6EB; border-radius:1rem; padding:.2rem .75rem;"></span>
+        </div>
+
+        <div style="padding:0;">
+          <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
+            <table class="table table-bordered mb-0" id="movementTable">
+              <thead class="sticky-top">
+                <tr>
+                  <th>ID No</th>
+                  <th>Employee Name</th>
+                  <th>Date Hired</th>
+                  <th>Previous Payroll Date</th>
+                  <th>Previous Region</th>
+                  <th>Current Payroll Date</th>
+                  <th>Current Region</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="movementTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #E3E6EB; padding:.75rem 1.15rem; display:flex; align-items:center; justify-content:space-between; border-radius:0 0 .65rem .65rem;">
+          <span id="pagination-info" style="font-size:.8rem; color:#6B7686;"></span>
+          <nav>
+            <ul class="pagination pagination-sm mb-0" id="pagination-controls"></ul>
+          </nav>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="/js/scripts.js"></script>
+<script src="/js/benefits-employee-movement.js"></script>
+
+</body>
+</html>

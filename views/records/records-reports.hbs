@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    .form-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #16304A;
+      margin-bottom: .35rem;
+    }
+    .form-control, .form-select {
+      border-color: #E3E6EB;
+      font-size: .9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12);
+    }
+
+    /* Report table */
+        /* ========================================
+       REPORT TABLE - ADAPTIVE FONT SIZING
+       ======================================== */
+    
+    /* Table container - ensure proper overflow */
+    #report-table {
+      width: 100%;
+      table-layout: auto;
+      border-collapse: collapse;
+    }
+    
+    /* Base styles - optimized for 8-10 columns */
+    #report-table thead th {
+      background: #16304A;
+      color: #fff;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #1e3e5e;
+      padding: .65rem .85rem;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 4px rgba(0,0,0,.08);
+    }
+    
+    #report-table tbody td {
+      font-size: .83rem;
+      color: #0F2233;
+      padding: .6rem .85rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    
+    /* Row striping */
+    #report-table tbody tr:nth-child(odd) td { background: #F6F7F9; }
+    #report-table tbody tr:nth-child(even) td { background: #fff; }
+    #report-table tbody tr:hover td { background: #EBF3FA !important; }
+    
+    /* ========================================
+       DYNAMIC FONT SIZING - Applied by JavaScript
+       ======================================== */
+    
+    /* 10-12 columns - Small font */
+    #report-table.cols-10-12 thead th {
+      font-size: .6rem !important;
+      padding: .45rem .6rem !important;
+    }
+    #report-table.cols-10-12 tbody td {
+      font-size: .7rem !important;
+      padding: .4rem .6rem !important;
+    }
+    
+    /* 13-16 columns - Extra small font */
+    #report-table.cols-13-16 thead th {
+      font-size: .52rem !important;
+      padding: .35rem .4rem !important;
+      letter-spacing: .02em;
+    }
+    #report-table.cols-13-16 tbody td {
+      font-size: .6rem !important;
+      padding: .3rem .4rem !important;
+    }
+    
+    /* 17+ columns - Tiny font with reduced padding */
+    #report-table.cols-17-plus thead th {
+      font-size: .45rem !important;
+      padding: .25rem .3rem !important;
+      letter-spacing: 0;
+    }
+    #report-table.cols-17-plus tbody td {
+      font-size: .5rem !important;
+      padding: .2rem .3rem !important;
+    }
+    
+    /* Hover tooltip for truncated text */
+    #report-table tbody td[title] {
+      cursor: help;
+    }
+
+    /* Extra columns checkboxes */
+    .nla-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: .5rem .75rem;
+    }
+    .nla-checkbox-grid label {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .85rem;
+      color: #16304A;
+      cursor: pointer;
+    }
+    .nla-checkbox-grid input[type="checkbox"] {
+      accent-color: #2E6F9E;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    /* Pagination */
+    #pagination-controls .page-link {
+      color: #2E6F9E;
+      border: none;
+      border-radius: .35rem;
+      margin: 0 .15rem;
+      font-size: .82rem;
+    }
+    #pagination-controls .page-item.active .page-link {
+      background: #2E6F9E;
+      color: #fff;
+    }
+    #pagination-controls .page-item:not(.active) .page-link:hover {
+      background: rgba(46,111,158,.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+          <i class="fas fa-folder-open" style="color:#2E6F9E;"></i> Employee Records Reports
+        </h1>
+        <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Select a report type and configure filters to generate or export records.</p>
+      </div>
+
+      <!-- Filter Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04); margin-bottom:1.25rem;">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-filter" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Report Filters</strong>
+        </div>
+
+        <div style="padding:1.15rem;">
+          <form id="recordsReportsForm">
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Report Type</label>
+                <select name="reportType" id="reportType" class="form-select" required>
+                  <option value="" disabled selected>Select Report</option>
+                  {{#each reportTypes}}
+                    <option value="{{this.reportname}}">{{this.reportname}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+
+            <!-- Dynamic Fields injected here -->
+            <div class="row g-3 mb-3" id="dynamicFields"></div>
+
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <p style="font-size:.82rem; color:#6B7686; margin:0;">
+                <i class="fas fa-circle-info me-1"></i>Select a report type to reveal additional filters.
+              </p>
+              <div class="d-flex gap-2">
+                <button type="button" id="resetBtn" class="btn btn-outline-secondary" style="font-size:.9rem;">
+                  <i class="fas fa-redo me-1"></i> Reset
+                </button>
+                <button type="submit" class="btn" style="background:#2E6F9E; border-color:#2E6F9E; color:#fff; font-weight:500; font-size:.9rem;">
+                  <i class="fas fa-file-export me-1"></i> Generate Report
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Loading -->
+      <div id="report-loading" class="text-center py-5" style="display:none;">
+        <div class="spinner-border" role="status" style="color:#2E6F9E; width:2.5rem; height:2.5rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2" style="color:#6B7686; font-size:.9rem;">Generating report...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error-message" class="alert border-0" style="display:none; border-left:4px solid #C1483D !important; border-radius:.55rem; font-size:.9rem; background:rgba(193,72,61,.07); color:#C1483D;"></div>
+
+      <!-- Results Card -->
+      <div id="reportResults" style="display:none; border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; justify-content:space-between; border-radius:.65rem .65rem 0 0;">
+          <div style="display:flex; align-items:center; gap:.55rem;">
+            <i class="fas fa-table-list" style="color:#2E6F9E;"></i>
+            <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Report Results</strong>
+          </div>
+          <button id="exportBtn" class="btn btn-outline-secondary btn-sm" style="font-size:.82rem;">
+            <i class="fas fa-download me-1"></i> Export to Excel
+          </button>
+        </div>
+
+        <div style="padding:0;">
+          <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
+            <table id="report-table" class="table table-bordered mb-0">
+              <thead>
+                <tr id="report-table-head"></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #E3E6EB; padding:.75rem 1.15rem; display:flex; align-items:center; justify-content:space-between; border-radius:0 0 .65rem .65rem;">
+          <span id="pagination-info" style="font-size:.8rem; color:#6B7686;"></span>
+          <nav>
+            <ul class="pagination pagination-sm mb-0" id="pagination-controls"></ul>
+          </nav>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // ── GLOBAL STATE ───────────────────────────────────────────────────────────
+  let currentPage    = 1;
+  const PAGE_SIZE    = 30;
+  let currentFilters = {};
+
+  window.changePage = function (page) {
+    currentPage = page;
+    fetchPage();
+  };
+
+  // ── INIT ───────────────────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    const reportTypeSelect = document.getElementById("reportType");
+    const form             = document.getElementById("recordsReportsForm");
+    const resetBtn         = document.getElementById("resetBtn");
+
+    reportTypeSelect.addEventListener("change", function () {
+      loadDynamicFields(this.value);
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      currentPage = 1;
+      generateReport();
+    });
+
+    resetBtn.addEventListener("click", function () {
+      form.reset();
+      document.getElementById("dynamicFields").innerHTML   = "";
+      document.getElementById("reportResults").style.display = "none";
+      document.getElementById("error-message").style.display = "none";
+    });
+  });
+
+    // Handle status changes to disable resignation date for active employees
+  document.addEventListener("change", function (e) {
+    if (e.target && e.target.id === "statusSelect") {
+      handleStatusChange(e.target.value);
+    }
+  });
+
+    // ── STATUS CHANGE HANDLER ──────────────────────────────────────────────────
+  function handleStatusChange(statusValue) {
+    const dateFilterType = document.getElementById("dateFilterType");
+    const statusHelp = document.getElementById("statusHelp");
+    
+    if (!dateFilterType) return;
+    
+    // Check if status is "Active" (status_id = 9 based on backend)
+    if (Number(statusValue) === 9) {
+      // Force date filter to "Date Hired"
+      dateFilterType.value = "date_hired";
+      
+      // Update labels
+      const dateFromLabel = document.getElementById("dateFromLabel");
+      const dateToLabel = document.getElementById("dateToLabel");
+      if (dateFromLabel) dateFromLabel.textContent = "Date Hired From";
+      if (dateToLabel) dateToLabel.textContent = "Date Hired To";
+      
+      // Disable resignation date option
+      const options = dateFilterType.querySelectorAll('option');
+      options.forEach(option => {
+        if (option.value === "resignation_date") {
+          option.disabled = true;
+          option.title = "Not available for active employees";
+          option.style.color = "#999";
+          option.style.cursor = "not-allowed";
+        }
+      });
+      
+      // Show help text
+      if (statusHelp) statusHelp.style.display = "block";
+      
+    } else {
+      // Re-enable resignation date option
+      const options = dateFilterType.querySelectorAll('option');
+      options.forEach(option => {
+        if (option.value === "resignation_date") {
+          option.disabled = false;
+          option.title = "";
+          option.style.color = "";
+          option.style.cursor = "";
+        }
+      });
+      
+      // Hide help text
+      if (statusHelp) statusHelp.style.display = "none";
+    }
+  }
+
+  // ── CASCADING DROPDOWN LISTENERS ──────────────────────────────────────────
+  document.addEventListener("change", function (e) {
+    if (!e.target) return;
+    if (e.target.id === "officeSelect")     loadRegionsByOffice.call(e.target);
+    if (e.target.id === "regionSelect")     loadAreasByRegion.call(e.target);
+    if (e.target.id === "areaSelect")       loadBranchesByRegion.call(e.target);
+    if (e.target.id === "dateFilterType") {
+      const dateFromLabel = document.getElementById("dateFromLabel");
+      const dateToLabel   = document.getElementById("dateToLabel");
+      if (e.target.value === "resignation_date") {
+        dateFromLabel.textContent = "Resignation Date From";
+        dateToLabel.textContent   = "Resignation Date To";
+      } else {
+        dateFromLabel.textContent = "Date Hired From";
+        dateToLabel.textContent   = "Date Hired To";
+      }
+    }
+  });
+
+  // ── REGION / AREA / BRANCH LOADERS ────────────────────────────────────────
+  async function loadRegionsByOffice() {
+    const office       = this.value;
+    const regionSelect = document.getElementById("regionSelect");
+    if (!office) { regionSelect.innerHTML = '<option value="" selected>All Regions</option>'; return; }
+    try {
+      regionSelect.disabled = true;
+      regionSelect.innerHTML = '<option value="">Loading regions...</option>';
+      const res  = await fetch(`/records/reports/regions?office=${encodeURIComponent(office)}`);
+      const data = await res.json();
+      regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+      if (data.success) {
+        data.regions.forEach(r => {
+          const o = document.createElement("option");
+          o.value = r.regionid; o.textContent = r.region_name;
+          regionSelect.appendChild(o);
+        });
+      } else showError(data.message || "Failed to load regions");
+    } catch (err) { console.error(err); showError("Failed to load regions"); }
+    finally { regionSelect.disabled = false; }
+  }
+
+  async function loadAreasByRegion() {
+    const office       = document.getElementById("officeSelect");
+    const regionSelect = document.getElementById("regionSelect");
+    const areaSelect   = document.getElementById("areaSelect");
+    const selectedRegion = regionSelect.value;
+    const selectedOffice = office.value;
+    console.log("++++ ", selectedRegion, "--- ", selectedOffice);
+    if (!office) { regionSelect.innerHTML = '<option value="" selected>All Regions</option>'; return; }
+    try {
+      areaSelect.disabled = true;
+      areaSelect.innerHTML = '<option value="">Loading areas...</option>';
+      const res  = await fetch(`/records/reports/areas?office=${encodeURIComponent(selectedOffice)}&region=${encodeURIComponent(selectedRegion)}`);
+      const data = await res.json();
+      areaSelect.innerHTML = '<option value="" selected>All Areas</option>';
+      if (data.success) {
+        data.areas.forEach(a => {
+          const o = document.createElement("option");
+          o.value = a.areaid; o.textContent = a.area_name;
+          areaSelect.appendChild(o);
+        });
+      } else showError(data.message || "Failed to load areas");
+    } catch (err) { console.error(err); showError("Failed to load areas"); }
+    finally { areaSelect.disabled = false; }
+  }
+
+  async function loadBranchesByRegion() {
+    const office       = document.getElementById("officeSelect");
+    const regionSelect = document.getElementById("regionSelect");
+    const areaSelect   = document.getElementById("areaSelect");
+    const branchSelect = document.getElementById("branchSelect");
+    const selectedRegion = regionSelect.value;
+    const selectedOffice = office.value;
+    const selectedArea   = areaSelect.value;
+    console.log("++++ ", selectedRegion, "--- ", selectedOffice);
+    if (!office) { regionSelect.innerHTML = '<option value="" selected>All Regions</option>'; return; }
+    try {
+      branchSelect.disabled = true;
+      branchSelect.innerHTML = '<option value="">Loading branches...</option>';
+      const res  = await fetch(`/records/reports/branches?office=${encodeURIComponent(selectedOffice)}&region=${encodeURIComponent(selectedRegion)}&area=${encodeURIComponent(selectedArea)}`);
+      const data = await res.json();
+      branchSelect.innerHTML = '<option value="" selected>All Branches</option>';
+      if (data.success) {
+        data.branches.forEach(b => {
+          const o = document.createElement("option");
+          o.value = b.branchid; o.textContent = b.branch_name;
+          branchSelect.appendChild(o);
+        });
+      } else showError(data.message || "Failed to load branches");
+    } catch (err) { console.error(err); showError("Failed to load branches"); }
+    finally { branchSelect.disabled = false; }
+  }
+
+  // ── DYNAMIC FIELDS ─────────────────────────────────────────────────────────
+  async function loadDynamicFields(reportName) {
+    const dynamicFields = document.getElementById("dynamicFields");
+    dynamicFields.innerHTML = "";
+    const report = reportName.toLowerCase();
+
+    if (report === "employee master list") {
+      let statusesData    = { success: false, statuses: [] };
+      let typesData       = { success: false, types: [] };
+      let sortOptionsData = { success: false, options: [] };
+      let designationsData  = { success: false, designations: [] };
+
+      try {
+        [statusesData, typesData, sortOptionsData, designationsData] = await Promise.all([
+          fetch("/records/reports/statuses").then(r => r.json()).catch(() => statusesData),
+          fetch("/records/reports/employee-types").then(r => r.json()).catch(() => typesData),
+          fetch("/records/reports/sort-options").then(r => r.json()).catch(() => sortOptionsData),
+              fetch("/records/reports/designations").then(r => r.json()).catch(() => designationsData),
+        ]);
+      } catch (err) { console.error("Error fetching dynamic lists:", err); }
+
+      console.log(designationsData);
+
+//      const designationOptions = (designationsData?.designations ?? [])
+//  .filter(d => Number(d.is_active) === 1)
+//  .map(d => `<option value="${d.designation}">${d.designation}</option>`).join("");
+const designationOptions = (designationsData?.designations ?? [])
+  .filter(d => Number(d.is_active) === 1)
+  .map(d => `<option value="${d.designation_id}">${d.designation}</option>`).join("");
+
+      const statusOptions = (statusesData?.statuses ?? [])
+        .map(s => `<option value="${s.status_id}">${s.status_name}</option>`).join("");
+      const typeOptions = (typesData?.types ?? [])
+        .map(t => `<option value="${t.rankid}">${t.rankname}</option>`).join("");
+      const sortOptions = (sortOptionsData?.options ?? [])
+        .map(o => `<option value="${o.sort_name}">${o.sort_name}</option>`).join("");
+
+      dynamicFields.innerHTML = `
+        <div class="col-md-3">
+          <label class="form-label">Office</label>
+          <select class="form-select" name="office" id="officeSelect">
+            <option value="" disabled selected>Select Office</option>
+            {{#each offices}}
+              <option value="{{this.office_name}}">{{this.office_name}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Region</label>
+          <select class="form-select" name="region" id="regionSelect">
+            <option value="">All Regions</option>
+            {{#each regions}}
+              <option value="{{this.region_name}}">{{this.region_name}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Area</label>
+          <select class="form-select" name="area" id="areaSelect">
+            <option value="">All Areas</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Branch</label>
+          <select class="form-select" name="branch" id="branchSelect">
+            <option value="">All Branches</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+  <label class="form-label">Status</label>
+  <select class="form-select" name="status" id="statusSelect">
+    <option value="">All Employees</option>
+    ${statusOptions}
+  </select>
+  <div id="statusHelp" style="display:none; margin-top:5px; font-size:0.75rem; color:#856404; background:#fff3cd; padding:5px 10px; border-radius:4px;">
+    <i class="fas fa-info-circle"></i> Resignation date filter is not available for active employees
+  </div>
+</div>
+
+        <div class="col-md-3">
+          <label class="form-label">Employee Type</label>
+          <select class="form-select" name="employeeType">
+            <option value="">All Types</option>
+            ${typeOptions}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Designation</label>
+          <select class="form-select" name="designation">
+            <option value="">All Designations</option>
+            ${designationOptions}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Output Format</label>
+          <select class="form-select" name="outputFormat">
+            <option value="preview">Preview</option>
+            <option value="excel">Excel</option>
+            <option value="pdf">PDF</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Sort By</label>
+          <select class="form-select" name="sortBy">
+            ${sortOptions}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Date Filter</label>
+          <select class="form-select" name="dateFilterType" id="dateFilterType">
+            <option value="date_hired" selected>Date Hired</option>
+            <option value="resignation_date">Resignation Date</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label" id="dateFromLabel">Date Hired From</label>
+          <input type="date" class="form-control" name="dateFrom" id="dateFrom">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label" id="dateToLabel">Date Hired To</label>
+          <input type="date" class="form-control" name="dateTo" id="dateTo">
+        </div>
+
+        <div class="col-md-3"></div>
+
+        <div class="col-12">
+          <label class="form-label d-block mb-2">Extra Columns</label>
+          <div style="border:1px solid #E3E6EB; border-radius:.55rem; padding:1rem; background:#F6F7F9;">
+            <div class="nla-checkbox-grid">
+              <label><input type="checkbox" name="extraColumns" value="contactno"> Contact No</label>
+              <label><input type="checkbox" name="extraColumns" value="gender"> Gender</label>
+              <label><input type="checkbox" name="extraColumns" value="birthdate"> Birthdate</label>
+              <label><input type="checkbox" name="extraColumns" value="age"> Age</label>
+              <label><input type="checkbox" name="extraColumns" value="civilstatus"> Civil Status</label>
+              <label><input type="checkbox" name="extraColumns" value="tin"> TIN</label>
+              <label><input type="checkbox" name="extraColumns" value="sss"> SSS</label>
+              <label><input type="checkbox" name="extraColumns" value="philhealth"> PhilHealth</label>
+              <label><input type="checkbox" name="extraColumns" value="pagibig"> PagIBIG</label>
+              <label><input type="checkbox" name="extraColumns" value="address"> Address</label>
+              <label><input type="checkbox" name="extraColumns" value="resignationdate"> Resignation Date</label>
+            </div>
+          </div>
+        </div>
+      `;
+
+    } else if (report === "new hires report") {
+    // New Hires Report fields - simpler form
+    dynamicFields.innerHTML = `
+      <div class="col-md-3">
+        <label class="form-label">Office</label>
+        <select class="form-select" name="office" id="officeSelect" required>
+          <option value="" disabled selected>Select Office</option>
+          {{#each offices}}
+            <option value="{{this.office_name}}">{{this.office_name}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Region</label>
+        <select class="form-select" name="region" id="regionSelect">
+          <option value="">All Regions</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Sort By</label>
+        <select class="form-select" name="sortBy">
+          <option value="lastname">Last Name</option>
+          <option value="region" selected>Region</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Output Format</label>
+        <select class="form-select" name="outputFormat">
+          <option value="preview">Preview</option>
+          <option value="excel">Excel</option>
+          <option value="pdf" selected>PDF</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Date Hired From</label>
+        <input type="date" class="form-control" name="dateFrom" required>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Date Hired To</label>
+        <input type="date" class="form-control" name="dateTo" required>
+      </div>
+
+      <div class="col-md-3"></div>
+      <div class="col-md-3"></div>
+
+      <div class="col-12">
+        <div class="alert alert-info" style="font-size:.85rem; background:#EBF3FA; border-color:#B8D4EA; color:#16304A;">
+          <i class="fas fa-info-circle me-2"></i>
+          This report shows all active employees hired within the selected date range.
+        </div>
+      </div>
+    `;
+
+    // Add event listener for office selection to load regions
+    document.getElementById("officeSelect").addEventListener("change", loadRegionsByOffice);
+  }
+  }
+
+  // ── GENERATE REPORT ────────────────────────────────────────────────────────
+  async function generateReport() {
+    const loading    = document.getElementById("report-loading");
+    const resultsDiv = document.getElementById("reportResults");
+    const errorDiv   = document.getElementById("error-message");
+
+    loading.style.display    = "block";
+    resultsDiv.style.display = "none";
+    errorDiv.style.display   = "none";
+
+    try {
+      const form     = document.getElementById("recordsReportsForm");
+      const formData = new FormData(form);
+      const formDataObj = {};
+
+      currentFilters = formDataObj;
+      formData.forEach((value, key) => {
+        if (formDataObj[key]) {
+          if (!Array.isArray(formDataObj[key])) formDataObj[key] = [formDataObj[key]];
+          formDataObj[key].push(value);
+        } else {
+          formDataObj[key] = value;
+        }
+      });
+  console.log('SUBMITTING FILTERS:', formDataObj);  // ADD THIS
+      formDataObj.page  = currentPage;
+      formDataObj.limit = PAGE_SIZE;
+      currentFilters    = { ...formDataObj };
+
+            // VALIDATION: Active status cannot use resignation date filter
+      if (Number(formDataObj.status) === 9 && formDataObj.dateFilterType === "resignation_date") {
+        showError("Resignation date filter is not available for active employees. Please select a different status or date filter.");
+        loading.style.display = "none";
+        return;
+      }
+
+      const reportType = (formDataObj.reportType || "").toLowerCase();
+      let endpoint     = "";
+
+      switch (reportType) {
+        case "employee master list": endpoint = "/records/reports/masterlist"; break;
+            case "new hires report":  // Add this case
+      endpoint = "/records/reports/newhires";
+      break;
+        default: throw new Error("Invalid report type selected");
+      }
+
+      if (formDataObj.outputFormat === "excel") {
+        const queryParams = new URLSearchParams();
+        Object.entries(formDataObj).forEach(([k, v]) => {
+          if (Array.isArray(v)) v.forEach(i => queryParams.append(k, i));
+          else queryParams.append(k, v);
+        });
+        window.location.href = `${endpoint}/export?${queryParams.toString()}`;
+        return;
+      }
+
+      if (formDataObj.outputFormat === "pdf") {
+        const queryParams = new URLSearchParams();
+        Object.entries(formDataObj).forEach(([k, v]) => {
+          if (Array.isArray(v)) v.forEach(i => queryParams.append(k, i));
+          else queryParams.append(k, v);
+        });
+        window.open(`${endpoint}/pdf?${queryParams.toString()}`, "_blank");
+        return;
+      }
+
+      const response = await fetch(endpoint, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(formDataObj),
+      });
+
+      const data = await response.json();
+      console.log("FULL RESPONSE:", data);
+
+      if (data.success) {
+        populateReportTable(data.data);
+        renderPagination(data.total, data.page, data.limit);
+        resultsDiv.style.display = "block";
+      } else {
+        showError(data.message || "Failed to generate report");
+      }
+
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Unexpected error occurred");
+    } finally {
+      loading.style.display = "none";
+    }
+  }
+
+  // ── TABLE ──────────────────────────────────────────────────────────────────
+    // ── POPULATE REPORT TABLE WITH ADAPTIVE SIZING ──────────────────────────
+  function populateReportTable(data) {
+    const head = document.getElementById("report-table-head");
+    const body = document.querySelector("#report-table tbody");
+    const table = document.getElementById("report-table");
+    
+    head.innerHTML = "";
+    body.innerHTML = "";
+
+    if (!Array.isArray(data) || data.length === 0) {
+      body.innerHTML = `<tr><td colspan="100%" style="text-align:center; color:#6B7686; padding:2rem;">No data found</td></tr>`;
+      return;
+    }
+
+    // ── DETECT COLUMN COUNT AND APPLY OPTIMAL FONT SIZE ──
+    const columnCount = Object.keys(data[0]).length;
+    
+    // Remove existing dynamic classes
+    table.classList.remove('cols-10-12', 'cols-13-16', 'cols-17-plus');
+    
+    // Apply the appropriate class based on column count
+    if (columnCount >= 17) {
+      table.classList.add('cols-17-plus');
+    } else if (columnCount >= 13) {
+      table.classList.add('cols-13-16');
+    } else if (columnCount >= 10) {
+      table.classList.add('cols-10-12');
+    }
+    // 9 or fewer columns: use default styles (no class added)
+
+    // ── GENERATE HEADERS ──
+    Object.keys(data[0]).forEach(key => {
+      // Format header: capitalize and replace underscores with spaces
+      const formattedKey = key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/_/g, ' ')
+        .trim();
+      head.innerHTML += `<th>${formattedKey}</th>`;
+    });
+
+    // ── GENERATE ROWS ──
+    data.forEach(row => {
+      let tr = "<tr>";
+      Object.entries(row).forEach(([key, val]) => {
+        let displayValue = val ?? "";
+        
+        // Format dates
+        if (displayValue && typeof displayValue === "string" && displayValue.includes("T")) {
+          const date = new Date(displayValue);
+          if (!isNaN(date)) {
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day   = String(date.getDate()).padStart(2, "0");
+            const year  = date.getFullYear();
+            displayValue = `${month}/${day}/${year}`;
+          }
+        }
+        
+        // Truncate long text and add title attribute for tooltip
+        const stringValue = String(displayValue);
+        let truncatedValue = stringValue;
+        let titleAttr = '';
+        
+        // If value is long, truncate and add tooltip
+        if (stringValue.length > 30 && columnCount >= 10) {
+          truncatedValue = stringValue.substring(0, 27) + '...';
+          titleAttr = ` title="${stringValue.replace(/"/g, '&quot;')}"`;
+        }
+        
+        tr += `<td${titleAttr}>${truncatedValue}</td>`;
+      });
+      tr += "</tr>";
+      body.innerHTML += tr;
+    });
+  }
+
+  // ── PAGINATION ─────────────────────────────────────────────────────────────
+  function renderPagination(total, page, limit) {
+    const pagination = document.getElementById("pagination-controls");
+    const info       = document.getElementById("pagination-info");
+    if (!pagination || !info) return;
+
+    total = Number(total) || 0;
+    page  = Number(page)  || 1;
+    limit = Number(limit) || 30;
+
+    pagination.innerHTML = "";
+    if (total === 0) { info.textContent = "No records found"; return; }
+
+    const totalPages = Math.ceil(total / limit);
+    if (page > totalPages) page = totalPages;
+
+    const start = (page - 1) * limit + 1;
+    const end   = Math.min(page * limit, total);
+    info.textContent = `Showing ${start}–${end} of ${total} records`;
+
+    pagination.innerHTML += `
+      <li class="page-item ${page === 1 ? 'disabled' : ''}">
+        <button type="button" class="page-link" onclick="changePage(${page - 1})">Previous</button>
+      </li>`;
+
+    let startPage = Math.max(1, page - 2);
+    let endPage   = Math.min(totalPages, page + 2);
+    for (let i = startPage; i <= endPage; i++) {
+      pagination.innerHTML += `
+        <li class="page-item ${i === page ? 'active' : ''}">
+          <button type="button" class="page-link" onclick="changePage(${i})">${i}</button>
+        </li>`;
+    }
+
+    pagination.innerHTML += `
+      <li class="page-item ${page === totalPages ? 'disabled' : ''}">
+        <button type="button" class="page-link" onclick="changePage(${page + 1})">Next</button>
+      </li>`;
+  }
+
+  async function fetchPage() {
+    const loading      = document.getElementById("report-loading");
+    const currentScrollY = window.scrollY;
+    loading.style.display = "block";
+    try {
+      const response = await fetch("/records/reports/masterlist", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ ...currentFilters, page: currentPage, limit: PAGE_SIZE }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        populateReportTable(data.data);
+        renderPagination(data.total, data.page, data.limit);
+        window.scrollTo({ top: currentScrollY, behavior: "instant" });
+      } else {
+        showError(data.message || "Failed to load page");
+      }
+    } catch (err) {
+      console.error(err);
+      showError("Failed to load page");
+    } finally {
+      loading.style.display = "none";
+    }
+  }
+
+  // ── ERROR ──────────────────────────────────────────────────────────────────
+  function showError(message) {
+    const errorDiv = document.getElementById("error-message");
+    errorDiv.textContent   = message;
+    errorDiv.style.display = "block";
+  }
+
+  // ── EXPORT ─────────────────────────────────────────────────────────────────
+  // In records-reports.hbs - update the export button handler
+document.getElementById("exportBtn").addEventListener("click", function () {
+  const form = document.getElementById("recordsReportsForm");
+  const formData = new FormData(form);
+  const exportParams = {};
+  formData.forEach((value, key) => {
+    if (exportParams[key]) {
+      if (!Array.isArray(exportParams[key])) exportParams[key] = [exportParams[key]];
+      exportParams[key].push(value);
+    } else {
+      exportParams[key] = value;
+    }
+  });
+  exportParams.page = 1;
+  exportParams.limit = 100000;
+
+  const queryParams = new URLSearchParams();
+  Object.entries(exportParams).forEach(([k, v]) => {
+    if (Array.isArray(v)) v.forEach(i => queryParams.append(k, i));
+    else queryParams.append(k, v);
+  });
+
+  const reportType = (exportParams.reportType || "").toLowerCase();
+  let exportUrl = "";
+  
+  if (reportType === "employee master list") {
+    exportUrl = `/records/reports/masterlist/export?${queryParams.toString()}`;
+  } else if (reportType === "new hires report") {
+    exportUrl = `/records/reports/newhires/export?${queryParams.toString()}`;
+  }
+  
+  if (exportUrl) {
+    window.location.href = exportUrl;
+  } else {
+    showError("Export not available for this report type");
+  }
+});
+</script>
+
+</body>
+</html>

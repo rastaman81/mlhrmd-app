@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-user-plus" style="color:#2E6F9E;"></i> User Registration
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Create a new system user account.</p>
+        </div>
+        <a href="/dashboard" class="btn btn-outline-secondary" style="font-size:.88rem;">
+          <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+
+      {{#if error}}
+        <div class="alert alert-danger border-0 mb-3" style="border-left:4px solid #C1483D !important; border-radius:.55rem; font-size:.9rem;">
+          <i class="fas fa-circle-exclamation me-2"></i>{{error}}
+        </div>
+      {{/if}}
+
+      {{#if success}}
+        <div class="alert alert-success alert-dismissible fade show border-0 mb-3" role="alert" style="border-left:4px solid #1F7A6C !important; border-radius:.55rem; font-size:.9rem;">
+          <i class="fas fa-circle-check me-2"></i>{{success}}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <script>setTimeout(() => { window.location.href = "/admin/register"; }, 2000);</script>
+      {{/if}}
+
+      <!-- Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+
+        <div style="background:#fff; border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-id-card-clip" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Account Information</strong>
+        </div>
+
+        <div style="padding:1.25rem 1.15rem;">
+          <form action="/admin/register" method="POST">
+            <div class="row g-3">
+
+              <!-- Personal Information Section -->
+              <div class="col-12">
+                <h6 style="color:#2E6F9E; font-weight:600; font-size:.85rem; border-bottom:1px solid #E3E6EB; padding-bottom:.5rem; margin-bottom:.75rem;">
+                  <i class="fas fa-user me-2"></i>Personal Information
+                </h6>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">ID Number</label>
+                <input type="text" name="idno" class="form-control" required style="border-color:#E3E6EB;" placeholder="e.g., EMP-2024-001">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">First Name</label>
+                <input type="text" name="firstname" class="form-control" required style="border-color:#E3E6EB;" placeholder="First Name">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">Last Name</label>
+                <input type="text" name="lastname" class="form-control" required style="border-color:#E3E6EB;" placeholder="Last Name">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">Designation</label>
+                <input type="text" name="designation" class="form-control" required style="border-color:#E3E6EB;" placeholder="e.g., HR Manager, Software Engineer">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">Email Address</label>
+                <input type="email" name="email" class="form-control" required style="border-color:#E3E6EB;" placeholder="user@company.com">
+              </div>
+
+              <!-- Account Information Section -->
+              <div class="col-12">
+                <h6 style="color:#2E6F9E; font-weight:600; font-size:.85rem; border-bottom:1px solid #E3E6EB; padding-bottom:.5rem; margin-bottom:.75rem; margin-top:.5rem;">
+                  <i class="fas fa-lock me-2"></i>Account Information
+                </h6>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">Username</label>
+                <input type="text" name="username" class="form-control" required style="border-color:#E3E6EB;" placeholder="Choose a username">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">Password</label>
+                <input type="password" name="password" class="form-control" required style="border-color:#E3E6EB;" placeholder="Create a password">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" style="font-size:.8rem; font-weight:600; color:#16304A;">User Role</label>
+                <select name="role_id" class="form-select" required style="border-color:#E3E6EB;">
+                  <option value="">Select Role</option>
+                  {{#each roles}}
+                    <option value="{{this.id}}">
+                      {{this.role_name}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <button type="submit" class="btn" style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-weight:500; font-size:.9rem;">
+                <i class="fas fa-save me-2"></i>Register User
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

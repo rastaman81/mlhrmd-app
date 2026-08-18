@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-users" style="color:#2E6F9E;"></i> Employee Records
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Search and manage employee information.</p>
+        </div>
+      </div>
+
+      <!-- Search Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04); margin-bottom:1.25rem;">
+
+        <div style="background:#fff; border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-search" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Search Filters</strong>
+        </div>
+
+        <div style="padding:1.15rem;">
+          <div class="row g-3 align-items-end">
+
+            <div class="col-md-2">
+              <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">Office</label>
+              <select name="office" id="officeSelect" class="form-select" style="border-color:#E3E6EB;" required>
+                <option value="" disabled {{#unless selectedOffice}}selected{{/unless}}>
+  Select Office
+</option>
+
+{{#each offices}}
+  <option
+    value="{{this.office_name}}"
+    {{#if (eq this.office_name ../selectedOffice)}}selected{{/if}}>
+    {{this.office_name}}
+  </option>
+{{/each}}
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">ID Number</label>
+              <input type="text" id="idno" class="form-control" placeholder="e.g. 00123" style="border-color:#E3E6EB;">
+            </div>
+
+            <div class="col-md-3">
+              <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">Last Name</label>
+              <input type="text" id="lastName" class="form-control" placeholder="e.g. dela Cruz" style="border-color:#E3E6EB;">
+            </div>
+
+            <div class="col-md-3">
+              <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">First Name</label>
+              <input type="text" id="firstName" class="form-control" placeholder="e.g. Juan" style="border-color:#E3E6EB;">
+            </div>
+
+            <div class="col-md-2">
+              <button type="button" class="btn w-100" onclick="searchActiveEmployees(1)"
+                style="background:#2E6F9E; border-color:#2E6F9E; color:#fff; font-weight:500; font-size:.9rem;">
+                <i class="fas fa-search me-1"></i> Search
+              </button>
+            </div>
+
+          </div>
+
+          <p style="font-size:.82rem; color:#6B7686; margin:.75rem 0 0;">
+            <i class="fas fa-circle-info me-1"></i>Select an office to narrow results, then filter by ID or name.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Table Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+
+        <div style="background:#fff; border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-table-list" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Results</strong>
+        </div>
+
+        <div style="padding:1.15rem;">
+
+          <div class="table-responsive">
+            <table id="employees-table" class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.85rem 1rem;">ID</th>
+                  <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.85rem 1rem;">Last Name</th>
+                  <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.85rem 1rem;">First Name</th>
+                  <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.85rem 1rem;">Middle Name</th>
+                  <th style="font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; font-weight:600; border-bottom:1px solid #E3E6EB; background:#fff; padding:.85rem 1rem;">Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <!-- Loading Spinner -->
+          <div id="loading" class="text-center py-5" style="display:none;">
+            <div class="spinner-border" role="status" style="color:#2E6F9E; width:2.5rem; height:2.5rem;">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2" style="color:#6B7686; font-size:.9rem;">Loading employee data...</p>
+          </div>
+
+          <!-- Pagination -->
+          <nav aria-label="Page navigation" class="mt-3">
+            <ul id="pagination" class="pagination" style="gap:.25rem;"></ul>
+          </nav>
+
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div id="error-message" class="alert border-0 mt-3" style="display:none; border-left:4px solid #C1483D !important; border-radius:.55rem; font-size:.9rem;"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/scripts.js"></script>
+</body>
+</html>

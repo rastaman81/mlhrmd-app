@@ -1,0 +1,48 @@
+{
+  "name": "hrmd-app",
+  "version": "1.0.0",
+  "description": "HRMD Application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "build": "node build.js",
+    "prod": "npm run build && cd dist && pm2 start ecosystem.config.js",
+    "prod-stop": "cd dist && pm2 stop hrmd-app",
+    "prod-restart": "cd dist && pm2 restart hrmd-app",
+    "prod-logs": "cd dist && pm2 logs hrmd-app",
+    "prod-status": "cd dist && pm2 status",
+    "prod-delete": "cd dist && pm2 delete hrmd-app",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dbase": "^0.0.102",
+    "dbf": "^0.2.0",
+    "dbffile": "^1.12.0",
+    "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "hbs": "^4.2.0",
+    "multer": "^2.1.1",
+    "mysql2": "^3.14.1",
+    "node-dbf": "^0.4.0",
+    "pdfkit": "^0.17.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "fs-extra": "^11.3.6",
+    "globals": "^17.6.0",
+    "javascript-obfuscator": "^4.1.1",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.4"
+  }
+}

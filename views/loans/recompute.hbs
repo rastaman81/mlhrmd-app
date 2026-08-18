@@ -1,0 +1,2780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --nla-navy: #16304A;
+      --nla-navy-deep: #0F2233;
+      --nla-blue: #2E6F9E;
+      --nla-teal: #1F7A6C;
+      --nla-gold: #A8762A;
+      --nla-bg: #F6F7F9;
+      --nla-surface: #FFFFFF;
+      --nla-border: #E3E6EB;
+      --nla-muted: #6B7686;
+      --nla-danger: #C1483D;
+      --nla-slate: #64748B;
+      --nla-violet: #7C5CBF;
+      --nla-rust: #C2703D;
+      --nla-indigo: #4F6FBA;
+    }
+
+    .main-content{ font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background:var(--nla-bg); }
+
+    .main-content .nla-page-head{ display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:.75rem; margin-bottom:1.75rem; }
+    .main-content .nla-title{ font-size:1.65rem; font-weight:700; color:var(--nla-navy-deep); margin:0; display:flex; align-items:center; gap:.6rem; }
+    .main-content .nla-title i{ color:var(--nla-blue); }
+    .main-content .nla-subtitle{ margin:.35rem 0 0; color:var(--nla-muted); font-size:.92rem; }
+
+    .main-content .nla-flow{ display:flex; flex-direction:column; gap:1.25rem; }
+    .main-content .nla-card{ border:1px solid var(--nla-border); border-radius:.65rem; background:var(--nla-surface); box-shadow:0 1px 2px rgba(16,24,40,.04); }
+    .main-content .nla-card .card-header{ background:var(--nla-surface); border-bottom:1px solid var(--nla-border); padding:.65rem 1rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0; }
+    .main-content .nla-card .card-header i{ color:var(--nla-blue); }
+    .main-content .nla-card .card-header strong{ color:var(--nla-navy-deep); font-weight:600; font-size:.92rem; }
+    .main-content .nla-card .card-body{ padding:1rem; }
+
+    .main-content .form-label{ font-size:.75rem; font-weight:600; color:var(--nla-navy); margin-bottom:.25rem; }
+    .main-content .form-select, .main-content .form-control{ border-color:var(--nla-border); font-size:.875rem; padding:.35rem .65rem; }
+    .main-content .form-select:focus, .main-content .form-control:focus{ border-color:var(--nla-blue); box-shadow:0 0 0 .2rem rgba(46,111,158,.12); }
+    .main-content .nla-help{ font-size:.78rem; color:var(--nla-muted); margin:.4rem 0 0; }
+    .main-content .nla-locked-hint{ font-size:.7rem; font-weight:600; color:var(--nla-muted); background:var(--nla-bg); border:1px solid var(--nla-border); border-radius:1rem; padding:.2rem .6rem; display:inline-flex; align-items:center; }
+
+    /* ---- Employee profile ---- */
+    .main-content .nla-profile{ display:flex; gap:.75rem; align-items:flex-start; }
+    .main-content .nla-avatar{ width:44px; height:44px; flex-shrink:0; border-radius:50%; background:linear-gradient(145deg, var(--nla-blue), var(--nla-navy)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+    .main-content .nla-profile-grid{ flex:1; display:grid; grid-template-columns:repeat(4, minmax(100px,1fr)); gap:.5rem 1rem; }
+    .main-content .nla-field-label{ display:block; font-size:.65rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--nla-muted); margin-bottom:.1rem; }
+    .main-content .nla-field-value{ display:block; font-size:.88rem; font-weight:600; color:var(--nla-navy-deep); }
+    @media (max-width:767px){ .main-content .nla-profile-grid{ grid-template-columns:repeat(2,1fr); } }
+
+    /* ---- Loan computation panel ---- */
+    .main-content .nla-compute-panel{ margin-top:.75rem; background:var(--nla-bg); border:1px solid var(--nla-border); border-radius:.5rem; padding:.75rem 1rem; }
+    .main-content .nla-compute-row{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.2rem 0; }
+    .main-content .nla-compute-label{ font-size:.8rem; color:var(--nla-muted); font-weight:500; }
+    .main-content .nla-compute-value{ border:none !important; background:transparent !important; text-align:right; font-weight:600; font-size:.9rem; color:var(--nla-navy-deep); font-variant-numeric:tabular-nums; padding:0 !important; max-width:170px; }
+    .main-content .nla-compute-value:focus{ box-shadow:none; }
+    .main-content .nla-compute-divider{ border-top:1px dashed var(--nla-border); margin:.35rem 0; }
+    .main-content .nla-net-row .nla-compute-label{ font-weight:700; color:var(--nla-navy-deep); font-size:.85rem; }
+    .main-content .nla-net-value{ border:none !important; background:transparent !important; text-align:right; font-family:'Lora', serif; font-weight:700; font-size:1.35rem; color:var(--nla-gold); font-variant-numeric:tabular-nums; padding:0 !important; max-width:200px; }
+    .main-content .nla-net-value:focus{ box-shadow:none; }
+
+    /* ---- Co-makers ---- */
+    .main-content .nla-comaker-label{ font-size:.75rem; font-weight:600; color:var(--nla-navy); margin-bottom:.2rem; display:block; }
+    .main-content .nla-comaker-count{ font-size:.72rem; font-weight:600; color:var(--nla-muted); background:var(--nla-bg); border:1px solid var(--nla-border); border-radius:1rem; padding:.15rem .6rem; }
+    .main-content .comaker-field{ transition:opacity .2s ease; }
+    .main-content .comaker-field.d-none{ display:none !important; }
+    .main-content .comaker-field.nla-fade-init{ opacity:0; }
+    .main-content .nla-comaker-remove{ color:var(--nla-muted); }
+    .main-content .nla-comaker-remove:hover{ color:var(--nla-danger); }
+
+    /* ---- Action bar ---- */
+    .main-content .nla-action-bar{ position:sticky; bottom:0; background:rgba(255,255,255,.97); border:1px solid var(--nla-border); border-radius:.65rem; padding:.75rem 1rem; box-shadow:0 -4px 16px rgba(16,24,40,.06); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.65rem; margin-top:1.5rem !important; }
+    .main-content .nla-quick-label{ font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--nla-muted); margin-right:.25rem; }
+    .main-content .nla-main-actions{ display:flex; gap:.5rem; flex-wrap:wrap; }
+    .main-content .btn-nla-navy{ background:var(--nla-navy); border-color:var(--nla-navy); color:#fff; }
+    .main-content .btn-nla-navy:hover{ background:var(--nla-navy-deep); border-color:var(--nla-navy-deep); color:#fff; }
+    .main-content .btn-nla-navy:disabled{ opacity:0.5; cursor:not-allowed; }
+
+    /* ---- Dynamic bracket button ---- */
+    .main-content .nla-bracket-btn-wrap{ display:flex; align-items:center; gap:.5rem; }
+    #btnViewBracket{ transition: opacity .2s ease, transform .15s ease; }
+    #btnViewBracket.nla-btn-appear{ animation: nla-pop-in .2s ease forwards; }
+    @keyframes nla-pop-in{ from{ opacity:0; transform:scale(.92); } to{ opacity:1; transform:scale(1); } }
+
+    /* ---- Modals ---- */
+    #bracketModal, #comakerSearchModal, #loanNameSearchModal{ font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    #bracketModal .modal-content, #comakerSearchModal .modal-content, #loanNameSearchModal .modal-content{ border-radius:.65rem; border:none; box-shadow: 0 12px 32px rgba(15,34,51,.18); }
+    #bracketModal .modal-header, #comakerSearchModal .modal-header, #loanNameSearchModal .modal-header{ background-color:#fff !important; border-bottom:1px solid var(--nla-border) !important; padding:.85rem 1.15rem; }
+    #bracketModal .modal-title, #comakerSearchModal .modal-title, #loanNameSearchModal .modal-title{ display:flex; align-items:center; gap:.55rem; color:var(--nla-navy-deep) !important; font-weight:600; font-size:1rem; }
+    #bracketModal .modal-title i, #comakerSearchModal .modal-title i, #loanNameSearchModal .modal-title i{ color:var(--nla-blue) !important; }
+    #bracketModal .modal-body, #comakerSearchModal .modal-body, #loanNameSearchModal .modal-body{ padding:1.15rem; }
+    #comakerSearchModal .form-control, #loanNameSearchModal .form-control{ border-color:var(--nla-border); }
+    #comakerSearchModal .form-control:focus, #loanNameSearchModal .form-control:focus{ border-color:var(--nla-blue); box-shadow:0 0 0 .2rem rgba(46,111,158,.12); }
+    #bracketModal .table, #comakerSearchModal .table, #loanNameSearchModal .table{ --bs-table-border-color: var(--nla-border); }
+    #bracketModal .table thead th, #comakerSearchModal .table thead th, #loanNameSearchModal .table thead th{ background:var(--nla-navy-deep); font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; color:var(--nla-surface); border-bottom:1px solid var(--nla-border); font-weight:600; white-space:nowrap; }
+    #bracketModal .table tbody td, #comakerSearchModal .table tbody td, #loanNameSearchModal .table tbody td{ vertical-align:middle; }
+    #comakerSearchModal .table tbody tr:hover, #loanNameSearchModal .table tbody tr:hover{ background:var(--nla-bg); }
+    .btn-nla-navy{ background: var(--nla-navy); border: 1px solid var(--nla-navy); color: #fff; font-weight: 500; }
+    .btn-nla-navy:hover{ background: var(--nla-navy-deep); border-color: var(--nla-navy-deep); color: #fff; }
+
+    #bracketModal .modal-dialog{ max-width: 92%; width: 92%; margin: 1.75rem auto; }
+    #bracketModal .nla-bracket-loading{ display:flex; align-items:center; justify-content:center; gap:.6rem; padding:2rem; color:var(--nla-muted); font-size:.9rem; }
+    #bracketModal .nla-bracket-error{ padding:1.5rem; text-align:center; color:var(--nla-danger); font-size:.9rem; }
+    #bracketModal .table-responsive{ max-height:420px; overflow-y:auto; overflow-x: hidden; }
+    #bracketModal .table tbody td{ font-size:.85rem; font-variant-numeric:tabular-nums; }
+
+    #bracketModal table.nla-no-row-hover tbody tr:hover { background: transparent; }
+    #bracketModal td.nla-bracket-cell:hover { background: var(--nla-blue); color: #fff; cursor: pointer; }
+
+    .badge{ font-weight:600; font-size:.72rem; padding:.3rem .6rem; border-radius:.4rem; }
+    .badge.nla-badge-approved      { background:var(--nla-teal);   color:#fff; }
+    .badge.nla-badge-cancelled     { background:var(--nla-gold);   color:#fff; }
+    .badge.nla-badge-disapproved   { background:var(--nla-danger); color:#fff; }
+    .badge.nla-badge-pending       { background:var(--nla-slate);  color:#fff; }
+    .badge.nla-badge-signature     { background:var(--nla-violet); color:#fff; }
+    .badge.nla-badge-hold          { background:var(--nla-rust);   color:#fff; }
+    .badge.nla-badge-verification  { background:var(--nla-indigo); color:#fff; }
+
+    #pageNumbers span{ padding: 0.25rem 0.5rem; border-radius: 0.25rem; transition: all 0.2s ease; }
+    #pageNumbers span:hover:not(.fw-bold){ background-color: var(--nla-bg); }
+    #pageNumbers .fw-bold{ background-color: var(--nla-blue); color: white !important; }
+
+    #eligibilityErrorModal .modal-header, #comakerEligibilityErrorModal .modal-header, #payrollDateMismatchModal .modal-header{ background: #dc3545 !important; color: white !important; }
+    #eligibilityErrorModal .modal-header .modal-title, #comakerEligibilityErrorModal .modal-header .modal-title, #payrollDateMismatchModal .modal-header .modal-title{ color: white !important; }
+    #eligibilityErrorModal .btn-close-white, #comakerEligibilityErrorModal .btn-close-white, #payrollDateMismatchModal .btn-close-white{ filter: brightness(0) invert(1); }
+    #eligibilityErrorModal .alert-danger, #payrollDateMismatchModal .alert-danger{ background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+
+    /* No-loan-loaded state */
+    #noLoanState{ text-align:center; padding:2.5rem 1rem; color:var(--nla-muted); }
+    #noLoanState i{ font-size:2.25rem; color:var(--nla-border); margin-bottom:.75rem; display:block; }
+
+    /* Bonus-loan-not-supported state */
+    #notSupportedState{ text-align:center; padding:1.5rem 1rem; color:var(--nla-danger); }
+    #notSupportedState i{ font-size:1.75rem; margin-bottom:.5rem; display:block; }
+
+    /* Payroll mismatch state */
+    #payrollMismatchState{ text-align:center; padding:1.5rem 1rem; color:var(--nla-danger); }
+    #payrollMismatchState i{ font-size:1.75rem; margin-bottom:.5rem; display:block; }
+
+    /* Toast */
+    #appToast{ border-radius:.55rem; box-shadow:0 8px 24px rgba(15,34,51,.18); color:#fff; min-width:280px; }
+    #appToast.toast-success{ background:var(--nla-teal); }
+    #appToast.toast-warning{ background:var(--nla-gold); }
+    #appToast.toast-danger { background:var(--nla-danger); }
+    #appToast.toast-info   { background:var(--nla-navy); }
+
+    /* Loan Type Display - read-only text styling */
+    #loanTypeDisplay {
+      background-color: #f8f9fa;
+      cursor: not-allowed;
+      font-weight: 500;
+      color: var(--nla-navy-deep);
+    }
+    #loanTypeDisplay:focus {
+      box-shadow: none;
+      border-color: var(--nla-border);
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-3">
+
+      <!-- PAGE HEADER -->
+      <div class="nla-page-head">
+        <div>
+          <h1 class="nla-title"><i class="fas fa-calculator"></i> Recompute Loan</h1>
+          <p class="nla-subtitle">Find an existing loan, recompute using the current payroll cycle, and save.</p>
+        </div>
+      </div>
+
+      <div class="nla-flow">
+
+        <!-- =========================
+             STEP 1: FIND LOAN
+        ========================== -->
+        <div class="card nla-card mb-0">
+          <div class="card-header">
+            <i class="fas fa-magnifying-glass"></i>
+            <strong>Find Loan</strong>
+          </div>
+          <div class="card-body">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-5">
+                <label class="form-label">Control No.</label>
+                <input type="text" class="form-control" id="controlNoInput" placeholder="Enter control number" inputmode="numeric">
+              </div>
+              <div class="col-md-3">
+                <button type="button" class="btn btn-nla-navy w-100" id="btnSearchControlNo">
+                  <i class="fas fa-search me-1"></i> Search
+                </button>
+              </div>
+              <div class="col-md-4">
+                <button type="button" class="btn btn-outline-primary w-100" id="btnSearchLoanByName">
+                  <i class="fas fa-user-search me-1"></i> Search by Employee Name
+                </button>
+              </div>
+            </div>
+            <p class="nla-help mt-2"><i class="fas fa-circle-info me-1"></i>Loan is recomputed using the employee's current payroll cycle.</p>
+          </div>
+        </div>
+
+        <!-- =========================
+             STEP 2: EMPLOYEE INFO
+        ========================== -->
+        <div class="card nla-card mb-0" id="employeeInfoCard" style="display:none;">
+          <div class="card-header">
+            <i class="fas fa-id-badge"></i>
+            <strong>Employee Information</strong>
+          </div>
+          <div class="card-body">
+            <div class="nla-profile">
+              <div class="nla-avatar"><i class="fas fa-user"></i></div>
+              <div class="nla-profile-grid">
+                <div><span class="nla-field-label">ID No.</span><span class="nla-field-value" id="empIdno">---</span></div>
+                <div><span class="nla-field-label">Last Name</span><span class="nla-field-value" id="empLast">---</span></div>
+                <div><span class="nla-field-label">First Name</span><span class="nla-field-value" id="empFirst">---</span></div>
+                <div><span class="nla-field-label">Branch</span><span class="nla-field-value" id="empBranch">---</span></div>
+                <div><span class="nla-field-label">Region</span><span class="nla-field-value" id="empRegion">---</span></div>
+                <div><span class="nla-field-label">Office</span><span class="nla-field-value" id="empOffice">---</span></div>
+                <div><span class="nla-field-label">Length of Service</span><span class="nla-field-value" id="empLos">---</span></div>
+                <div><span class="nla-field-label">Control No.</span><span class="nla-field-value" id="empControlNo">---</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================
+             NOT SUPPORTED STATE (bonus loan types)
+        ========================== -->
+        <div class="card nla-card mb-0" id="notSupportedCard" style="display:none;">
+          <div class="card-body">
+            <div id="notSupportedState">
+              <i class="fas fa-triangle-exclamation"></i>
+              <p class="mb-0"><strong id="notSupportedLoanType">This loan type</strong> is a bonus payout and is not eligible for recompute here. Please use Update Loan Status for this record instead.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================
+             PAYROLL MISMATCH STATE
+        ========================== -->
+        <div class="card nla-card mb-0" id="payrollMismatchCard" style="display:none;">
+          <div class="card-body">
+            <div id="payrollMismatchState">
+              <i class="fas fa-calendar-times"></i>
+              <p class="mb-0"><strong>Payroll Cycle Mismatch</strong></p>
+              <p class="mb-0" id="payrollMismatchMessage">This loan was created with a different payroll cycle. Please create a new loan instead.</p>
+              <div class="mt-2 text-start" style="font-size:0.85rem; max-width:500px; margin:0 auto; background:var(--nla-bg); padding:1rem; border-radius:0.5rem;">
+                <p class="mb-1"><strong>Loan's Payroll Dates:</strong></p>
+                <p class="mb-1" id="loanPayrollDates">First: -- | Second: --</p>
+                <p class="mb-1"><strong>Current Payroll Dates:</strong></p>
+                <p class="mb-0" id="currentPayrollDates">First: -- | Second: --</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================
+             STEP 3: LOAN DETAILS
+        ========================== -->
+        <div class="card nla-card mb-0" id="loanDetailsCard" style="display:none;">
+          <div class="card-header">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <strong>Loan Details</strong>
+          </div>
+
+          <div class="card-body">
+
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label">Loan Type</label>
+                <input type="text" class="form-control" id="loanTypeDisplay" readonly>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Loan Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">₱</span>
+                  <input type="text" class="form-control" id="loanAmount" placeholder="0.00">
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-2 mt-2 d-none" id="monthsToPayRow">
+              <div class="col-12">
+                <label class="form-label"><i class="fas fa-calendar-alt me-1"></i>Months to Pay</label>
+                <select class="form-select" id="monthsToPay">
+                  <option value="">Select number of months</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="nla-compute-panel">
+              <div class="nla-compute-row">
+                <span class="nla-compute-label">Existing Loan</span>
+                <input type="text" class="nla-compute-value" id="existingLoan" >
+              </div>
+              <div class="nla-compute-row">
+                <span class="nla-compute-label">Loan Deduction</span>
+                <input type="text" class="nla-compute-value" id="loanDeduction">
+              </div>
+              <div class="nla-compute-divider"></div>
+              <div class="nla-compute-row nla-net-row">
+                <span class="nla-compute-label">Net Proceeds</span>
+                <input type="text" class="nla-net-value" id="netProceeds" readonly>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- =========================
+             STEP 4: COMAKERS
+        ========================== -->
+        <div class="card nla-card mb-0" id="comakerCard" style="display:none;">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-user-friends"></i>
+              <strong>Co-Makers</strong>
+            </div>
+            <span class="nla-comaker-count" id="comakerCount">0 of 4 added</span>
+          </div>
+
+          <div class="card-body">
+            <div class="row g-3" id="comakerFields">
+              <div class="col-md-3 comaker-field d-none">
+                <label class="nla-comaker-label">Co-Maker 1</label>
+                <div class="input-group">
+                  <input class="form-control" placeholder="Click to search co-maker">
+                  <button type="button" class="btn btn-outline-secondary nla-comaker-remove" aria-label="Remove Co-Maker 1"><i class="fas fa-xmark"></i></button>
+                </div>
+              </div>
+              <div class="col-md-3 comaker-field d-none">
+                <label class="nla-comaker-label">Co-Maker 2</label>
+                <div class="input-group">
+                  <input class="form-control" placeholder="Click to search co-maker">
+                  <button type="button" class="btn btn-outline-secondary nla-comaker-remove" aria-label="Remove Co-Maker 2"><i class="fas fa-xmark"></i></button>
+                </div>
+              </div>
+              <div class="col-md-3 comaker-field d-none">
+                <label class="nla-comaker-label">Co-Maker 3</label>
+                <div class="input-group">
+                  <input class="form-control" placeholder="Click to search co-maker">
+                  <button type="button" class="btn btn-outline-secondary nla-comaker-remove" aria-label="Remove Co-Maker 3"><i class="fas fa-xmark"></i></button>
+                </div>
+              </div>
+              <div class="col-md-3 comaker-field d-none">
+                <label class="nla-comaker-label">Co-Maker 4</label>
+                <div class="input-group">
+                  <input class="form-control" placeholder="Click to search co-maker">
+                  <button type="button" class="btn btn-outline-secondary nla-comaker-remove" aria-label="Remove Co-Maker 4"><i class="fas fa-xmark"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="btnAddComaker">
+              <i class="fas fa-plus me-1"></i> Add Co-Maker
+            </button>
+            <p class="nla-help mb-0">Add up to 4 co-makers for this loan. Click the <strong>×</strong> on a field to remove it.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ACTION BAR -->
+      <div class="nla-action-bar mt-3">
+        <div class="nla-bracket-btn-wrap">
+          <span class="nla-quick-label" id="bracketBtnLabel" style="display:none;">Loan Table</span>
+          <button type="button" class="btn btn-outline-primary btn-sm d-none" id="btnViewBracket">
+            <i class="fas fa-table me-1" id="bracketBtnIcon"></i>
+            <span id="bracketBtnText">View Table</span>
+          </button>
+        </div>
+        <div class="nla-main-actions">
+          <button type="button" class="btn btn-outline-secondary" id="btnClear">
+            <i class="fas fa-eraser me-1"></i> Clear
+          </button>
+          <button type="button" class="btn btn-nla-navy" id="btnSave" disabled>
+            <i class="fas fa-check me-1"></i> Recompute &amp; Save
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     SEARCH LOAN BY EMPLOYEE NAME MODAL
+========================== -->
+<div id="loanNameSearchModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-magnifying-glass"></i> Search by Employee Name</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-2 mb-3">
+          <div class="col-md-3">
+            <label class="form-label">Office</label>
+            <select class="form-select" id="loanSearchOffice">
+              <option value="" disabled selected>Select Office</option>
+              {{#each offices}}
+                <option value="{{office_name}}">{{office_name}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Last Name</label>
+            <input type="text" id="loanSearchLastName" class="form-control" placeholder="Enter last name">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">First Name</label>
+            <input type="text" id="loanSearchFirstName" class="form-control" placeholder="Enter first name">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-nla-navy w-100" id="loanSearchBtn" style="height:38px;">
+              <i class="fas fa-search me-1"></i> Search
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span id="loanResultCount" class="text-muted small">0 results found</span>
+          <span id="loanPageInfo" class="text-muted small"></span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Control No</th><th>ID No</th><th>Last Name</th><th>First Name</th>
+                <th>Loan Type</th><th>Status</th><th>Select</th>
+              </tr>
+            </thead>
+            <tbody id="loanSearchResults"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <button class="btn btn-outline-secondary btn-sm" id="loanPrevPage" disabled><i class="fas fa-chevron-left"></i> Previous</button>
+          <span id="loanPageNumbers" class="small"></span>
+          <button class="btn btn-outline-secondary btn-sm" id="loanNextPage" disabled>Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     LOAN BRACKET MODAL
+========================== -->
+<div id="bracketModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-table" id="bracketModalIcon"></i>
+          <span id="bracketModalTitle">Loan Table</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="bracketModalBody"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     CO-MAKER SEARCH MODAL
+========================== -->
+<div id="comakerSearchModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i> Search Co-Maker</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-2 mb-3">
+          <div class="col-md-3">
+            <label class="form-label small">Search By</label>
+            <select class="form-select form-select-sm" id="comakerSearchField">
+              <option value="all">All Fields</option>
+              <option value="idno">ID No.</option>
+              <option value="lastname" selected>Last Name</option>
+              <option value="firstname">First Name</option>
+            </select>
+          </div>
+          <div class="col-md-7">
+            <label class="form-label small">Search Query</label>
+            <input type="text" id="comakerSearchInput" class="form-control" placeholder="Search by ID, Last Name, or First Name">
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-nla-navy w-100" id="comakerSearchBtn"><i class="fas fa-search me-1"></i> Search</button>
+          </div>
+        </div>
+
+        <div class="alert alert-info small">
+          <i class="fas fa-info-circle me-1"></i>
+          Co-maker must meet the same length of service requirements as the borrower.
+          The borrower (ID: <span id="comakerBorrowerId"></span>) will be excluded from search results.
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span id="comakerResultCount" class="text-muted small">0 results found</span>
+          <span id="comakerPageInfo" class="text-muted small"></span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>ID No</th><th>Last Name</th><th>First Name</th><th>Middle Name</th>
+                <th>Region</th><th>Branch</th><th>Length of Service</th><th>Select</th>
+              </tr>
+            </thead>
+            <tbody id="comakerSearchResults">
+              <tr><td colspan="8" class="text-center text-muted py-3">Type a search query and click Search to find co-makers.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <button class="btn btn-outline-secondary btn-sm" id="comakerPrevPage" disabled><i class="fas fa-chevron-left"></i> Previous</button>
+          <span id="comakerPageNumbers" class="small"></span>
+          <button class="btn btn-outline-secondary btn-sm" id="comakerNextPage" disabled>Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+  <div id="appToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body d-flex align-items-center gap-2">
+        <i id="appToastIcon" class="fas fa-circle-check"></i>
+        <span id="appToastMessage">Message</span>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ─────────────────────────────────────────────
+  // GLOBAL STATE
+  // ─────────────────────────────────────────────
+  let loadedLoan = null;
+  let selectedEmployeeData = null;
+  let activeBracket = null;
+  let payrollDatesValid = false;
+
+  window.userData = { firstName: "{{firstName}}", lastName: "{{lastName}}", designation: "{{designation}}" };
+  const { firstName, lastName, designation } = window.userData || {};
+
+  const RECOMPUTE_EXCLUDED_LOAN_TYPES = [
+    'ml fund 13th month',
+    'ml fund a.l.l. bonus',
+    'sako 13th month',
+    'sako a.l.l. bonus'
+  ];
+
+  const MONTHS_BASED_LOAN_CONFIG = {
+    'ml fund jewelry loan': { options: [1,2,3,4,5,6,7,8,9,10,11,12] },
+    'ml fund o.p.i.':       { options: [1,2,3,4,5,6,7,8,9,10,11,12] },
+    'ml fund pettycash':    { options: [1,1.5,2,2.5,3,3.5,4,4.5,5,5.5] }
+  };
+  const MONTHS_BASED_LOAN_TYPES = Object.keys(MONTHS_BASED_LOAN_CONFIG);
+
+  const BRACKET_MAP = [
+    { test: (name) => /^ml\s+fund\s+regular(?:\s+reloan)?$/i.test(name.trim()), key: 'ml_fund', label: 'ML Fund Table', icon: 'fas fa-university' },
+    { test: (name) => /sako\s*maxi/i.test(name), key: 'sako_maxi', label: 'Sako Maxi Table', icon: 'fas fa-piggy-bank' },
+    { test: (name) => /sako\s*petty/i.test(name), key: 'sako_petty', label: 'Sako Petty Cash Table', icon: 'fas fa-coins' },
+  ];
+
+  const BRACKET_DRIVEN_LOAN_TYPES = ['ml fund regular', 'ml fund regular reloan', 'sako maxi', 'sako pettycash'];
+
+  const EDITABLE_DEDUCTION_LOANS = [
+    'sss', 'pagibig', 'sako commodity', 'sako emergency', 'sako preferential', 'ml lending motor loan','ml fund emergency'
+  ];
+
+
+
+  const EDITABLE_DEDUCTION_MONTHLY_COUNT = {
+    'sss': 1,
+    'pagibig': 1,
+    'sako commodity': 2,
+    'sako emergency': 2,
+    'sako preferential': 2,
+    'ml lending motor loan': 2,
+    'ml fund emergency': 2,
+  };
+
+  const STATUS_BADGE_CLASS = {
+    'approved': 'nla-badge-approved', 'cancelled': 'nla-badge-cancelled', 'canceled': 'nla-badge-cancelled',
+    'disapproved': 'nla-badge-disapproved', 'disapprove': 'nla-badge-disapproved', 'pending': 'nla-badge-pending',
+    'for signature': 'nla-badge-signature', 'temporary hold': 'nla-badge-hold', 'for verification': 'nla-badge-verification',
+  };
+
+  const YEAR_COLUMN_MAP = {
+    'one year': 1, 'two years': 2, 'three years': 3, 'four years': 4, 'five years': 5, 'six years': 6
+  };
+
+  const EXISTING_LOAN_EDITABLE_LOANS = EDITABLE_DEDUCTION_LOANS;
+
+  function isExistingLoanEditable(loanType) {
+    if (!loanType) return false;
+    return EXISTING_LOAN_EDITABLE_LOANS.includes(loanType.toLowerCase().trim());
+  }
+  function updateExistingLoanEditable(loanType) {
+    const existingLoanInput = document.getElementById('existingLoan');
+    if (!existingLoanInput) return;
+    const editable = isExistingLoanEditable(loanType);
+    if (editable) {
+      existingLoanInput.removeAttribute('readonly');
+      existingLoanInput.style.backgroundColor = '#fff';
+      existingLoanInput.style.cursor = 'text';
+      existingLoanInput.placeholder = 'Enter existing loan amount';
+    } else {
+      existingLoanInput.setAttribute('readonly', true);
+      existingLoanInput.style.backgroundColor = 'transparent';
+      existingLoanInput.style.cursor = 'default';
+      existingLoanInput.placeholder = '';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // TOAST NOTIFICATIONS
+  // ─────────────────────────────────────────────
+  const appToastEl = document.getElementById('appToast');
+  const appToast = bootstrap.Toast.getOrCreateInstance(appToastEl, { delay: 3500 });
+  const appToastIcon = document.getElementById('appToastIcon');
+  const appToastMessage = document.getElementById('appToastMessage');
+  const TOAST_ICON = {
+    success: 'fas fa-circle-check', warning: 'fas fa-triangle-exclamation',
+    danger: 'fas fa-circle-xmark', info: 'fas fa-circle-info',
+  };
+  function showToast(message, type = 'info') {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    appToastEl.classList.remove('toast-success', 'toast-warning', 'toast-danger', 'toast-info');
+    appToastEl.classList.add(`toast-${type}`);
+    appToastIcon.className = TOAST_ICON[type] || TOAST_ICON.info;
+    appToastMessage.textContent = message.replace(/^[✅⚠️❌🔄ℹ️]\s*/u, '');
+    appToast.show();
+  }
+
+  // ─────────────────────────────────────────────
+  // ELEMENT REFERENCES
+  // ─────────────────────────────────────────────
+  const controlNoInput = document.getElementById('controlNoInput');
+  const btnSearchControlNo = document.getElementById('btnSearchControlNo');
+  const btnSearchLoanByName = document.getElementById('btnSearchLoanByName');
+
+  const employeeInfoCard = document.getElementById('employeeInfoCard');
+  const notSupportedCard = document.getElementById('notSupportedCard');
+  const payrollMismatchCard = document.getElementById('payrollMismatchCard');
+  const loanDetailsCard = document.getElementById('loanDetailsCard');
+  const comakerCard = document.getElementById('comakerCard');
+
+  const loanTypeDisplay = document.getElementById('loanTypeDisplay');
+  const btnViewBracket = document.getElementById('btnViewBracket');
+  const bracketBtnText = document.getElementById('bracketBtnText');
+  const bracketBtnIcon = document.getElementById('bracketBtnIcon');
+  const bracketBtnLabel = document.getElementById('bracketBtnLabel');
+
+  const bracketModalEl = document.getElementById('bracketModal');
+  const bracketModal = bootstrap.Modal.getOrCreateInstance(bracketModalEl);
+  const bracketModalTitle = document.getElementById('bracketModalTitle');
+  const bracketModalIcon = document.getElementById('bracketModalIcon');
+  const bracketModalBody = document.getElementById('bracketModalBody');
+
+  const btnSave = document.getElementById('btnSave');
+  const btnClear = document.getElementById('btnClear');
+
+  const loanNameSearchModalEl = document.getElementById('loanNameSearchModal');
+  const loanNameSearchModal = bootstrap.Modal.getOrCreateInstance(loanNameSearchModalEl);
+  const loanSearchOffice = document.getElementById('loanSearchOffice');
+  const loanSearchLastName = document.getElementById('loanSearchLastName');
+  const loanSearchFirstName = document.getElementById('loanSearchFirstName');
+  const loanSearchBtn = document.getElementById('loanSearchBtn');
+  const loanSearchResults = document.getElementById('loanSearchResults');
+  const loanResultCount = document.getElementById('loanResultCount');
+  const loanPageInfo = document.getElementById('loanPageInfo');
+  const loanPageNumbers = document.getElementById('loanPageNumbers');
+  const loanPrevPage = document.getElementById('loanPrevPage');
+  const loanNextPage = document.getElementById('loanNextPage');
+
+  // ─────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────
+  function formatCurrencyDisplay(value) {
+    if (value === null || value === undefined || isNaN(value)) return '₱0.00';
+    return `₱${parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  function formatLoanAmount(value) {
+    if (value === null || value === undefined || isNaN(value)) return '';
+    const num = parseFloat(value);
+    if (isNaN(num)) return '';
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function parseLoanAmount(formattedValue) {
+    if (!formattedValue || typeof formattedValue !== 'string') return NaN;
+    const cleaned = formattedValue.replace(/[^0-9.]/g, '');
+    return parseFloat(cleaned);
+  }
+  function setLoanAmountValue(value) {
+    const loanAmountInput = document.getElementById('loanAmount');
+    if (!loanAmountInput) return;
+    let numericValue = value;
+    if (typeof value === 'string') {
+      numericValue = (value.includes(',') || value.includes('₱')) ? parseLoanAmount(value) : parseFloat(value);
+    }
+    if (!isNaN(numericValue) && numericValue !== null && numericValue !== undefined) {
+      loanAmountInput.value = formatLoanAmount(numericValue);
+    } else if (value === '' || value === null || value === undefined) {
+      loanAmountInput.value = '';
+    } else {
+      loanAmountInput.value = value;
+    }
+  }
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function parseBracketNumber(value) {
+    if (value === null || value === undefined) return 0;
+    const cleaned = String(value).replace(/[^0-9.-]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  }
+  function parseYearsFromColumn(colName) {
+    const key = (colName || '').toLowerCase().trim();
+    return YEAR_COLUMN_MAP[key] || 0;
+  }
+  function applyStatusBadge(element, status) {
+    if (!element) return;
+    const key = (status || '').toLowerCase().trim();
+    element.textContent = status || '---';
+    element.className = `badge ${STATUS_BADGE_CLASS[key] || 'nla-badge-pending'}`;
+  }
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  function formatDateForDisplay(date) {
+    if (!date) return 'N/A';
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return 'N/A';
+    return d.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
+  function formatDateForComparison(date) {
+    if (!date) return null;
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString().split('T')[0];
+  }
+
+  function isLoanAmountEditable(loanType) {
+    if (!loanType) return true;
+    return !BRACKET_DRIVEN_LOAN_TYPES.includes(loanType.toLowerCase().trim());
+  }
+  function updateLoanAmountEditable(loanType) {
+    const loanAmountInput = document.getElementById('loanAmount');
+    if (!loanAmountInput) return;
+    const editable = isLoanAmountEditable(loanType);
+    if (editable) {
+      loanAmountInput.removeAttribute('readonly');
+      loanAmountInput.style.backgroundColor = '#fff';
+      loanAmountInput.style.cursor = 'text';
+      loanAmountInput.placeholder = '0.00';
+    } else {
+      loanAmountInput.setAttribute('readonly', true);
+      loanAmountInput.style.backgroundColor = 'transparent';
+      loanAmountInput.style.cursor = 'default';
+      loanAmountInput.placeholder = 'Select from bracket table';
+    }
+  }
+  function isDeductionEditable(loanType) {
+    if (!loanType) return false;
+    return EDITABLE_DEDUCTION_LOANS.includes(loanType.toLowerCase().trim());
+  }
+  function updateDeductionEditable() {
+    const loanDeductionInput = document.getElementById('loanDeduction');
+    if (!loanDeductionInput) return;
+    const loanType = loanTypeDisplay.value;
+    const isEditable = isDeductionEditable(loanType);
+    if (isEditable) {
+      loanDeductionInput.removeAttribute('readonly');
+      loanDeductionInput.style.backgroundColor = '#fff';
+      loanDeductionInput.style.cursor = 'text';
+      loanDeductionInput.placeholder = 'Enter deduction amount';
+    } else {
+      loanDeductionInput.setAttribute('readonly', true);
+      loanDeductionInput.style.backgroundColor = 'transparent';
+      loanDeductionInput.style.cursor = 'default';
+      loanDeductionInput.placeholder = '';
+    }
+  }
+
+  function showMonthsToPayRow(show) {
+    document.getElementById('monthsToPayRow').classList.toggle('d-none', !show);
+  }
+  function populateMonthsToPay(loanType) {
+    const sel = document.getElementById('monthsToPay');
+    if (!sel) return;
+    const config = MONTHS_BASED_LOAN_CONFIG[loanType.toLowerCase()];
+    const options = config ? config.options : [];
+    sel.innerHTML = '<option value="">Select number of months</option>';
+    options.forEach((m) => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = `${m} Month${m === 1 ? '' : 's'}`;
+      sel.appendChild(opt);
+    });
+  }
+  function resetMonthsToPay() {
+    const sel = document.getElementById('monthsToPay');
+    if (sel) sel.value = '';
+  }
+
+  const loanTypeConfigCache = {};
+  async function getLoanTypeConfig(loanType) {
+    const key = loanType.toLowerCase();
+    if (loanTypeConfigCache[key]) return loanTypeConfigCache[key];
+    try {
+      const url = new URL('/loan/recompute/loan-type-config', window.location.origin);
+      url.searchParams.append('loanType', loanType);
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        loanTypeConfigCache[key] = data.config;
+        return data.config;
+      }
+    } catch (err) {
+      console.error('Error fetching loan type config:', err);
+    }
+    return { monthly_deduction_count: 2, interest_rate: 0.01, formula_type: 'input_based' };
+  }
+
+  // ─────────────────────────────────────────────
+  // PAYROLL DATE FUNCTIONS
+  // ─────────────────────────────────────────────
+  function getCurrentPayrollDates(payrollRecords) {
+    if (!payrollRecords || payrollRecords.length === 0) {
+        console.log('⚠️ No payroll records found');
+        return { firstCycle: null, secondCycle: null };
+    }
+
+    const sortedRecords = [...payrollRecords].sort((a, b) => new Date(b.enddate) - new Date(a.enddate));
+    let firstCycleRecord = null;
+    let secondCycleRecord = null;
+
+    console.log('📊 Processing payroll records...');
+    console.log('   Total records:', sortedRecords.length);
+    
+    // First pass: Try to find exact matches for 15th and end of month
+    sortedRecords.forEach((record, index) => {
+        const endDate = new Date(record.enddate);
+        const day = endDate.getDate();
+        const month = endDate.getMonth();
+        const year = endDate.getFullYear();
+        const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+        const isLastDayOfMonth = day === lastDayOfMonth;
+        
+        console.log(`   Record ${index + 1}:`, {
+            enddate: record.enddate,
+            day: day,
+            isLastDayOfMonth: isLastDayOfMonth,
+            netpay: record.netpay
+        });
+
+        // First cycle: ALWAYS the 15th day of the month
+        if (day === 15 && !firstCycleRecord) {
+            firstCycleRecord = record;
+            console.log('   ✅ Found first cycle (15th):', record.enddate);
+        } 
+        // Second cycle: ALWAYS the last day of the month
+        else if (isLastDayOfMonth && !secondCycleRecord) {
+            secondCycleRecord = record;
+            console.log('   ✅ Found second cycle (end of month):', record.enddate);
+        }
+    });
+
+    // Second pass: If we're missing one or both, try to find them from the most recent records
+    if (!firstCycleRecord || !secondCycleRecord) {
+        console.log('⚠️ Using fallback logic for missing cycles...');
+        
+        // Look through sorted records again, but more carefully
+        for (const record of sortedRecords) {
+            const endDate = new Date(record.enddate);
+            const day = endDate.getDate();
+            const month = endDate.getMonth();
+            const year = endDate.getFullYear();
+            const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+            const isLastDayOfMonth = day === lastDayOfMonth;
+            
+            if (!firstCycleRecord && day === 15) {
+                firstCycleRecord = record;
+                console.log('   ✅ Found first cycle (15th) in fallback:', record.enddate);
+            }
+            
+            if (!secondCycleRecord && isLastDayOfMonth) {
+                secondCycleRecord = record;
+                console.log('   ✅ Found second cycle (end of month) in fallback:', record.enddate);
+            }
+            
+            if (firstCycleRecord && secondCycleRecord) break;
+        }
+    }
+
+    // Third pass: If still missing, use the most recent records intelligently
+    if (!firstCycleRecord || !secondCycleRecord) {
+        console.log('⚠️ Using intelligent fallback with most recent records...');
+        
+        if (sortedRecords.length >= 2) {
+            const mostRecent = sortedRecords[0];
+            const secondMostRecent = sortedRecords[1];
+            
+            const mostRecentDay = new Date(mostRecent.enddate).getDate();
+            const secondMostRecentDay = new Date(secondMostRecent.enddate).getDate();
+            
+            const mostRecentMonth = new Date(mostRecent.enddate).getMonth();
+            const mostRecentYear = new Date(mostRecent.enddate).getFullYear();
+            const mostRecentLastDay = new Date(mostRecentYear, mostRecentMonth + 1, 0).getDate();
+            
+            const secondMostRecentMonth = new Date(secondMostRecent.enddate).getMonth();
+            const secondMostRecentYear = new Date(secondMostRecent.enddate).getFullYear();
+            const secondMostRecentLastDay = new Date(secondMostRecentYear, secondMostRecentMonth + 1, 0).getDate();
+            
+            const mostRecentIs15th = mostRecentDay === 15;
+            const mostRecentIsEndOfMonth = mostRecentDay === mostRecentLastDay;
+            const secondMostRecentIs15th = secondMostRecentDay === 15;
+            const secondMostRecentIsEndOfMonth = secondMostRecentDay === secondMostRecentLastDay;
+            
+            // Try to assign based on what we know
+            if (!firstCycleRecord) {
+                if (mostRecentIs15th) {
+                    firstCycleRecord = mostRecent;
+                } else if (secondMostRecentIs15th) {
+                    firstCycleRecord = secondMostRecent;
+                } else {
+                    // Neither is 15th, use the one that's not end of month
+                    if (!mostRecentIsEndOfMonth) {
+                        firstCycleRecord = mostRecent;
+                    } else if (!secondMostRecentIsEndOfMonth) {
+                        firstCycleRecord = secondMostRecent;
+                    } else {
+                        firstCycleRecord = secondMostRecent;
+                        console.log('   ⚠️ Warning: No clear 15th found, using fallback');
+                    }
+                }
+            }
+            
+            if (!secondCycleRecord) {
+                if (mostRecentIsEndOfMonth) {
+                    secondCycleRecord = mostRecent;
+                } else if (secondMostRecentIsEndOfMonth) {
+                    secondCycleRecord = secondMostRecent;
+                } else {
+                    // Neither is end of month, use the one that's not 15th
+                    if (!mostRecentIs15th) {
+                        secondCycleRecord = mostRecent;
+                    } else if (!secondMostRecentIs15th) {
+                        secondCycleRecord = secondMostRecent;
+                    } else {
+                        secondCycleRecord = mostRecent;
+                        console.log('   ⚠️ Warning: No clear end of month found, using fallback');
+                    }
+                }
+            }
+        } else if (sortedRecords.length === 1) {
+            // Only one record, use it for both but warn
+            firstCycleRecord = sortedRecords[0];
+            secondCycleRecord = sortedRecords[0];
+            console.log('   ⚠️ Only 1 record found, using for both cycles');
+        }
+    }
+
+    // Final fallback: If we still don't have both, just use what we have
+    if (!firstCycleRecord) {
+        console.log('   ⚠️ No first cycle record found, using most recent');
+        firstCycleRecord = sortedRecords[0] || null;
+    }
+    if (!secondCycleRecord) {
+        console.log('   ⚠️ No second cycle record found, using most recent');
+        secondCycleRecord = sortedRecords[0] || null;
+    }
+
+    const result = {
+        firstCycle: firstCycleRecord ? new Date(firstCycleRecord.enddate) : null,
+        secondCycle: secondCycleRecord ? new Date(secondCycleRecord.enddate) : null,
+        firstCycleRecord: firstCycleRecord,
+        secondCycleRecord: secondCycleRecord
+    };
+
+    console.log('📅 Final payroll dates:');
+    console.log('   First Cycle (Date object):', result.firstCycle);
+    console.log('   First Cycle (YYYY-MM-DD): ', result.firstCycle ? formatDateForComparison(result.firstCycle) : 'null');
+    console.log('   Second Cycle (Date object):', result.secondCycle);
+    console.log('   Second Cycle (YYYY-MM-DD):', result.secondCycle ? formatDateForComparison(result.secondCycle) : 'null');
+    
+    // Verify the dates are correct (15th for first, end of month for second)
+    if (result.firstCycle) {
+        const day = result.firstCycle.getDate();
+        if (day !== 15) {
+            console.log(`   ⚠️ Warning: First cycle is not 15th (got ${day}th)`);
+        }
+    }
+    if (result.secondCycle) {
+        const endDate = result.secondCycle;
+        const month = endDate.getMonth();
+        const year = endDate.getFullYear();
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        const day = endDate.getDate();
+        if (day !== lastDay) {
+            console.log(`   ⚠️ Warning: Second cycle is not end of month (got ${day}th, expected ${lastDay}th)`);
+        }
+    }
+    
+    return result;
+}
+
+  function comparePayrollDates(loanFirstDate, loanSecondDate, currentFirstDate, currentSecondDate) {
+    const loanFirst = loanFirstDate ? new Date(loanFirstDate) : null;
+    const loanSecond = loanSecondDate ? new Date(loanSecondDate) : null;
+    const currentFirst = currentFirstDate ? new Date(currentFirstDate) : null;
+    const currentSecond = currentSecondDate ? new Date(currentSecondDate) : null;
+
+    const loanFirstStr = formatDateForComparison(loanFirst);
+    const loanSecondStr = formatDateForComparison(loanSecond);
+    const currentFirstStr = formatDateForComparison(currentFirst);
+    const currentSecondStr = formatDateForComparison(currentSecond);
+
+    return loanFirstStr === currentFirstStr && loanSecondStr === currentSecondStr;
+  }
+
+  function showPayrollDateMismatchError(loanFirst, loanSecond, currentFirst, currentSecond) {
+    // Show the mismatch card instead of a modal
+    payrollMismatchCard.style.display = '';
+    document.getElementById('loanPayrollDates').textContent = 
+      `First: ${formatDateForDisplay(loanFirst)} | Second: ${formatDateForDisplay(loanSecond)}`;
+    document.getElementById('currentPayrollDates').textContent = 
+      `First: ${formatDateForDisplay(currentFirst)} | Second: ${formatDateForDisplay(currentSecond)}`;
+    
+    // Hide other cards
+    loanDetailsCard.style.display = 'none';
+    comakerCard.style.display = 'none';
+    btnSave.disabled = true;
+    payrollDatesValid = false;
+  }
+
+  // ─────────────────────────────────────────────
+  // CALCULATE EXISTING LOAN TOTAL
+  // ─────────────────────────────────────────────
+  function calculateExistingLoanTotal(payrollRecords, loanType = null) {
+    if (!payrollRecords || payrollRecords.length === 0) return 0;
+
+    const LOAN_FIELDS = {
+      'ml fund regular': ['mlfund_regular'],
+      'ml fund regular reloan': ['mlfund_regular'],
+      'ml fund pettycash': ['mlfund_pcl'],
+      'ml fund pettycash reloan': ['mlfund_pcl'],
+      'ml fund jewelry loan': ['mlfund_jewelry'],
+      'ml fund o.p.i.': ['mlfund_opi'],
+      'ml fund emergency': ['mlfund_emergency'],
+      'ml lending motor loan': ['motor_loan'],
+      'sako maxi': ['sako'],
+      'sako pettycash': ['sako'],
+      'sako emergency': ['sako'],
+      'sako preferential': ['sako'],
+      'sako commodity': ['sako'],
+      'sako retirement': ['sako'],
+      'sss': ['sssloan'],
+      'pagibig': ['pagibigloan']
+    };
+
+    let fieldsToSum = [];
+    if (loanType) {
+      const normalizedType = loanType.toLowerCase().trim();
+      if (LOAN_FIELDS[normalizedType]) {
+        fieldsToSum = LOAN_FIELDS[normalizedType];
+      } else if (normalizedType.includes('ml fund')) {
+        fieldsToSum = ['mlfund_total'];
+      } else if (normalizedType.includes('sako')) {
+        fieldsToSum = ['sako'];
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+
+    let total = 0;
+    payrollRecords.forEach((record) => {
+      total += fieldsToSum.reduce((sum, field) => sum + (parseFloat(record[field]) || 0), 0);
+    });
+    return total;
+  }
+
+  // ─────────────────────────────────────────────
+  // LOAN TYPE HANDLERS
+  // ─────────────────────────────────────────────
+  async function handleMLFundRegular(employeeData, loanAmount) {
+    const existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'ml fund regular');
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    if (selectedEmployeeData && selectedEmployeeData.selectedBracketRow) {
+      const bracket = selectedEmployeeData.selectedBracketRow;
+      const loanComputation = employeeData.loanComputation || {};
+      const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+      const percent35 = loanComputation.percentage || 0;
+      const deductionPerMonth = bracket.loanDeduct * 2;
+      const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+      return {
+        success: true,
+        message: `✅ ML Fund Regular calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+        data: {
+          netProceeds: parseFloat(netProceeds.toFixed(2)),
+          loanAmount: parseFloat(bracket.bracketLoanAmount),
+          loanDeduction: parseFloat(bracket.loanDeduct),
+          existingLoan: parseFloat(existingLoanForType),
+          percent35: parseFloat(percent35),
+          deductionPerMonth: parseFloat(deductionPerMonth),
+          loanType: 'ML Fund Regular'
+        }
+      };
+    }
+
+    showToast('ℹ️ Please select a bracket amount from the ML Fund table.', 'info');
+    return { success: false, needsBracket: true, message: 'Please select a bracket amount from the ML Fund table.', data: null };
+  }
+
+  async function handleMLFundRegularReloan(employeeData, loanAmount) {
+    return handleMLFundRegular(employeeData, loanAmount);
+  }
+
+  async function handleMLFundEmergency(employeeData, loanAmount) {
+  let existingLoanForType = 0;
+  const existingLoanInput = document.getElementById('existingLoan');
+  if (existingLoanInput) {
+    const parsed = parseLoanAmount(existingLoanInput.value);
+    if (!isNaN(parsed) && parsed > 0) existingLoanForType = parsed;
+  }
+  if (existingLoanForType === 0) {
+    existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'ml fund emergency');
+  }
+  selectedEmployeeData.existingLoanTotal = existingLoanForType;
+  document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+  // Respect a manually-edited deduction amount; default to loanAmount otherwise
+  let loanDeduction = loanAmount;
+  const deductionInput = document.getElementById('loanDeduction');
+  if (deductionInput) {
+    const parsedDeduction = parseLoanAmount(deductionInput.value);
+    if (!isNaN(parsedDeduction) && parsedDeduction > 0) loanDeduction = parsedDeduction;
+  }
+
+  const loanComputation = employeeData.loanComputation || {};
+  const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+  const percent35 = loanComputation.percentage || 0;
+  const monthlyDeductionCount = 2;
+  const deductionPerMonth = loanDeduction * monthlyDeductionCount;
+  const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+  return {
+    success: true,
+    message: `✅ ML Fund Emergency calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+    data: {
+      netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(loanAmount), loanDeduction: parseFloat(loanDeduction),
+      existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+      monthlyDeductionCount, loanType: 'ML Fund Emergency'
+    }
+  };
+}
+
+  async function handleSakoEmergency(employeeData, loanAmount) {
+    let existingLoanForType = 0;
+    const existingLoanInput = document.getElementById('existingLoan');
+    if (existingLoanInput) {
+      const parsed = parseLoanAmount(existingLoanInput.value);
+      if (!isNaN(parsed) && parsed > 0) existingLoanForType = parsed;
+    }
+    if (existingLoanForType === 0) {
+      existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'sako emergency');
+    }
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanAmount * 2;
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ SAKO Emergency calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(loanAmount), loanDeduction: parseFloat(loanAmount),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        loanType: 'SAKO Emergency'
+      }
+    };
+  }
+
+  async function handleSakoPreferential(employeeData, loanAmount) {
+    const existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'sako preferential');
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanAmount * 2;
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ SAKO Preferential calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(loanAmount), loanDeduction: parseFloat(loanAmount),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        loanType: 'SAKO Preferential'
+      }
+    };
+  }
+
+  async function handleSakoCommodity(employeeData, loanAmount) {
+    const existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'sako commodity');
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanAmount * 2;
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ SAKO Commodity calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(loanAmount), loanDeduction: parseFloat(loanAmount),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        loanType: 'SAKO Commodity'
+      }
+    };
+  }
+
+  async function handleMLLendingMotorLoan(employeeData, loanAmount) {
+    let existingLoanForType = 0;
+    const existingLoanInput = document.getElementById('existingLoan');
+    if (existingLoanInput) {
+      const parsed = parseLoanAmount(existingLoanInput.value);
+      if (!isNaN(parsed) && parsed > 0) existingLoanForType = parsed;
+    }
+    if (existingLoanForType === 0) {
+      existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'ml lending motor loan');
+    }
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const monthlyDeductionCount = 2;
+    const deductionPerMonth = loanAmount * monthlyDeductionCount;
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ ML Lending Motor Loan calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(loanAmount), loanDeduction: parseFloat(loanAmount),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        monthlyDeductionCount, loanType: 'ML Lending Motor Loan'
+      }
+    };
+  }
+
+  async function handleMLFundMonthsBased(employeeData, loanAmount) {
+    const loanType = loanTypeDisplay.value;
+    const monthsSelect = document.getElementById('monthsToPay');
+    const months = parseFloat(monthsSelect?.value);
+
+    if (!months || months < 1) {
+        return { success: false, needsMonths: true, message: 'Please select the number of months to pay.', data: null };
+    }
+
+    const config = await getLoanTypeConfig(loanType);
+    const monthlyDeductionCount = config.monthly_deduction_count || 2;
+    const interestRate = parseFloat(config.interest_rate) || 0;
+
+    let existingLoanForType = 0;
+    const existingLoanInput = document.getElementById('existingLoan');
+    if (existingLoanInput) {
+        const parsed = parseLoanAmount(existingLoanInput.value);
+        if (!isNaN(parsed) && parsed > 0) existingLoanForType = parsed;
+    }
+    if (existingLoanForType === 0) {
+        existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, loanType.toLowerCase());
+    }
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+
+    let loanDeduction = 0;  // This is the per-period deduction
+    let monthlyDeduction = 0;  // This is the total monthly deduction
+    const loanTypeLower = loanType.toLowerCase();
+    
+    if (loanTypeLower === 'ml fund pettycash' || loanTypeLower === 'ml fund pettycash reloan') {
+        // For pettycash, no interest, just divide by months
+        const totalMonthlyDeduction = round2(loanAmount / months);
+        loanDeduction = round2(totalMonthlyDeduction / monthlyDeductionCount);
+        monthlyDeduction = totalMonthlyDeduction;
+    } else {
+        // For jewelry loan and OPI, apply interest rate
+        const effectiveInterestRate = interestRate > 0 ? interestRate : 0.01;
+        // Formula: (loan_amount * (1 + interest_rate * months)) / months
+        const totalMonthlyDeduction = round2((loanAmount * (1 + effectiveInterestRate * months)) / months);
+        // Per-period deduction = total monthly deduction / monthly_deduction_count
+        loanDeduction = round2(totalMonthlyDeduction / monthlyDeductionCount);
+        monthlyDeduction = totalMonthlyDeduction;
+    }
+    console.log('loan deduction: ',loanDeduction, 'monthly deduction: ', monthlyDeduction)
+
+    // Net proceeds = (totalNetPay + existingLoan) - 35% - monthlyDeduction
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - monthlyDeduction;
+
+    // Display the per-period deduction in the loan deduction field
+    document.getElementById('loanDeduction').value = formatCurrencyDisplay(loanDeduction);
+    document.getElementById('netProceeds').value = formatCurrencyDisplay(netProceeds);
+
+    return {
+        success: true,
+        message: `✅ ${loanType} calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+        data: {
+            netProceeds: parseFloat(netProceeds.toFixed(2)), 
+            loanAmount: parseFloat(loanAmount), 
+            loanDeduction: loanDeduction,  // Per-period deduction (displayed)
+            monthlyDeduction: monthlyDeduction,  // Total monthly deduction (used for net proceeds)
+            existingLoan: parseFloat(existingLoanForType), 
+            percent35: parseFloat(percent35), 
+            months, 
+            monthlyDeductionCount, 
+            interestRate, 
+            loanType
+        }
+    };
+}
+
+  async function handleSakoMaxi(employeeData, loanAmount) {
+    if (!selectedEmployeeData || !selectedEmployeeData.selectedBracketRow) {
+      showToast('ℹ️ Please select a payment term from the Sako Maxi table.', 'info');
+      return { success: false, needsBracket: true, message: 'Please select a payment term from the Sako Maxi table.', data: null };
+    }
+    const bracket = selectedEmployeeData.selectedBracketRow;
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const existingLoanForType = bracket.existingLoan ?? selectedEmployeeData.existingLoanTotal ?? 0;
+    const deductionPerMonth = bracket.deductionPerMonth ?? (bracket.loanDeduct * bracket.monthlyDeductionCount);
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ SAKO Maxi calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(bracket.bracketLoanAmount), loanDeduction: parseFloat(bracket.loanDeduct),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        yearsRequired: bracket.yearsRequired, loanType: 'SAKO Maxi'
+      }
+    };
+  }
+
+  async function handleSakoPettyCash(employeeData, loanAmount) {
+    if (!selectedEmployeeData || !selectedEmployeeData.selectedBracketRow) {
+      showToast('ℹ️ Please select a deduction amount from the Sako Petty Cash table.', 'info');
+      return { success: false, needsBracket: true, message: 'Please select a deduction amount from the Sako Petty Cash table.', data: null };
+    }
+    const bracket = selectedEmployeeData.selectedBracketRow;
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const existingLoanForType = bracket.existingLoan ?? selectedEmployeeData.existingLoanTotal ?? 0;
+    const deductionPerMonth = bracket.deductionPerMonth ?? (bracket.loanDeduct * bracket.monthlyDeductionCount);
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ SAKO Petty Cash calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(bracket.bracketLoanAmount), loanDeduction: parseFloat(bracket.loanDeduct),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        monthsToPay: bracket.monthsToPay, loanType: 'SAKO Petty Cash'
+      }
+    };
+  }
+
+  async function handleSSS(employeeData, loanAmount) {
+    let existingLoanForType = 0;
+    const existingLoanInput = document.getElementById('existingLoan');
+    if (existingLoanInput) {
+      const parsed = parseLoanAmount(existingLoanInput.value);
+      if (!isNaN(parsed) && parsed > 0) existingLoanForType = parsed;
+    }
+    if (existingLoanForType === 0) {
+      existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'sss');
+    }
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanAmount * 1;
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ SSS calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(loanAmount), loanDeduction: parseFloat(loanAmount),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        monthlyDeductionCount: 1, loanType: 'SSS'
+      }
+    };
+  }
+
+  async function handlePagIBIG(employeeData, loanAmount) {
+    let existingLoanForType = 0;
+    const existingLoanInput = document.getElementById('existingLoan');
+    if (existingLoanInput) {
+      const parsed = parseLoanAmount(existingLoanInput.value);
+      if (!isNaN(parsed) && parsed > 0) existingLoanForType = parsed;
+    }
+    if (existingLoanForType === 0) {
+      existingLoanForType = calculateExistingLoanTotal(employeeData.payrollRecords, 'pagibig');
+    }
+    selectedEmployeeData.existingLoanTotal = existingLoanForType;
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoanForType);
+
+    const loanComputation = employeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanAmount * 1;
+    const netProceeds = (totalNetPay + existingLoanForType) - percent35 - deductionPerMonth;
+
+    return {
+      success: true,
+      message: `✅ Pag-IBIG calculated. Net proceeds: ${formatCurrencyDisplay(netProceeds)}`,
+      data: {
+        netProceeds: parseFloat(netProceeds.toFixed(2)), loanAmount: parseFloat(loanAmount), loanDeduction: parseFloat(loanAmount),
+        existingLoan: parseFloat(existingLoanForType), percent35: parseFloat(percent35), deductionPerMonth: parseFloat(deductionPerMonth),
+        monthlyDeductionCount: 1, loanType: 'Pag-IBIG'
+      }
+    };
+  }
+
+  const LOAN_TYPE_HANDLERS = {
+    'ml fund regular': handleMLFundRegular,
+    'ml fund regular reloan': handleMLFundRegularReloan,
+    'sako maxi': handleSakoMaxi,
+    'sako pettycash': handleSakoPettyCash,
+    'sss': handleSSS,
+    'pagibig': handlePagIBIG,
+    'sako emergency': handleSakoEmergency,
+    'sako preferential': handleSakoPreferential,
+    'sako commodity': handleSakoCommodity,
+    'ml lending motor loan': handleMLLendingMotorLoan,
+    'ml fund jewelry loan': handleMLFundMonthsBased,
+    'ml fund o.p.i.': handleMLFundMonthsBased,
+    'ml fund pettycash': handleMLFundMonthsBased,
+    'ml fund emergency': handleMLFundEmergency,
+  };
+
+  // ─────────────────────────────────────────────
+  // ACTION BUTTON STATE
+  // ─────────────────────────────────────────────
+  function updateActionButtonsState() {
+    const hasLoanType = !!loanTypeDisplay.value;
+    const loanAmount = parseLoanAmount(document.getElementById('loanAmount').value);
+    const hasLoanAmount = !isNaN(loanAmount) && loanAmount > 0;
+    const hasEmployee = !!selectedEmployeeData && !!selectedEmployeeData.idno;
+    const loanName = loanTypeDisplay.value.toLowerCase();
+
+    const requiresBracket = BRACKET_MAP.some((b) => b.test(loanName));
+    let hasBracketSelected = true;
+    if (requiresBracket) hasBracketSelected = !!(selectedEmployeeData && selectedEmployeeData.selectedBracketRow);
+
+    const requiresMonths = MONTHS_BASED_LOAN_TYPES.includes(loanName);
+    let hasMonthsSelected = true;
+    if (requiresMonths) hasMonthsSelected = !!document.getElementById('monthsToPay')?.value;
+
+    const shouldEnable = hasLoanType && hasLoanAmount && hasEmployee && hasBracketSelected && hasMonthsSelected && payrollDatesValid;
+    btnSave.disabled = !shouldEnable;
+  }
+
+  function triggerLoanRecalculation() {
+    const loanType = loanTypeDisplay.value;
+    const loanAmount = parseFloat(document.getElementById('loanAmount').value.replace(/[₱,]/g, '')) || 0;
+    if (!selectedEmployeeData || !selectedEmployeeData.idno || !loanType || loanAmount <= 0) return;
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot recompute - payroll cycle has changed.', 'warning');
+      return;
+    }
+
+    const existingLoanInput = document.getElementById('existingLoan');
+    let userExistingLoan = null;
+    if (existingLoanInput) {
+      const parsed = parseLoanAmount(existingLoanInput.value);
+      if (!isNaN(parsed)) { userExistingLoan = parsed; selectedEmployeeData.existingLoanTotal = parsed; }
+    }
+
+    const deductionInput = document.getElementById('loanDeduction');
+    let userLoanDeduction = null;
+    if (deductionInput && isDeductionEditable(loanType)) {
+      const parsed = parseLoanAmount(deductionInput.value);
+      if (!isNaN(parsed) && parsed > 0) userLoanDeduction = parsed;
+    }
+
+    const handler = LOAN_TYPE_HANDLERS[loanType.toLowerCase()];
+    if (!handler) return;
+
+    handler(selectedEmployeeData, loanAmount).then(result => {
+      if (result.success) {
+            selectedEmployeeData.lastComputedData = result.data;
+        if (result.data && result.data.netProceeds !== undefined) {
+          document.getElementById('netProceeds').value = formatCurrencyDisplay(result.data.netProceeds);
+        }
+        if (userExistingLoan !== null && userExistingLoan >= 0) {
+          document.getElementById('existingLoan').value = formatCurrencyDisplay(userExistingLoan);
+          selectedEmployeeData.existingLoanTotal = userExistingLoan;
+          if (selectedEmployeeData.selectedBracketRow) selectedEmployeeData.selectedBracketRow.existingLoan = userExistingLoan;
+        } else if (result.data && result.data.existingLoan !== undefined) {
+          document.getElementById('existingLoan').value = formatCurrencyDisplay(result.data.existingLoan);
+          selectedEmployeeData.existingLoanTotal = result.data.existingLoan;
+        }
+        if (userLoanDeduction !== null && userLoanDeduction > 0 && isDeductionEditable(loanType)) {
+          document.getElementById('loanDeduction').value = formatCurrencyDisplay(userLoanDeduction);
+        } else if (result.data && result.data.loanDeduction !== undefined) {
+          document.getElementById('loanDeduction').value = formatCurrencyDisplay(result.data.loanDeduction);
+        }
+        updateActionButtonsState();
+      } else if (result.needsBracket) {
+        showToast('ℹ️ Please select a bracket amount.', 'info');
+      } else if (result.needsMonths) {
+        showToast('ℹ️ Please select the number of months to pay.', 'info');
+      } else {
+        showToast(result.message || 'Recalculation failed', 'warning');
+      }
+    }).catch(err => console.error('Error during recalculation:', err));
+  }
+
+  function updateNetProceedsOnly() {
+    const loanType = loanTypeDisplay.value;
+    const loanAmount = parseFloat(document.getElementById('loanAmount').value.replace(/[₱,]/g, '')) || 0;
+    if (!selectedEmployeeData || !selectedEmployeeData.idno || !loanType || loanAmount <= 0) return;
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot recompute - payroll cycle has changed.', 'warning');
+      return;
+    }
+
+    let existingLoan = selectedEmployeeData.existingLoanTotal || 0;
+    const existingLoanInput = document.getElementById('existingLoan');
+    if (existingLoanInput) {
+      const parsed = parseLoanAmount(existingLoanInput.value);
+      if (!isNaN(parsed) && parsed > 0) { existingLoan = parsed; selectedEmployeeData.existingLoanTotal = parsed; }
+    }
+
+    let loanDeduction = 0;
+    const deductionInput = document.getElementById('loanDeduction');
+    if (deductionInput && isDeductionEditable(loanType)) {
+      const parsed = parseLoanAmount(deductionInput.value);
+      if (!isNaN(parsed) && parsed > 0) {
+        loanDeduction = parsed;
+      } else {
+        loanDeduction = loanAmount;
+        document.getElementById('loanDeduction').value = formatCurrencyDisplay(loanDeduction);
+      }
+    } else {
+      loanDeduction = loanAmount;
+      document.getElementById('loanDeduction').value = formatCurrencyDisplay(loanDeduction);
+    }
+
+    const loanComputation = selectedEmployeeData.loanComputation || {};
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const monthlyDeductionCount = EDITABLE_DEDUCTION_MONTHLY_COUNT[loanType.toLowerCase()] ?? 2;
+    const deductionPerMonth = loanDeduction * monthlyDeductionCount;
+    const netProceeds = (totalNetPay + existingLoan) - percent35 - deductionPerMonth;
+
+    document.getElementById('netProceeds').value = formatCurrencyDisplay(netProceeds);
+  }
+
+  // ─────────────────────────────────────────────
+  // BRACKET FUNCTIONS
+  // ─────────────────────────────────────────────
+  function showEligibilityErrorModal(loanAmount, requiredLos, employeeLos, fname, lname) {
+    let modalEl = document.getElementById('eligibilityErrorModal');
+    if (!modalEl) {
+      modalEl = document.createElement('div');
+      modalEl.id = 'eligibilityErrorModal';
+      modalEl.className = 'modal fade';
+      modalEl.tabIndex = '-1';
+      modalEl.innerHTML = `
+        <div class="modal-dialog modal-md">
+          <div class="modal-content">
+            <div class="modal-header" style="background:#dc3545;color:#fff;">
+              <h5 class="modal-title"><i class="fas fa-exclamation-circle me-2"></i>Not Eligible</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i> Close</button>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(modalEl);
+    }
+    modalEl.querySelector('.modal-body').innerHTML = `
+      <div class="text-center mb-3"><i class="fas fa-user-times" style="font-size:48px;color:#dc3545;"></i></div>
+      <h5 class="text-center mb-3">Employee Does Not Qualify for This Loan Amount</h5>
+      <div class="alert alert-danger">
+        <p><strong>Employee:</strong> ${escapeHtml(fname)} ${escapeHtml(lname)}</p>
+        <p><strong>Length of Service:</strong> ${employeeLos} year(s)</p>
+        <p><strong>Required Length of Service:</strong> ${requiredLos} year(s)</p>
+        <p><strong>Loan Amount:</strong> ${formatCurrencyDisplay(loanAmount)}</p>
+      </div>`;
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+    modalEl.addEventListener('hidden.bs.modal', function () {
+      setLoanAmountValue('');
+      document.getElementById('loanDeduction').value = '';
+      document.getElementById('netProceeds').value = '';
+      if (selectedEmployeeData) selectedEmployeeData.selectedBracketRow = null;
+      updateActionButtonsState();
+    }, { once: true });
+  }
+
+  function applyMlFundBracketRow(row, losRequired) {
+    if (!selectedEmployeeData || !selectedEmployeeData.loanComputation) {
+      showToast('⚠️ Employee data not loaded.', 'warning');
+      return;
+    }
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot apply bracket - payroll cycle has changed.', 'warning');
+      return;
+    }
+    const loanComputation = selectedEmployeeData.loanComputation;
+    const employeeLos = selectedEmployeeData.service_years || 0;
+    const currentLoanType = loanTypeDisplay.value;
+
+    if (losRequired > 0 && employeeLos < losRequired) {
+      showEligibilityErrorModal(row['LOAN AMOUNT'], losRequired, employeeLos, selectedEmployeeData.firstname, selectedEmployeeData.lastname);
+      return;
+    }
+
+    const bracketLoanAmount = parseBracketNumber(row['LOAN AMOUNT']);
+    const loanDeduct = parseBracketNumber(row['DEDUCTION']);
+    const monthlyDeductionCount = 2;
+    const existingLoan = calculateExistingLoanTotal(selectedEmployeeData.payrollRecords, currentLoanType);
+    selectedEmployeeData.existingLoanTotal = existingLoan;
+
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanDeduct * monthlyDeductionCount;
+    const netProceeds = (totalNetPay + existingLoan) - percent35 - deductionPerMonth;
+
+    setLoanAmountValue(bracketLoanAmount);
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoan);
+    document.getElementById('loanDeduction').value = formatCurrencyDisplay(loanDeduct);
+    document.getElementById('netProceeds').value = formatCurrencyDisplay(netProceeds);
+
+    selectedEmployeeData.selectedBracketRow = {
+      raw: row, bracketLoanAmount, loanDeduct, monthlyDeductionCount, existingLoan,
+      totalNetPay, percent35, deductionPerMonth, netProceeds, losRequired, employeeLos, loanType: currentLoanType
+    };
+    updateActionButtonsState();
+    showToast(`✅ Bracket applied. Net Proceeds: ${formatCurrencyDisplay(netProceeds)}`, 'success');
+    bracketModal.hide();
+  }
+
+  function applySakoPettyCashBracketCell(row, monthsColumn) {
+    if (!selectedEmployeeData || !selectedEmployeeData.loanComputation) {
+      showToast('⚠️ Employee data not loaded.', 'warning');
+      return;
+    }
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot apply bracket - payroll cycle has changed.', 'warning');
+      return;
+    }
+    const loanComputation = selectedEmployeeData.loanComputation;
+    const currentLoanType = loanTypeDisplay.value;
+    const bracketLoanAmount = parseBracketNumber(row['LOAN AMOUNT']);
+    const loanDeduct = parseBracketNumber(row[monthsColumn]);
+    const monthsToPay = parseInt(monthsColumn, 10) || parseBracketNumber(monthsColumn);
+    const monthlyDeductionCount = 2;
+    const existingLoan = calculateExistingLoanTotal(selectedEmployeeData.payrollRecords, currentLoanType);
+    selectedEmployeeData.existingLoanTotal = existingLoan;
+
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanDeduct * monthlyDeductionCount;
+    const netProceeds = (totalNetPay + existingLoan) - percent35 - deductionPerMonth;
+
+    setLoanAmountValue(bracketLoanAmount);
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoan);
+    document.getElementById('loanDeduction').value = formatCurrencyDisplay(loanDeduct);
+    document.getElementById('netProceeds').value = formatCurrencyDisplay(netProceeds);
+
+    selectedEmployeeData.selectedBracketRow = {
+      raw: row, bracketLoanAmount, loanDeduct, monthsToPay, monthlyDeductionCount, existingLoan,
+      totalNetPay, percent35, deductionPerMonth, netProceeds, loanType: currentLoanType
+    };
+    updateActionButtonsState();
+    showToast(`✅ Bracket applied (${monthsToPay} months). Net Proceeds: ${formatCurrencyDisplay(netProceeds)}`, 'success');
+    bracketModal.hide();
+  }
+
+  function applySakoMaxiBracketCell(row, yearColumn) {
+    if (!selectedEmployeeData || !selectedEmployeeData.loanComputation) {
+      showToast('⚠️ Employee data not loaded.', 'warning');
+      return;
+    }
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot apply bracket - payroll cycle has changed.', 'warning');
+      return;
+    }
+    const currentLoanType = loanTypeDisplay.value;
+    const yearsRequired = parseYearsFromColumn(yearColumn);
+    const employeeLos = selectedEmployeeData.service_years || 0;
+
+    if (yearsRequired > 0 && employeeLos < yearsRequired) {
+      showEligibilityErrorModal(row['LOAN AMOUNT'], yearsRequired, employeeLos, selectedEmployeeData.firstname, selectedEmployeeData.lastname);
+      return;
+    }
+
+    const loanComputation = selectedEmployeeData.loanComputation;
+    const bracketLoanAmount = parseBracketNumber(row['LOAN AMOUNT']);
+    const loanDeduct = parseBracketNumber(row[yearColumn]);
+    const monthlyDeductionCount = 2;
+    const existingLoan = calculateExistingLoanTotal(selectedEmployeeData.payrollRecords, currentLoanType);
+    selectedEmployeeData.existingLoanTotal = existingLoan;
+
+    const totalNetPay = (loanComputation.firstCycleNetPay || 0) + (loanComputation.secondCycleNetPay || 0);
+    const percent35 = loanComputation.percentage || 0;
+    const deductionPerMonth = loanDeduct * monthlyDeductionCount;
+    const netProceeds = (totalNetPay + existingLoan) - percent35 - deductionPerMonth;
+
+    setLoanAmountValue(bracketLoanAmount);
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(existingLoan);
+    document.getElementById('loanDeduction').value = formatCurrencyDisplay(loanDeduct);
+    document.getElementById('netProceeds').value = formatCurrencyDisplay(netProceeds);
+
+    selectedEmployeeData.selectedBracketRow = {
+      raw: row, bracketLoanAmount, loanDeduct, yearsRequired, monthlyDeductionCount, existingLoan,
+      totalNetPay, percent35, deductionPerMonth, netProceeds, employeeLos, loanType: currentLoanType
+    };
+    updateActionButtonsState();
+    showToast(`✅ Bracket applied (${yearsRequired}-year term). Net Proceeds: ${formatCurrencyDisplay(netProceeds)}`, 'success');
+    bracketModal.hide();
+  }
+
+  function renderBracketTable(columns, rows) {
+    if (!columns.length) {
+      bracketModalBody.innerHTML = '<p class="text-center text-muted py-3">No data available.</p>';
+      return;
+    }
+    const isMlFund = activeBracket && activeBracket.key === 'ml_fund';
+    const isSakoPetty = activeBracket && activeBracket.key === 'sako_petty';
+    const isSakoMaxi = activeBracket && activeBracket.key === 'sako_maxi';
+    const usesCellSelection = isSakoPetty || isSakoMaxi;
+
+    const ths = columns.map((col) => `<th>${escapeHtml(col)}</th>`).join('');
+
+    const trs = rows
+      .map((row, idx) => {
+        const tds = columns
+          .map((col) => {
+            const value = row[col] ?? '';
+            if (usesCellSelection && col !== 'LOAN AMOUNT') {
+              const isZero = parseBracketNumber(value) === 0;
+              if (isZero) {
+                // Not selectable — no deduction amount available for this term/column.
+                return `<td class="text-muted" style="cursor:not-allowed;">${escapeHtml(value)}</td>`;
+              }
+              return `<td data-row-index="${idx}" data-col="${escapeHtml(col)}" class="nla-bracket-cell" style="cursor:pointer;">${escapeHtml(value)}</td>`;
+            }
+            return `<td>${escapeHtml(value)}</td>`;
+          })
+          .join('');
+
+        const losRequired = row['LENGTH OF SERVICE'] ? parseBracketNumber(row['LENGTH OF SERVICE']) : 0;
+        const attrs = isMlFund ? `data-row-index="${idx}" data-los="${losRequired}" style="cursor:pointer;"` : '';
+        return `<tr ${attrs}>${tds}</tr>`;
+      })
+      .join('');
+
+    bracketModalBody.innerHTML = `
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0 ${usesCellSelection ? 'nla-no-row-hover' : 'table-hover'}">
+          <thead><tr>${ths}</tr></thead>
+          <tbody>${trs}</tbody>
+        </table>
+      </div>
+      ${isMlFund ? '<p class="nla-help mb-0 mt-2"><i class="fas fa-circle-info me-1"></i>Click a row to apply that bracket.</p>' : ''}
+      ${isSakoPetty ? '<p class="nla-help mb-0 mt-2"><i class="fas fa-circle-info me-1"></i>Click the deduction amount under the number of months.</p>' : ''}
+      ${isSakoMaxi ? '<p class="nla-help mb-0 mt-2"><i class="fas fa-circle-info me-1"></i>Click the deduction amount under the payment term.</p>' : ''}
+    `;
+
+    if (isMlFund) {
+      bracketModalBody.querySelectorAll('tbody tr[data-row-index]').forEach((tr) => {
+        tr.addEventListener('click', () => {
+          const idx = parseInt(tr.dataset.rowIndex, 10);
+          const losRequired = parseInt(tr.dataset.los, 10);
+          applyMlFundBracketRow(rows[idx], losRequired);
+        });
+      });
+    }
+    if (isSakoPetty) {
+      bracketModalBody.querySelectorAll('td.nla-bracket-cell[data-row-index]').forEach((td) => {
+        td.addEventListener('click', () => applySakoPettyCashBracketCell(rows[parseInt(td.dataset.rowIndex, 10)], td.dataset.col));
+      });
+    }
+    if (isSakoMaxi) {
+      bracketModalBody.querySelectorAll('td.nla-bracket-cell[data-row-index]').forEach((td) => {
+        td.addEventListener('click', () => applySakoMaxiBracketCell(rows[parseInt(td.dataset.rowIndex, 10)], td.dataset.col));
+      });
+    }
+  }
+
+  function showBracketError(message) {
+    bracketModalBody.innerHTML = `<div class="nla-bracket-error"><i class="fas fa-circle-exclamation me-1"></i>${escapeHtml(message)}</div>`;
+  }
+
+  btnViewBracket.addEventListener('click', async () => {
+    if (!activeBracket || !selectedEmployeeData || !selectedEmployeeData.idno) {
+      showToast('⚠️ Please load a loan first.', 'warning');
+      return;
+    }
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot view bracket - payroll cycle has changed.', 'warning');
+      return;
+    }
+    bracketModalIcon.className = `${activeBracket.icon} me-1`;
+    bracketModalTitle.textContent = activeBracket.label;
+    bracketModalBody.innerHTML = `<div class="nla-bracket-loading"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span>Loading table…</span></div>`;
+    bracketModal.show();
+    try {
+      const res = await fetch(`/loan/bracket?type=${encodeURIComponent(activeBracket.key)}`);
+      const data = await res.json();
+      if (!data.success) { showBracketError(data.message || 'Failed to load table.'); return; }
+      renderBracketTable(data.columns, data.rows);
+    } catch (err) {
+      console.error('Bracket fetch error:', err);
+      showBracketError('Something went wrong. Please try again.');
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  // CO-MAKER FUNCTIONS
+  // ─────────────────────────────────────────────
+  let comakerSearchData = { currentPage: 1, totalPages: 1, currentData: [], comakerFieldIndex: null };
+  const comakerSearchModalEl = document.getElementById('comakerSearchModal');
+  const comakerSearchModal = bootstrap.Modal.getOrCreateInstance(comakerSearchModalEl);
+
+  function getSelectedComakers() {
+    const comakers = [];
+    document.querySelectorAll('#comakerFields .comaker-field:not(.d-none) input').forEach((input, index) => {
+      if (input.value.trim()) comakers.push({ index, idno: input.dataset.idno || '', name: input.value.trim(), los: parseInt(input.dataset.los) || 0 });
+    });
+    return comakers;
+  }
+  function updateComakerCount() {
+    const count = getSelectedComakers().length;
+    const countLabel = document.getElementById('comakerCount');
+    if (countLabel) countLabel.textContent = `${count} of 4 added`;
+  }
+  function openComakerSearch(fieldIndex) {
+    if (!selectedEmployeeData || !selectedEmployeeData.idno) {
+      showToast('⚠️ Please load a loan first.', 'warning');
+      return;
+    }
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot add co-makers - payroll cycle has changed.', 'warning');
+      return;
+    }
+    document.getElementById('comakerBorrowerId').textContent = selectedEmployeeData.idno;
+    comakerSearchData.comakerFieldIndex = fieldIndex;
+    comakerSearchData.currentPage = 1;
+    comakerSearchModal.show();
+    document.getElementById('comakerSearchInput').focus();
+  }
+  async function performComakerSearch() {
+    const query = document.getElementById('comakerSearchInput').value.trim();
+    const office = selectedEmployeeData.office;
+    const field = document.getElementById('comakerSearchField').value;
+    const excludeIdno = selectedEmployeeData.idno;
+    if (!query) { document.getElementById('comakerSearchInput').focus(); return; }
+
+    const resultsBody = document.getElementById('comakerSearchResults');
+    resultsBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">Searching...</td></tr>`;
+    try {
+      const url = new URL('/loan/recompute/search-comaker', window.location.origin);
+      url.searchParams.append('query', query);
+      url.searchParams.append('office', office);
+      url.searchParams.append('excludeIdno', excludeIdno);
+      url.searchParams.append('field', field);
+      url.searchParams.append('page', comakerSearchData.currentPage);
+      url.searchParams.append('limit', 20);
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.success) { resultsBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-3">${data.message || 'Search failed.'}</td></tr>`; return; }
+      comakerSearchData.currentData = data.data || [];
+      comakerSearchData.totalPages = data.pagination?.totalPages || 1;
+      document.getElementById('comakerResultCount').textContent = `${data.pagination?.total || 0} result(s) found`;
+      renderComakerResults(data.data || []);
+      updateComakerPaginationControls();
+    } catch (err) {
+      console.error('Co-maker search error:', err);
+      resultsBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-3">Something went wrong. Please try again.</td></tr>`;
+    }
+  }
+  function renderComakerResults(employees) {
+    const resultsBody = document.getElementById('comakerSearchResults');
+    resultsBody.innerHTML = '';
+    if (!employees || employees.length === 0) {
+      resultsBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">No employees found.</td></tr>`;
+      return;
+    }
+    employees.forEach((emp) => {
+      const row = document.createElement('tr');
+      row.style.cursor = 'pointer';
+      const fields = [emp.idno, emp.lastname, emp.firstname, emp.middlename || '-', emp.region || '-', emp.branch || '-', `${emp.service_years || 0} year(s)`];
+      fields.forEach((value) => { const td = document.createElement('td'); td.textContent = value || '-'; row.appendChild(td); });
+      const tdSelect = document.createElement('td');
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn btn-outline-primary btn-sm'; btn.textContent = 'Select';
+      tdSelect.appendChild(btn); row.appendChild(tdSelect);
+      row.addEventListener('click', (e) => { if (e.target.tagName !== 'BUTTON') selectComaker(emp); });
+      btn.addEventListener('click', (e) => { e.stopPropagation(); selectComaker(emp); });
+      resultsBody.appendChild(row);
+    });
+  }
+  function updateComakerPaginationControls() {
+    const currentPage = comakerSearchData.currentPage;
+    const totalPages = comakerSearchData.totalPages;
+    document.getElementById('comakerPrevPage').disabled = currentPage <= 1;
+    document.getElementById('comakerNextPage').disabled = currentPage >= totalPages;
+    let html = '';
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    if (endPage - startPage < maxVisible - 1) startPage = Math.max(1, endPage - maxVisible + 1);
+    if (startPage > 1) html += `<span class="px-1">...</span>`;
+    for (let i = startPage; i <= endPage; i++) html += `<span class="px-1 ${i === currentPage ? 'fw-bold text-primary' : ''}" style="cursor:pointer" data-page="${i}">${i}</span>`;
+    if (endPage < totalPages) html += `<span class="px-1">...</span>`;
+    const pn = document.getElementById('comakerPageNumbers');
+    pn.innerHTML = html;
+    pn.querySelectorAll('span[data-page]').forEach(el => el.addEventListener('click', () => {
+      const page = parseInt(el.dataset.page);
+      if (page !== currentPage) { comakerSearchData.currentPage = page; performComakerSearch(); }
+    }));
+  }
+  function showCoMakerEligibilityErrorModal(emp, comakerLos, requiredLos) {
+    let modalEl = document.getElementById('comakerEligibilityErrorModal');
+    if (!modalEl) {
+      modalEl = document.createElement('div');
+      modalEl.id = 'comakerEligibilityErrorModal';
+      modalEl.className = 'modal fade';
+      modalEl.tabIndex = '-1';
+      modalEl.innerHTML = `
+        <div class="modal-dialog modal-md">
+          <div class="modal-content">
+            <div class="modal-header" style="background:#dc3545;color:#fff;">
+              <h5 class="modal-title"><i class="fas fa-exclamation-circle me-2"></i>Co-Maker Not Qualified</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+          </div>
+        </div>`;
+      document.body.appendChild(modalEl);
+    }
+    modalEl.querySelector('.modal-body').innerHTML = `
+      <div class="text-center mb-3"><i class="fas fa-user-times" style="font-size:48px;color:#dc3545;"></i></div>
+      <h5 class="text-center mb-3">Co-Maker Does Not Meet Requirements</h5>
+      <div class="alert alert-danger">
+        <p><strong>Co-maker:</strong> ${escapeHtml(emp.firstname)} ${escapeHtml(emp.lastname)} (${escapeHtml(emp.idno)})</p>
+        <p><strong>Co-maker LOS:</strong> ${comakerLos} year(s)</p>
+        <p><strong>Required LOS:</strong> ${requiredLos} year(s)</p>
+      </div>`;
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
+  function selectComaker(emp) {
+    const fieldIndex = comakerSearchData.comakerFieldIndex;
+    const fieldInput = document.querySelectorAll('#comakerFields .comaker-field input')[fieldIndex];
+    const fieldLabel = document.querySelectorAll('#comakerFields .comaker-field label')[fieldIndex];
+    if (!fieldInput) return;
+
+    const comakerLos = emp.service_years || 0;
+    const loanType = loanTypeDisplay.value;
+    const requiredLos = selectedEmployeeData.selectedBracketRow?.losRequired || 0;
+
+    if (emp.idno === selectedEmployeeData.idno) { showToast('⚠️ The borrower cannot be a co-maker.', 'warning'); return; }
+    const existing = getSelectedComakers();
+    if (existing.some(c => c.idno === emp.idno)) { showToast('⚠️ This co-maker is already added.', 'warning'); return; }
+
+    let isEligible = true;
+    if (loanType.toLowerCase().includes('ml fund regular') && requiredLos > 0 && comakerLos < requiredLos) isEligible = false;
+
+    if (!isEligible) { showCoMakerEligibilityErrorModal(emp, comakerLos, requiredLos); return; }
+
+    const fullName = `${emp.lastname}, ${emp.firstname}`;
+    fieldInput.value = fullName;
+    fieldInput.dataset.idno = emp.idno;
+    fieldInput.dataset.los = comakerLos;
+    if (fieldLabel) fieldLabel.textContent = `Co-Maker ${fieldIndex + 1} (LOS: ${comakerLos} yrs)`;
+    comakerSearchModal.hide();
+    updateComakerCount();
+    showToast(`✅ Co-maker ${fieldIndex + 1} added: ${fullName}`, 'success');
+  }
+  function setupComakerFields() {
+    document.querySelectorAll('#comakerFields .comaker-field input').forEach((input, index) => {
+      input.readOnly = true;
+      input.style.cursor = 'pointer';
+      input.placeholder = 'Click to search co-maker';
+      const newInput = input.cloneNode(true);
+      input.parentNode.replaceChild(newInput, input);
+      newInput.addEventListener('click', function (e) {
+        e.preventDefault();
+        const field = this.closest('.comaker-field');
+        if (!field.classList.contains('d-none')) openComakerSearch(index);
+      });
+    });
+  }
+  setupComakerFields();
+
+  document.getElementById('comakerSearchBtn').addEventListener('click', (e) => { e.preventDefault(); performComakerSearch(); });
+  document.getElementById('comakerSearchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); performComakerSearch(); } });
+  document.getElementById('comakerPrevPage').addEventListener('click', () => { if (comakerSearchData.currentPage > 1) { comakerSearchData.currentPage--; performComakerSearch(); } });
+  document.getElementById('comakerNextPage').addEventListener('click', () => { if (comakerSearchData.currentPage < comakerSearchData.totalPages) { comakerSearchData.currentPage++; performComakerSearch(); } });
+
+  comakerSearchModalEl.addEventListener('hidden.bs.modal', function () {
+    document.getElementById('comakerSearchInput').value = '';
+    document.getElementById('comakerSearchResults').innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">Type a search query and click Search to find co-makers.</td></tr>`;
+    document.getElementById('comakerResultCount').textContent = '0 results found';
+    document.getElementById('comakerPageNumbers').innerHTML = '';
+    document.getElementById('comakerPrevPage').disabled = true;
+    document.getElementById('comakerNextPage').disabled = true;
+    comakerSearchData.currentPage = 1;
+    comakerSearchData.totalPages = 1;
+  });
+
+  // Add Co-Maker button reveal logic
+  const addComakerBtn = document.getElementById('btnAddComaker');
+  const comakerCountLabel = document.getElementById('comakerCount');
+  const comakerFieldsArr = Array.prototype.slice.call(document.querySelectorAll('#comakerFields .comaker-field'));
+  const maxComakerFields = comakerFieldsArr.length;
+
+  function visibleComakerCount() { return comakerFieldsArr.filter(f => !f.classList.contains('d-none')).length; }
+  function refreshComakerUI() {
+    const count = visibleComakerCount();
+    if (comakerCountLabel) comakerCountLabel.textContent = `${count} of ${maxComakerFields} added`;
+    addComakerBtn.classList.toggle('d-none', count >= maxComakerFields);
+  }
+  function revealNextComakerField() {
+    const next = comakerFieldsArr.filter(f => f.classList.contains('d-none'))[0];
+    if (!next) return;
+    next.classList.remove('d-none');
+    next.classList.add('nla-fade-init');
+    requestAnimationFrame(() => requestAnimationFrame(() => next.classList.remove('nla-fade-init')));
+    const input = next.querySelector('input');
+    if (input) input.focus();
+    refreshComakerUI();
+  }
+  function hideComakerField(field) {
+    const input = field.querySelector('input');
+    if (input) { input.value = ''; delete input.dataset.idno; delete input.dataset.los; }
+    field.classList.add('d-none');
+    refreshComakerUI();
+  }
+  addComakerBtn.addEventListener('click', revealNextComakerField);
+  comakerFieldsArr.forEach((field) => {
+    const removeBtn = field.querySelector('.nla-comaker-remove');
+    if (removeBtn) removeBtn.addEventListener('click', () => hideComakerField(field));
+  });
+
+  // ─────────────────────────────────────────────
+  // FIND LOAN — BY CONTROL NO.
+  // ─────────────────────────────────────────────
+  btnSearchControlNo.addEventListener('click', async () => {
+    const controlNo = controlNoInput.value.trim();
+    if (!controlNo) { showToast('⚠️ Please enter a control number.', 'warning'); controlNoInput.focus(); return; }
+
+    btnSearchControlNo.disabled = true;
+    const originalText = btnSearchControlNo.innerHTML;
+    btnSearchControlNo.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Searching...';
+
+    try {
+      const url = new URL('/loan/recompute/by-control', window.location.origin);
+      url.searchParams.append('controlNo', controlNo);
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.success || !data.loan) {
+        showToast(data.message || 'No loan found for that control number.', 'warning');
+        return;
+      }
+      await loadLoanForRecompute(data.loan);
+    } catch (err) {
+      console.error('Control No. search error:', err);
+      showToast('❌ Something went wrong. Please try again.', 'danger');
+    } finally {
+      btnSearchControlNo.disabled = false;
+      btnSearchControlNo.innerHTML = originalText;
+    }
+  });
+  controlNoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); btnSearchControlNo.click(); } });
+
+  // ─────────────────────────────────────────────
+  // FIND LOAN — BY EMPLOYEE NAME
+  // ─────────────────────────────────────────────
+  const LOAN_PAGE_SIZE = 20;
+  let loanCurrentPage = 1;
+  let loanTotalPages = 1;
+  let loanCurrentTotal = 0;
+
+  function showLoanMessageRow(message, variant = 'muted') {
+    loanSearchResults.innerHTML = `<tr><td colspan="7" class="text-center text-${variant} py-3">${escapeHtml(message)}</td></tr>`;
+  }
+
+  function renderLoanSearchResults(loans) {
+    loanSearchResults.innerHTML = '';
+    if (!loans || loans.length === 0) { showLoanMessageRow('No loans found matching your search criteria.'); return; }
+    loans.forEach((loan) => {
+      const row = document.createElement('tr');
+      row.style.cursor = 'pointer';
+      const statusBadgeClass = STATUS_BADGE_CLASS[(loan.status || '').toLowerCase().trim()] || 'nla-badge-pending';
+      row.innerHTML = `
+        <td>${escapeHtml(loan.controlno)}</td>
+        <td>${escapeHtml(loan.idno)}</td>
+        <td>${escapeHtml(loan.lastname)}</td>
+        <td>${escapeHtml(loan.firstname)}</td>
+        <td>${escapeHtml(loan.loantype)}</td>
+        <td><span class="badge ${statusBadgeClass}">${escapeHtml(loan.status || '---')}</span></td>
+        <td><button type="button" class="btn btn-outline-primary btn-sm">Select</button></td>
+      `;
+      row.addEventListener('click', (e) => { if (e.target.tagName !== 'BUTTON') pickLoanFromSearch(loan); });
+      row.querySelector('button').addEventListener('click', (e) => { e.stopPropagation(); pickLoanFromSearch(loan); });
+      loanSearchResults.appendChild(row);
+    });
+  }
+
+  function updateLoanPaginationControls() {
+    if (loanCurrentTotal === 0) {
+      loanPageInfo.textContent = ''; loanPageNumbers.textContent = '';
+      loanPrevPage.disabled = true; loanNextPage.disabled = true;
+      return;
+    }
+    const start = (loanCurrentPage - 1) * LOAN_PAGE_SIZE + 1;
+    const end = Math.min(loanCurrentPage * LOAN_PAGE_SIZE, loanCurrentTotal);
+    loanPageInfo.textContent = `Showing ${start}-${end} of ${loanCurrentTotal}`;
+
+    let html = '';
+    const maxVisible = 5;
+    let startPage = Math.max(1, loanCurrentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(loanTotalPages, startPage + maxVisible - 1);
+    if (endPage - startPage < maxVisible - 1) startPage = Math.max(1, endPage - maxVisible + 1);
+    if (startPage > 1) html += `<span class="px-1">...</span>`;
+    for (let i = startPage; i <= endPage; i++) html += `<span class="px-1 ${i === loanCurrentPage ? 'fw-bold text-primary' : ''}" style="cursor:pointer" data-page="${i}">${i}</span>`;
+    if (endPage < loanTotalPages) html += `<span class="px-1">...</span>`;
+    loanPageNumbers.innerHTML = html;
+    loanPageNumbers.querySelectorAll('span[data-page]').forEach(el => el.addEventListener('click', () => {
+      const page = parseInt(el.dataset.page);
+      if (page !== loanCurrentPage) { loanCurrentPage = page; performLoanNameSearch(); }
+    }));
+    loanPrevPage.disabled = loanCurrentPage <= 1;
+    loanNextPage.disabled = loanCurrentPage >= loanTotalPages;
+  }
+
+  async function performLoanNameSearch() {
+    const office = loanSearchOffice.value;
+    const lastName = loanSearchLastName.value.trim();
+    const firstName = loanSearchFirstName.value.trim();
+
+    if (!office) { showToast('⚠️ Please select an office first.', 'warning'); loanSearchOffice.focus(); return; }
+    if (!lastName && !firstName) { showToast('⚠️ Please enter a last name or first name.', 'warning'); loanSearchLastName.focus(); return; }
+
+    showLoanMessageRow('Searching…');
+    loanResultCount.textContent = 'Searching...';
+    loanPrevPage.disabled = true; loanNextPage.disabled = true;
+
+    try {
+      const url = new URL('/loan/recompute/search-by-name-recompute', window.location.origin);
+      url.searchParams.append('office', office);
+      url.searchParams.append('page', loanCurrentPage);
+      url.searchParams.append('limit', LOAN_PAGE_SIZE);
+      if (lastName) url.searchParams.append('lastname', lastName);
+      if (firstName) url.searchParams.append('firstname', firstName);
+
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.success) { showLoanMessageRow(data.message || 'Search failed.', 'danger'); loanResultCount.textContent = '0 results found'; return; }
+
+      const loans = data.data || [];
+      console.log(loans);
+      loanCurrentTotal = data.pagination?.total || loans.length;
+      loanTotalPages = data.pagination?.totalPages || Math.ceil(loans.length / LOAN_PAGE_SIZE);
+      loanCurrentPage = data.pagination?.page || 1;
+
+      loanResultCount.textContent = `${loanCurrentTotal} result(s) found`;
+      renderLoanSearchResults(loans);
+      updateLoanPaginationControls();
+    } catch (err) {
+      console.error('Loan search error:', err);
+      showLoanMessageRow('Something went wrong. Please try again.', 'danger');
+      loanResultCount.textContent = 'Error occurred';
+    }
+  }
+
+  async function pickLoanFromSearch(loan) {
+    if (!loan.controlno) { showToast('⚠️ This loan record has no control number.', 'warning'); return; }
+    loanNameSearchModal.hide();
+    try {
+      const url = new URL('/loan/recompute/by-control', window.location.origin);
+      url.searchParams.append('controlNo', loan.controlno);
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.success || !data.loan) { showToast(data.message || 'Could not load full loan details.', 'warning'); return; }
+      controlNoInput.value = data.loan.controlno || '';
+      await loadLoanForRecompute(data.loan);
+    } catch (err) {
+      console.error('Error loading full loan details:', err);
+      showToast('❌ Something went wrong loading this loan.', 'danger');
+    }
+  }
+
+  btnSearchLoanByName.addEventListener('click', () => {
+    loanSearchOffice.value = 'VISMIN';
+    loanSearchLastName.value = ''; loanSearchFirstName.value = '';
+    showLoanMessageRow('Select an office, enter a last name and/or first name, then click Search.');
+    loanResultCount.textContent = '0 results found';
+    loanPageInfo.textContent = ''; loanPageNumbers.textContent = '';
+    loanPrevPage.disabled = true; loanNextPage.disabled = true;
+    loanCurrentPage = 1; loanCurrentTotal = 0;
+    loanNameSearchModal.show();
+  });
+  loanSearchBtn.addEventListener('click', () => { loanCurrentPage = 1; performLoanNameSearch(); });
+  loanSearchLastName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); loanCurrentPage = 1; performLoanNameSearch(); } });
+  loanSearchFirstName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); loanCurrentPage = 1; performLoanNameSearch(); } });
+  loanPrevPage.addEventListener('click', () => { if (loanCurrentPage > 1) { loanCurrentPage--; performLoanNameSearch(); } });
+  loanNextPage.addEventListener('click', () => { if (loanCurrentPage < loanTotalPages) { loanCurrentPage++; performLoanNameSearch(); } });
+
+  // ─────────────────────────────────────────────
+  // LOAD LOAN → BUILD selectedEmployeeData → FETCH PAYROLL → PREFILL
+  // ─────────────────────────────────────────────
+  async function loadLoanForRecompute(loan) {
+    loadedLoan = loan;
+    payrollDatesValid = false;
+
+    // Basic employee info display
+    employeeInfoCard.style.display = '';
+    document.getElementById('empIdno').textContent = loan.idno || '---';
+    document.getElementById('empLast').textContent = loan.lastname || '---';
+    document.getElementById('empFirst').textContent = loan.firstname || '---';
+    document.getElementById('empBranch').textContent = loan.branch || '---';
+    document.getElementById('empRegion').textContent = loan.region || '---';
+    document.getElementById('empOffice').textContent = loan.office || '---';
+    document.getElementById('empLos').textContent = `${loan.lengthofservice || 0} year(s)`;
+    document.getElementById('empControlNo').textContent = loan.controlno || '---';
+
+    const loanTypeLower = (loan.loantype || '').toLowerCase().trim();
+
+    // Guard: bonus loan types aren't supported on this page
+    if (RECOMPUTE_EXCLUDED_LOAN_TYPES.includes(loanTypeLower)) {
+        notSupportedCard.style.display = '';
+        payrollMismatchCard.style.display = 'none';
+        document.getElementById('notSupportedLoanType').textContent = loan.loantype;
+        loanDetailsCard.style.display = 'none';
+        comakerCard.style.display = 'none';
+        btnSave.disabled = true;
+        selectedEmployeeData = null;
+        showToast(`⚠️ "${loan.loantype}" is not eligible for recompute here.`, 'warning');
+        return;
+    }
+
+    notSupportedCard.style.display = 'none';
+    payrollMismatchCard.style.display = 'none';
+    loanDetailsCard.style.display = '';
+    comakerCard.style.display = '';
+
+    // Build employee data shell
+    selectedEmployeeData = {
+        idno: loan.idno,
+        lastname: loan.lastname,
+        firstname: loan.firstname,
+        branch: loan.branch,
+        region: loan.region,
+        office: loan.office,
+        service_years: loan.lengthofservice || 0,
+        monthly_rate: loan.monthly_rate || 0,
+        selectedBracketRow: null,
+        existingLoanTotal: 0,
+    };
+
+    // Fetch CURRENT payroll cycle for this employee
+    try {
+        const url = new URL('/loan/recompute/employee-payroll', window.location.origin);
+        url.searchParams.append('employeeId', loan.idno);
+        url.searchParams.append('office', loan.office);
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (!result.success) throw new Error(result.message || 'Failed to load employee payroll data');
+
+        selectedEmployeeData.payrollRecords = result.data;
+
+        if (result.data && result.data.length > 0) {
+            const currentPayrollDates = getCurrentPayrollDates(result.data);
+            const loanFirstDate = loan.first_cycle;
+            const loanSecondDate = loan.second_cycle;
+
+            // Validate dates match
+            const datesMatch = comparePayrollDates(
+                loanFirstDate, 
+                loanSecondDate,
+                currentPayrollDates.firstCycle,
+                currentPayrollDates.secondCycle
+            );
+            
+            if (!datesMatch) {
+                showPayrollDateMismatchError(
+                    loanFirstDate,
+                    loanSecondDate,
+                    currentPayrollDates.firstCycle,
+                    currentPayrollDates.secondCycle
+                );
+                btnSave.disabled = true;
+                showToast('⚠️ Payroll cycle has changed. Cannot recompute this loan.', 'warning');
+                return;
+            }
+            
+            payrollDatesValid = true;
+            
+            // Process payroll records
+            const sortedRecords = [...result.data].sort((a, b) => new Date(b.enddate) - new Date(a.enddate));
+            let firstCycleRecord = null;
+            let secondCycleRecord = null;
+
+            sortedRecords.forEach(record => {
+                const endDate = new Date(record.enddate);
+                const day = endDate.getDate();
+                const lastDayOfMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
+                const isLastDayOfMonth = day === lastDayOfMonth;
+
+                if (day === 15 && !firstCycleRecord) firstCycleRecord = record;
+                else if (isLastDayOfMonth && !secondCycleRecord) secondCycleRecord = record;
+            });
+
+            if (!firstCycleRecord || !secondCycleRecord) {
+                if (sortedRecords.length >= 2) { secondCycleRecord = sortedRecords[0]; firstCycleRecord = sortedRecords[1]; }
+                else if (sortedRecords.length === 1) { firstCycleRecord = sortedRecords[0]; secondCycleRecord = sortedRecords[0]; }
+            }
+            if (!firstCycleRecord && sortedRecords.length > 0) firstCycleRecord = sortedRecords[0];
+            if (!secondCycleRecord && sortedRecords.length > 0) secondCycleRecord = sortedRecords[0];
+
+            const firstCycleRawNetPay = firstCycleRecord ? parseFloat(firstCycleRecord.netpay) || 0 : 0;
+            const firstCycleOvertime = firstCycleRecord ? parseFloat(firstCycleRecord.ot_total) || 0 : 0;
+            const firstCycleAllowance = firstCycleRecord ? parseFloat(firstCycleRecord.allowance_total) || 0 : 0;
+            const firstCycleOtherIncome = firstCycleRecord ? parseFloat(firstCycleRecord.otherincome) || 0 : 0;
+
+            const secondCycleRawNetPay = secondCycleRecord ? parseFloat(secondCycleRecord.netpay) || 0 : 0;
+            const secondCycleOvertime = secondCycleRecord ? parseFloat(secondCycleRecord.ot_total) || 0 : 0;
+            const secondCycleAllowance = secondCycleRecord ? parseFloat(secondCycleRecord.allowance_total) || 0 : 0;
+            const secondCycleOtherIncome = secondCycleRecord ? parseFloat(secondCycleRecord.otherincome) || 0 : 0;
+
+            const firstCycleNetPay = firstCycleRawNetPay - (firstCycleOvertime + firstCycleOtherIncome);
+            const secondCycleNetPay = secondCycleRawNetPay - (secondCycleOvertime + secondCycleOtherIncome);
+            const totalAllowance = firstCycleAllowance + secondCycleAllowance;
+
+            const monthlyRate = selectedEmployeeData.monthly_rate;
+
+            // ✅ CRITICAL FIX: Use the stored 35% from the loan record
+            // DO NOT recalculate it - use what's already in the database
+            let percentage = parseFloat(loan['35percent']);
+if (isNaN(percentage) || percentage <= 0) {
+    // Stored value is missing/zero — recalculate from the CURRENT monthly
+    // rate so recompute actually reflects live data (same as netpay1/netpay2),
+    // instead of silently perpetuating a bad/zero value.
+    const monthlyRate = parseFloat(loan.monthlyrate) || parseFloat(selectedEmployeeData.monthly_rate) || 0;
+    percentage = round2(monthlyRate * 0.35); // ⚠️ confirm this matches the formula used in newLoan.hbs
+    console.warn('⚠️ Loan had no valid stored 35% — recalculated from monthly rate:', percentage);
+} else {
+    console.log('📊 Using stored 35% from loan record:', percentage);
+}
+            console.log('📊 Using stored 35% from loan record:', percentage);
+
+            selectedEmployeeData.loanComputation = {
+                firstCycleNetPay,
+                secondCycleNetPay,
+                totalAllowance,
+                percentage,  // ← Use the stored value
+                monthlyRate,
+                hasFirstCycle: !!firstCycleRecord,
+                hasSecondCycle: !!secondCycleRecord,
+                isSameCycle: firstCycleRecord === secondCycleRecord,
+            };
+
+            if (firstCycleRecord === secondCycleRecord) {
+                showToast('⚠️ Only one payroll record found. Using it for both cycles.', 'warning');
+            }
+        } else {
+            selectedEmployeeData.loanComputation = {};
+            showToast('⚠️ No current payroll data found for this employee.', 'warning');
+        }
+    } catch (err) {
+        console.error('Error loading employee payroll:', err);
+        showToast('❌ Failed to load current payroll data.', 'danger');
+        selectedEmployeeData.loanComputation = {};
+        selectedEmployeeData.payrollRecords = [];
+    }
+
+    // Pre-fill co-makers
+    document.querySelectorAll('#comakerFields .comaker-field input').forEach(input => { input.value = ''; delete input.dataset.idno; delete input.dataset.los; });
+    document.querySelectorAll('#comakerFields .comaker-field label').forEach((label, index) => { label.textContent = `Co-Maker ${index + 1}`; });
+    document.querySelectorAll('#comakerFields .comaker-field').forEach(field => field.classList.add('d-none'));
+
+    const existingComakers = [loan.comaker1, loan.comaker2, loan.comaker3, loan.comaker4].filter(c => c && c.trim());
+    existingComakers.forEach((name, idx) => {
+        const field = comakerFieldsArr[idx];
+        if (!field) return;
+        field.classList.remove('d-none');
+        const input = field.querySelector('input');
+        if (input) input.value = name;
+    });
+    refreshComakerUI();
+
+    // Prefill the loan type and values
+    prefillLoanType(loan);
+}
+
+  function prefillLoanType(loan) {
+    const loanTypeLower = (loan.loantype || '').toLowerCase().trim();
+
+    // 1. Set loan type in read-only display
+    loanTypeDisplay.value = loan.loantype;
+    
+    // 2. Update UI states
+    updateDeductionEditable();
+    updateLoanAmountEditable(loanTypeLower);
+        updateExistingLoanEditable(loanTypeLower); 
+
+    // 3. Handle bracket button
+    const match = BRACKET_MAP.find((b) => b.test(loanTypeLower));
+    if (match) {
+        activeBracket = match;
+        bracketBtnIcon.className = `${match.icon} me-1`;
+        bracketBtnText.textContent = match.label;
+        btnViewBracket.classList.remove('d-none');
+        bracketBtnLabel.style.display = '';
+    } else {
+        activeBracket = null;
+        btnViewBracket.classList.add('d-none');
+        bracketBtnLabel.style.display = 'none';
+    }
+
+    // 4. Handle months-to-pay dropdown
+    const isMonthsBasedLoan = MONTHS_BASED_LOAN_TYPES.includes(loanTypeLower);
+    if (isMonthsBasedLoan) {
+        showMonthsToPayRow(true);
+        populateMonthsToPay(loanTypeLower);
+    } else {
+        showMonthsToPayRow(false);
+        resetMonthsToPay();
+    }
+
+    // 5. ✅ DISPLAY ONLY - All data from database, NO COMPUTATIONS
+    setLoanAmountValue(loan.loanamount);
+    document.getElementById('existingLoan').value = formatCurrencyDisplay(loan.existingloan || 0);
+    document.getElementById('loanDeduction').value = formatCurrencyDisplay(loan.loandeduction);
+    document.getElementById('netProceeds').value = formatCurrencyDisplay(loan.netproceeds);
+    
+    // 6. Store the existing loan value from database
+    if (selectedEmployeeData) {
+        selectedEmployeeData.existingLoanTotal = loan.existingloan || 0;
+    }
+    
+    // 7. Show info message if dates are valid
+    if (payrollDatesValid) {
+      showToast('ℹ️ Loan data loaded. Click "Recompute & Save" to recalculate with current payroll.', 'info');
+    }
+
+    // 8. Update button states
+    updateActionButtonsState();
+  }
+
+  // ─────────────────────────────────────────────
+  // AMOUNT / DEDUCTION / EXISTING LOAN INPUT HANDLERS
+  // ─────────────────────────────────────────────
+  const loanAmountInput = document.getElementById('loanAmount');
+  loanAmountInput.addEventListener('blur', function () {
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot modify - payroll cycle has changed.', 'warning');
+      return;
+    }
+    const rawValue = this.value;
+    if (!rawValue || rawValue.trim() === '') { this.value = ''; updateActionButtonsState(); return; }
+    const numericValue = parseLoanAmount(rawValue);
+    if (isNaN(numericValue)) { this.value = ''; showToast('⚠️ Please enter a valid number', 'warning'); updateActionButtonsState(); return; }
+    this.value = formatLoanAmount(numericValue);
+    triggerLoanRecalculation();
+    updateActionButtonsState();
+  });
+  loanAmountInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+  loanAmountInput.addEventListener('input', function () {
+    const start = this.selectionStart, end = this.selectionEnd;
+    let cleaned = this.value.replace(/[^0-9.]/g, '');
+    const parts = cleaned.split('.');
+    if (parts.length > 2) cleaned = parts[0] + '.' + parts.slice(1).join('');
+    if (parts.length === 2 && parts[1].length > 2) cleaned = parts[0] + '.' + parts[1].substring(0, 2);
+    if (this.value !== cleaned) { this.value = cleaned; if (start && end) { const newPos = Math.min(start, cleaned.length); this.setSelectionRange(newPos, newPos); } }
+    updateActionButtonsState();
+  });
+
+  document.getElementById('monthsToPay')?.addEventListener('change', function () {
+    const loanName = loanTypeDisplay.value.toLowerCase();
+    if (!MONTHS_BASED_LOAN_TYPES.includes(loanName)) return;
+    if (!selectedEmployeeData || !selectedEmployeeData.idno) return;
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot modify - payroll cycle has changed.', 'warning');
+      return;
+    }
+    triggerLoanRecalculation();
+    updateActionButtonsState();
+  });
+
+  const existingLoanInput = document.getElementById('existingLoan');
+  existingLoanInput.addEventListener('blur', function () {
+    const loanType = loanTypeDisplay.value;
+    const editable = isExistingLoanEditable(loanType);
+
+    const rawValue = this.value;
+
+    if (!rawValue || rawValue.trim() === '' || rawValue === '₱0.00' || rawValue === '0.00') {
+      this.value = formatCurrencyDisplay(0);
+      if (selectedEmployeeData) selectedEmployeeData.existingLoanTotal = 0;
+      if (editable) {
+        if (!payrollDatesValid) { showToast('⚠️ Cannot modify - payroll cycle has changed.', 'warning'); return; }
+        triggerLoanRecalculation();
+      }
+      return;
+    }
+
+    const numericValue = parseLoanAmount(rawValue);
+    if (!isNaN(numericValue)) {
+      this.value = formatCurrencyDisplay(numericValue);
+      if (editable) {
+        if (!payrollDatesValid) { showToast('⚠️ Cannot modify - payroll cycle has changed.', 'warning'); return; }
+        if (selectedEmployeeData) selectedEmployeeData.existingLoanTotal = numericValue;
+        triggerLoanRecalculation();
+      }
+    } else {
+      showToast('⚠️ Please enter a valid number', 'warning');
+    }
+  });
+  existingLoanInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+  existingLoanInput.addEventListener('focus', function () { if (isExistingLoanEditable(loanTypeDisplay.value)) this.select(); });
+
+  const loanDeductionInput = document.getElementById('loanDeduction');
+  loanDeductionInput.addEventListener('blur', function () {
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot modify - payroll cycle has changed.', 'warning');
+      return;
+    }
+    const loanType = loanTypeDisplay.value;
+    if (!isDeductionEditable(loanType)) return;
+    const rawValue = this.value;
+    if (!rawValue || rawValue.trim() === '' || rawValue === '₱0.00' || rawValue === '0.00') {
+      this.value = formatCurrencyDisplay(0);
+      if (selectedEmployeeData) updateNetProceedsOnly();
+      return;
+    }
+    const numericValue = parseLoanAmount(rawValue);
+    if (!isNaN(numericValue)) { this.value = formatCurrencyDisplay(numericValue); if (selectedEmployeeData) updateNetProceedsOnly(); }
+    else { showToast('⚠️ Please enter a valid number', 'warning'); }
+  });
+  loanDeductionInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+  loanDeductionInput.addEventListener('input', function () {
+    const loanType = loanTypeDisplay.value;
+    if (!isDeductionEditable(loanType)) return;
+  });
+  loanDeductionInput.addEventListener('focus', function () { if (isDeductionEditable(loanTypeDisplay.value)) this.select(); });
+
+  // ─────────────────────────────────────────────
+  // SAVE (RECOMPUTE & UPDATE)
+  // ─────────────────────────────────────────────
+  btnSave.addEventListener('click', async function () {
+    if (!loadedLoan || !selectedEmployeeData) { showToast('⚠️ Please load a loan first.', 'warning'); return; }
+    if (!payrollDatesValid) {
+      showToast('⚠️ Cannot recompute - payroll cycle has changed. Please create a new loan instead.', 'warning');
+      return;
+    }
+
+    const loanType = loanTypeDisplay.value;
+    if (!loanType) { showToast('⚠️ No loan type loaded.', 'warning'); return; }
+
+    const loanAmount = parseLoanAmount(document.getElementById('loanAmount').value);
+    if (isNaN(loanAmount) || loanAmount <= 0) { showToast('⚠️ Please enter a valid loan amount.', 'warning'); return; }
+
+    const loanComputation = selectedEmployeeData.loanComputation || {};
+    const bracket = selectedEmployeeData.selectedBracketRow || {};
+    const netpay1 = loanComputation.firstCycleNetPay || 0;
+    const netpay2 = loanComputation.secondCycleNetPay || 0;
+    const percent35 = loanComputation.percentage || 0;
+
+    let existingLoan = parseLoanAmount(document.getElementById('existingLoan').value) || 0;
+    const loanDeductionValue = bracket.loanDeduct !== undefined
+      ? bracket.loanDeduct
+      : parseFloat(document.getElementById('loanDeduction').value.replace(/[₱,]/g, '')) || 0;
+
+    const isMonthsBasedType = MONTHS_BASED_LOAN_TYPES.includes(loanType.toLowerCase());
+let deductionPerMonth;
+if (isMonthsBasedType) {
+  const computed = selectedEmployeeData.lastComputedData;
+  if (computed && computed.monthlyDeduction !== undefined) {
+    deductionPerMonth = computed.monthlyDeduction;       // ✅ 4120
+  } else {
+    // Fallback if Save is clicked before any recompute happened —
+    // don't assume per-period === monthly, refetch the real multiplier.
+    const config = await getLoanTypeConfig(loanType);
+    deductionPerMonth = round2(loanDeductionValue * (config.monthly_deduction_count || 2));
+  }
+} else if (bracket.monthlyDeductionCount !== undefined) {
+  deductionPerMonth = loanDeductionValue * bracket.monthlyDeductionCount;
+} else {
+  const count = (loanType.toLowerCase() === 'sss' || loanType.toLowerCase() === 'pagibig') ? 1 : 2;
+  deductionPerMonth = loanDeductionValue * count;
+}
+
+    const netproceeds = bracket.netProceeds !== undefined
+      ? bracket.netProceeds
+      : parseFloat(document.getElementById('netProceeds').value.replace(/[₱,]/g, '')) || 0;
+
+    const comakerInputs = document.querySelectorAll('#comakerFields .comaker-field:not(.d-none) input');
+    const comakers = [];
+    comakerInputs.forEach((input) => { if (input.value.trim()) comakers.push(input.value.trim()); });
+console.log('@@@@@@@@@@@@@@@@@@@@@ ', percent35)
+    const payload = {
+      controlNo: loadedLoan.controlno,
+      loantype: loanType,
+      loanamount: loanAmount,
+      loandeduction: loanDeductionValue,
+      netpay1, netpay2,
+      existingloan: existingLoan,
+      percent35: percent35,
+      deductionpermonth: deductionPerMonth,
+      netproceeds,
+      comaker1: comakers[0] || null,
+      comaker2: comakers[1] || null,
+      comaker3: comakers[2] || null,
+      comaker4: comakers[3] || null,
+      lengthofservice: selectedEmployeeData.service_years || 0,
+      monthly_rate: selectedEmployeeData.monthly_rate || 0,
+    };
+
+    const originalText = btnSave.innerHTML;
+    btnSave.disabled = true;
+    btnSave.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+    try {
+      const response = await fetch('/loan/recompute/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message || 'Failed to recompute loan');
+
+      showToast('✅ Loan recomputed and saved successfully.', 'success');
+      loadedLoan.loantype = loanType;
+      loadedLoan.loanamount = loanAmount;
+      loadedLoan.loandeduction = loanDeductionValue;
+      loadedLoan.netproceeds = netproceeds;
+
+      const pdfUrl = `/loan/generate-pdf/${loadedLoan.controlno}?office=${selectedEmployeeData.office}`;
+      window.open(pdfUrl, '_blank');
+
+    } catch (err) {
+      console.error('Error recomputing loan:', err);
+      showToast(`❌ Error recomputing loan: ${err.message}`, 'danger');
+    } finally {
+      btnSave.disabled = false;
+      btnSave.innerHTML = originalText;
+      updateActionButtonsState();
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  // CLEAR
+  // ─────────────────────────────────────────────
+  btnClear.addEventListener('click', () => {
+    controlNoInput.value = '';
+    loadedLoan = null;
+    selectedEmployeeData = null;
+    activeBracket = null;
+    payrollDatesValid = false;
+    if (selectedEmployeeData) selectedEmployeeData.lastComputedData = null;
+
+    employeeInfoCard.style.display = 'none';
+    notSupportedCard.style.display = 'none';
+    payrollMismatchCard.style.display = 'none';
+    loanDetailsCard.style.display = 'none';
+    comakerCard.style.display = 'none';
+
+    loanTypeDisplay.value = '';
+    setLoanAmountValue('');
+    document.getElementById('existingLoan').value = '';
+    document.getElementById('loanDeduction').value = '';
+    document.getElementById('netProceeds').value = '';
+
+    document.querySelectorAll('#comakerFields .comaker-field input').forEach(input => { input.value = ''; delete input.dataset.idno; delete input.dataset.los; });
+    document.querySelectorAll('#comakerFields .comaker-field label').forEach((label, index) => { label.textContent = `Co-Maker ${index + 1}`; });
+    document.querySelectorAll('#comakerFields .comaker-field').forEach(field => field.classList.add('d-none'));
+    refreshComakerUI();
+
+    btnViewBracket.classList.add('d-none');
+    bracketBtnLabel.style.display = 'none';
+    showMonthsToPayRow(false);
+    resetMonthsToPay();
+
+    btnSave.disabled = true;
+    showToast('🔄 Form cleared.', 'info');
+  });
+
+  // ─────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────
+  refreshComakerUI();
+
+});
+</script>
+
+</body>
+</html>

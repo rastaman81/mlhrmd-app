@@ -1,0 +1,177 @@
+<nav
+  class='navbar navbar-expand-lg'
+  style='
+  background: linear-gradient(135deg, #16304A, #0F2233);
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(15, 34, 51, 0.25);
+'
+>
+  <div class='container-fluid d-flex align-items-center justify-content-between px-0'>
+
+    <!-- LEFT GROUP: Logo + Welcome + Home + Dropdown -->
+    <div class='d-flex align-items-center gap-3'>
+
+      <!-- Logo and Welcome -->
+      <div class='d-flex align-items-center'>
+        <img
+          src='/images/hrmd_logo_white.png'
+          alt='Company Logo'
+          style='height: 80px; width: auto; margin-right: 12px;'
+          class='d-inline-block align-top'
+        />
+        <div>
+          <div
+            style='
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-size: .65rem;
+            font-weight: 600;
+            color: #6AABCF;
+            margin-bottom: .1rem;
+          '
+          >HRMD Portal</div>
+          <span
+            style="
+            color: #FFFFFF;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: .97rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+          "
+          >
+            <i class='fas fa-user-tie' style='color: #6AABCF; font-size: .85rem;'></i>
+            Welcome,
+            {{firstName}}
+          </span>
+        </div>
+      </div>
+
+      <!-- Home Button -->
+      <a
+        href='/dashboard'
+        style="
+        border: 1px solid rgba(255,255,255,.25);
+        background: rgba(255,255,255,.07);
+        color: #fff;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: .85rem;
+        font-weight: 500;
+        padding: .45rem .9rem;
+        border-radius: .45rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: background .2s, border-color .2s;
+      "
+        onmouseover="this.style.background='rgba(255,255,255,.15)'; this.style.borderColor='rgba(255,255,255,.45)';"
+        onmouseout="this.style.background='rgba(255,255,255,.07)'; this.style.borderColor='rgba(255,255,255,.25)';"
+      >
+        <i class='fas fa-home'></i>
+        Home
+      </a>
+
+      <!-- Dropdown -->
+      <div class='dropdown'>
+        <button
+          type='button'
+          id='menuDropdown'
+          data-bs-toggle='dropdown'
+          aria-expanded='false'
+          style="
+            background: #2E6F9E;
+            border: 1px solid #3a84b8;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            padding: .45rem .9rem;
+            border-radius: .45rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            cursor: pointer;
+            transition: background .2s;
+          "
+          onmouseover="this.style.background='#245f8a';"
+          onmouseout="this.style.background='#2E6F9E';"
+        >
+          <i class='fas fa-bars'></i>
+          Select Menu
+          <i class='fas fa-chevron-down' style='font-size:.7rem; margin-left:.15rem;'></i>
+        </button>
+        <ul
+          class='dropdown-menu dropdown-menu-start'
+          aria-labelledby='menuDropdown'
+          style='
+            background: #FFFFFF;
+            border: 1px solid #E3E6EB;
+            border-radius: .65rem;
+            box-shadow: 0 8px 24px rgba(16,24,40,.12);
+            padding: .35rem 0;
+            min-width: 200px;
+          '
+        >
+          {{#each menus}}
+            <li>
+              <a
+                href='{{this.url}}'
+                class='dropdown-item'
+                style="
+                font-family: 'Inter', -apple-system, sans-serif;
+                font-size: .88rem;
+                font-weight: 500;
+                color: #16304A;
+                padding: .6rem 1.1rem;
+                display: flex;
+                align-items: center;
+                gap: .6rem;
+                transition: background .15s;
+              "
+                onmouseover="this.style.background='#F0F4F8'; this.style.color='#2E6F9E';"
+                onmouseout="this.style.background=''; this.style.color='#16304A';"
+              >
+                <i
+                  class='fas {{this.icon}}'
+                  style='color: #2E6F9E; width: 16px; text-align: center;'
+                ></i>
+                {{this.menu_name}}
+              </a>
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Logout -->
+    <div>
+      <a
+        href='/logout'
+        style="
+        border: 1px solid rgba(255,255,255,.25);
+        background: rgba(255,255,255,.07);
+        color: #fff;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: .85rem;
+        font-weight: 500;
+        padding: .45rem .9rem;
+        border-radius: .45rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: background .2s, border-color .2s;
+      "
+        onmouseover="this.style.background='rgba(193,72,61,.35)'; this.style.borderColor='rgba(193,72,61,.6)';"
+        onmouseout="this.style.background='rgba(255,255,255,.07)'; this.style.borderColor='rgba(255,255,255,.25)';"
+      >
+        <i class='fas fa-sign-out-alt'></i>
+        Logout
+      </a>
+    </div>
+
+  </div>
+</nav>

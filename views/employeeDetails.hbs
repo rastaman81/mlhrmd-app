@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-user-tie" style="color:#2E6F9E;"></i> Employee Details
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Viewing full profile and records.</p>
+        </div>
+        <a href="/dashboard?office={{office}}" class="btn btn-outline-secondary" style="font-size:.88rem;">
+          <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+
+      <div class="row g-4">
+
+        <!-- LEFT: Avatar + Status -->
+        <div class="col-md-3">
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04); padding:1.5rem; text-align:center;">
+
+            <div style="width:96px; height:96px; border-radius:50%; background:linear-gradient(145deg,#2E6F9E,#16304A); color:#fff; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 1rem;">
+              <i class="fas fa-user"></i>
+            </div>
+
+            <p style="font-weight:700; font-size:1rem; color:#0F2233; margin:0 0 .25rem;">
+              {{val employee.employeelname}}, {{val employee.employeefname}}
+            </p>
+            <p style="font-size:.82rem; color:#6B7686; margin:0 0 1rem;">
+              {{val employee.employeedesignation}}
+            </p>
+
+            {{#if (eq employee.employeeempstat 1)}}
+              <span style="background:rgba(31,122,108,.1); color:#1F7A6C; font-size:.78rem; font-weight:600; padding:.3rem .8rem; border-radius:1rem; display:inline-block;">
+                <i class="fas fa-circle me-1" style="font-size:.5rem; vertical-align:middle;"></i> Active
+              </span>
+            {{else}}
+              <span style="background:rgba(193,72,61,.1); color:#C1483D; font-size:.78rem; font-weight:600; padding:.3rem .8rem; border-radius:1rem; display:inline-block;">
+                <i class="fas fa-circle me-1" style="font-size:.5rem; vertical-align:middle;"></i> Inactive
+              </span>
+            {{/if}}
+
+            <hr style="border-color:#E3E6EB; margin:1.25rem 0;">
+
+            <div style="text-align:left;">
+              <p style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; margin:0 0 .5rem;">Quick Info</p>
+
+              <div style="display:flex; flex-direction:column; gap:.6rem;">
+                <div>
+                  <span style="font-size:.75rem; color:#6B7686;">Employee ID</span>
+                  <p style="font-size:.9rem; font-weight:600; color:#0F2233; margin:0;">{{val employee.employeeid}}</p>
+                </div>
+                <div>
+                  <span style="font-size:.75rem; color:#6B7686;">Branch</span>
+                  <p style="font-size:.9rem; font-weight:600; color:#0F2233; margin:0;">{{val employee.branch}}</p>
+                </div>
+                <div>
+                  <span style="font-size:.75rem; color:#6B7686;">Date Hired</span>
+                  <p style="font-size:.9rem; font-weight:600; color:#0F2233; margin:0;">{{formatDate employee.employeedateemp}}</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RIGHT: Detail Cards -->
+        <div class="col-md-9 d-flex flex-column gap-4">
+
+          <!-- Personal Information -->
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+            <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+              <i class="fas fa-id-card" style="color:#2E6F9E;"></i>
+              <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Personal Information</strong>
+            </div>
+            <div style="padding:1.15rem;">
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Full Name</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeelname}}, {{val employee.employeefname}} {{val employee.employeemi}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Date of Birth</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{formatDate employee.employeebdate}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Gender</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeegender}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Civil Status</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeestatus}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Contact Number</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeecontactno}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Email</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.email}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Birth Place</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeebplace}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Address</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeeaddress}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Wallet No.</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">
+                    {{#if employee.walletno}}{{val employee.walletno}}{{else}}{{val employee.employeesalary}}{{/if}}
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Employment Information -->
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+            <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+              <i class="fas fa-briefcase" style="color:#2E6F9E;"></i>
+              <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Employment Information</strong>
+            </div>
+            <div style="padding:1.15rem;">
+
+              <script>
+                console.log("Employee:", {{{json employee}}});
+                console.log({{{json employee.empresigndate}}});
+              </script>
+
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Region / Division</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.region}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Region / Division Manager</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.regionmanager}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Area / Department</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.area_name}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Area / Department Manager</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.area_manager}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Branch</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.branch}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Position</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeedesignation}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Employment Type</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.ranking}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Date Hired</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{formatDate employee.employeedateemp}}</p>
+                </div>
+
+                {{#if employee.empresigndate}}
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#C1483D;">Date Resigned</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#C1483D; margin:.2rem 0 0;">{{formatDate employee.empresigndate}}</p>
+                </div>
+                {{/if}}
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Education Information -->
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+            <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+              <i class="fas fa-graduation-cap" style="color:#2E6F9E;"></i>
+              <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Education Information</strong>
+            </div>
+            <div style="padding:1.15rem;">
+
+              <!-- Table-style education layout -->
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0; border:1px solid #E3E6EB; border-radius:.45rem; overflow:hidden;">
+
+                <!-- Header Row -->
+                <div style="background:#F6F7F9; padding:.6rem .85rem; font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; border-bottom:1px solid #E3E6EB;">Level</div>
+                <div style="background:#F6F7F9; padding:.6rem .85rem; font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; border-bottom:1px solid #E3E6EB;">School</div>
+                <div style="background:#F6F7F9; padding:.6rem .85rem; font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; border-bottom:1px solid #E3E6EB;">Address</div>
+                <div style="background:#F6F7F9; padding:.6rem .85rem; font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686; border-bottom:1px solid #E3E6EB;">Year Graduated</div>
+
+                <!-- Grade School -->
+                <div style="padding:.7rem .85rem; font-size:.82rem; font-weight:600; color:#16304A; border-bottom:1px solid #E3E6EB; border-right:1px solid #E3E6EB;">Grade School</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-bottom:1px solid #E3E6EB; border-right:1px solid #E3E6EB;">{{val employee.employeeschool1}}</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-bottom:1px solid #E3E6EB; border-right:1px solid #E3E6EB;">{{val employee.employeeaddress1}}</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-bottom:1px solid #E3E6EB;">{{val employee.employeescyear1}}</div>
+
+                <!-- High School -->
+                <div style="padding:.7rem .85rem; font-size:.82rem; font-weight:600; color:#16304A; border-bottom:1px solid #E3E6EB; border-right:1px solid #E3E6EB;">High School</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-bottom:1px solid #E3E6EB; border-right:1px solid #E3E6EB;">{{val employee.employeeschool2}}</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-bottom:1px solid #E3E6EB; border-right:1px solid #E3E6EB;">{{val employee.employeeaddress2}}</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-bottom:1px solid #E3E6EB;">{{val employee.employeescyear2}}</div>
+
+                <!-- College -->
+                <div style="padding:.7rem .85rem; font-size:.82rem; font-weight:600; color:#16304A; border-right:1px solid #E3E6EB;">College</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-right:1px solid #E3E6EB;">{{val employee.employeeschool3}}</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233; border-right:1px solid #E3E6EB;">{{val employee.employeeaddress3}}</div>
+                <div style="padding:.7rem .85rem; font-size:.88rem; color:#0F2233;">{{val employee.employeescyear3}}</div>
+
+              </div>
+
+              <!-- Course / Major row below the grid -->
+              <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Course</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeeschool4}}</p>
+                </div>
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Major</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeeaddress4}}</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Government IDs -->
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+            <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+              <i class="fas fa-id-badge" style="color:#2E6F9E;"></i>
+              <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Government ID Information</strong>
+            </div>
+            <div style="padding:1.15rem;">
+              <div class="row g-3">
+
+                <div class="col-md-3">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">TIN</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeetin}}</p>
+                </div>
+
+                <div class="col-md-3">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">SSS</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeesss}}</p>
+                </div>
+
+                <div class="col-md-3">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Pag-IBIG</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeepagibig}}</p>
+                </div>
+
+                <div class="col-md-3">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">PhilHealth</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeephilhealth}}</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Family Information -->
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+            <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+              <i class="fas fa-people-roof" style="color:#2E6F9E;"></i>
+              <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Family Information</strong>
+            </div>
+            <div style="padding:1.15rem;">
+
+              <script>console.log("Employee:", {{{json employee}}});</script>
+
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Spouse Name</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeespouse}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Spouse Work</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeespousework}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Father's Name</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeefathersname}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Father's Work</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeefatherswork}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Mother's Name</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeemothersname}}</p>
+                </div>
+
+                <div class="col-md-6">
+                  <span style="font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#6B7686;">Mother's Work</span>
+                  <p style="font-size:.95rem; font-weight:600; color:#0F2233; margin:.2rem 0 0;">{{val employee.employeemotherswork}}</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --rd-navy:      #16304A;
+      --rd-navy-deep: #0F2233;
+      --rd-blue:      #2E6F9E;
+      --rd-teal:      #1F7A6C;
+      --rd-gold:      #A8762A;
+      --rd-bg:        #F6F7F9;
+      --rd-surface:   #FFFFFF;
+      --rd-border:    #E3E6EB;
+      --rd-muted:     #6B7686;
+      --rd-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--rd-bg);
+    }
+
+    /* ---- Page header ---- */
+    .rd-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--rd-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .rd-title i{ color:var(--rd-blue); }
+    .rd-subtitle{ color:var(--rd-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Buttons ---- */
+    .btn-rd-teal{
+      background:var(--rd-teal); border-color:var(--rd-teal); color:#fff; font-weight:500;
+    }
+    .btn-rd-teal:hover{ background:#176255; border-color:#176255; color:#fff; }
+    .btn-rd-danger{
+      background:var(--rd-danger); border-color:var(--rd-danger); color:#fff; font-weight:500;
+    }
+    .btn-rd-danger:hover{ background:#a83a30; border-color:#a83a30; color:#fff; }
+    .btn-rd-outline{
+      background:var(--rd-surface); border-color:var(--rd-border); color:var(--rd-navy-deep); font-weight:500;
+    }
+    .btn-rd-outline:hover{ background:var(--rd-bg); border-color:var(--rd-muted); color:var(--rd-navy-deep); }
+
+    /* ---- Alert ---- */
+    #formMessage{
+      border-radius:.55rem;
+      font-size:.9rem;
+      border:none;
+      border-left:4px solid transparent;
+    }
+
+    /* ---- Request info panel ---- */
+    .rd-info-panel{
+      background:var(--rd-surface);
+      border:1px solid var(--rd-border);
+      border-radius:.65rem;
+      padding:1.25rem;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      margin-bottom:1.25rem;
+    }
+    .rd-info-label{
+      font-size:.72rem;
+      text-transform:uppercase;
+      font-weight:600;
+      color:var(--rd-muted);
+      letter-spacing:.04em;
+      margin-bottom:.2rem;
+    }
+    .rd-info-value{
+      font-size:.95rem;
+      font-weight:600;
+      color:var(--rd-navy-deep);
+    }
+    .rd-info-sub{
+      font-size:.82rem;
+      color:var(--rd-muted);
+      margin-top:.1rem;
+    }
+    .rd-remarks-text{ color:var(--rd-muted); font-size:.9rem; margin-top:.2rem; }
+
+    /* ---- Status badge ---- */
+    .status-badge{
+      padding:.3rem 1rem;
+      border-radius:1rem;
+      font-size:.8rem;
+      font-weight:600;
+      text-transform:uppercase;
+      display:inline-block;
+    }
+    .status-pending  { background:rgba(168,118,42,.12); color:var(--rd-gold);   }
+    .status-approved { background:rgba(31,122,108,.12);  color:var(--rd-teal);   }
+    .status-rejected { background:rgba(193,72,61,.12);   color:var(--rd-danger); }
+
+    /* ---- Shared card styles ---- */
+    .rd-card{
+      border:1px solid var(--rd-border);
+      border-radius:.65rem;
+      background:var(--rd-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+      margin-bottom:1.25rem;
+    }
+    .rd-card-header{
+      border-bottom:1px solid var(--rd-border);
+      padding:.85rem 1.15rem;
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+    }
+    .rd-card-header i{ color:var(--rd-blue); }
+    .rd-card-header strong{ color:var(--rd-navy-deep); font-weight:600; font-size:.97rem; }
+
+    /* ---- Items table ---- */
+    .rd-card .table{ margin:0; }
+    .rd-card .table thead th{
+      background:var(--rd-navy) !important;
+      color:#fff !important;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:600;
+      border-color:#1e3e5e;
+      padding:.75rem 1rem;
+      white-space:nowrap;
+    }
+    .rd-card .table tbody td{
+      padding:.65rem 1rem;
+      vertical-align:middle;
+      border-color:var(--rd-border);
+      color:var(--rd-navy-deep);
+    }
+    .rd-card .table tbody tr:hover{ background:var(--rd-bg); }
+
+    .rd-item-name{ font-weight:600; }
+    .rd-item-meta{ font-size:.78rem; color:var(--rd-muted); }
+
+    .stock-warning{ color:var(--rd-danger); font-weight:600; }
+    .stock-ok     { color:var(--rd-teal);   font-weight:600; }
+
+    .rd-stock-insufficient{ color:var(--rd-danger); font-size:.8rem; }
+    .rd-stock-available   { color:var(--rd-teal);   font-size:.8rem; }
+
+    /* ---- Approval actions card ---- */
+    .rd-actions-header{
+      padding:.85rem 1.15rem;
+      border-bottom:1px solid var(--rd-border);
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+    }
+    .rd-actions-header i{ color:var(--rd-blue); }
+    .rd-actions-header h6{
+      font-weight:600;
+      color:var(--rd-navy-deep);
+      margin:0;
+      font-size:.97rem;
+    }
+    .rd-actions-body{ padding:1.25rem; }
+    .rd-action-label{
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--rd-navy);
+      margin-bottom:.35rem;
+    }
+    .rd-actions-body .form-control{
+      border-color:var(--rd-border);
+    }
+    .rd-actions-body .form-control:focus{
+      border-color:var(--rd-blue);
+      box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+    }
+
+    /* ---- Resolved state ---- */
+    .rd-resolved{
+      text-align:center;
+      color:var(--rd-muted);
+      padding:1.25rem;
+    }
+    .rd-resolved strong{ color:var(--rd-navy-deep); }
+    .rd-resolved .rd-resolved-detail{
+      font-size:.85rem;
+      margin-top:.4rem;
+      color:var(--rd-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="rd-title">
+            <i class="fas fa-file-alt"></i> Request Approval
+          </h1>
+          <p class="rd-subtitle">Review request details and approve or reject.</p>
+        </div>
+        <a href="/inventory/approval" class="btn btn-rd-outline">
+          <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="formMessage" class="alert d-none mb-3"></div>
+
+      <!-- Request Info Panel -->
+      <div class="rd-info-panel">
+        <div class="row g-3">
+
+          <div class="col-md-3">
+            <div class="rd-info-label">Request Number</div>
+            <div class="rd-info-value">{{request.request_number}}</div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="rd-info-label">Requester</div>
+            <div class="rd-info-value">{{request.first_name}} {{request.last_name}}</div>
+            <div class="rd-info-sub">{{request.idno}} | {{request.designation}}</div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="rd-info-label">Date Requested</div>
+            <div class="rd-info-value">{{formatDate request.created_at}}</div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="rd-info-label">Status</div>
+            <span class="status-badge status-{{request.status}}">{{request.status}}</span>
+          </div>
+
+          <div class="col-md-2">
+            <div class="rd-info-label">Total Items</div>
+            <div class="rd-info-value">{{request.total_items}}</div>
+          </div>
+
+        </div>
+
+        {{#if request.remarks}}
+          <div class="mt-3">
+            <div class="rd-info-label">Remarks</div>
+            <div class="rd-remarks-text">{{request.remarks}}</div>
+          </div>
+        {{/if}}
+      </div>
+
+      <!-- Requested Items Table -->
+      <div class="rd-card">
+
+        <div class="rd-card-header">
+          <i class="fas fa-list"></i>
+          <strong>Requested Items</strong>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th class="text-center">Requested</th>
+                <th class="text-center">Available</th>
+                <th>Reason</th>
+                <th class="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each items}}
+                <tr>
+
+                  <td style="color:var(--rd-muted); font-weight:600;">{{add @index 1}}</td>
+
+                  <td>
+                    <div class="rd-item-name">{{this.item_name}}</div>
+                    <div class="rd-item-meta">{{this.item_code}} | {{this.item_unit}}</div>
+                  </td>
+
+                  <td class="text-center" style="font-weight:600;">{{this.requested_quantity}}</td>
+
+                  <td class="text-center">
+                    <span class="{{#if (lt this.current_stock this.requested_quantity)}}stock-warning{{else}}stock-ok{{/if}}">
+                      {{this.current_stock}}
+                    </span>
+                    {{#if (lt this.current_stock this.requested_quantity)}}
+                      <i class="fas fa-exclamation-triangle ms-1" style="color:var(--rd-danger);" title="Insufficient stock"></i>
+                    {{/if}}
+                  </td>
+
+                  <td style="font-size:.85rem;">
+                    {{#if this.custom_reason}}
+                      {{this.custom_reason}}
+                    {{else}}
+                      {{this.reason_name}}
+                    {{/if}}
+                  </td>
+
+                  <td class="text-center">
+                    {{#if (lt this.current_stock this.requested_quantity)}}
+                      <span class="rd-stock-insufficient">
+                        <i class="fas fa-times-circle me-1"></i>Insufficient
+                      </span>
+                    {{else}}
+                      <span class="rd-stock-available">
+                        <i class="fas fa-check-circle me-1"></i>Available
+                      </span>
+                    {{/if}}
+                  </td>
+
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Approval Actions / Resolved State -->
+      {{#if (eq request.status "pending")}}
+        <div class="rd-card">
+          <div class="rd-actions-header">
+            <i class="fas fa-gavel"></i>
+            <h6>Approval Actions</h6>
+          </div>
+
+          <div class="rd-actions-body">
+            <div class="row g-3">
+
+              <div class="col-md-6">
+                <label class="rd-action-label">Remarks (Optional)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="approvalRemarks"
+                  placeholder="Add approval notes..."
+                >
+              </div>
+
+              <div class="col-md-6">
+                <label class="rd-action-label">
+                  Rejection Reason <span style="color:var(--rd-danger);">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="rejectionReason"
+                  placeholder="Required if rejecting..."
+                >
+              </div>
+
+            </div>
+
+            <div class="mt-3 d-flex gap-3 flex-wrap">
+              <button id="approveBtn" class="btn btn-rd-teal" style="padding:.6rem 2rem;">
+                <i class="fas fa-check me-1"></i> Approve Request
+              </button>
+              <button id="rejectBtn" class="btn btn-rd-danger" style="padding:.6rem 2rem;">
+                <i class="fas fa-times me-1"></i> Reject Request
+              </button>
+            </div>
+          </div>
+        </div>
+
+      {{else}}
+        <div class="rd-card">
+          <div class="rd-resolved">
+            <i class="fas fa-info-circle me-1"></i>
+            This request has been <strong>{{request.status}}</strong>
+            {{#if (eq request.status "approved")}}
+              by <strong>{{request.approved_by_name}}</strong> on {{formatDate request.approved_date}}.
+            {{/if}}
+            {{#if (eq request.status "rejected")}}
+              by <strong>{{request.rejected_by_name}}</strong> on {{formatDate request.rejected_date}}.
+              {{#if request.rejection_reason}}
+                <div class="rd-resolved-detail">Reason: {{request.rejection_reason}}</div>
+              {{/if}}
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // =============================================
+  // APPROVAL ACTIONS
+  // =============================================
+
+  const formMessage     = document.getElementById('formMessage');
+  const approveBtn      = document.getElementById('approveBtn');
+  const rejectBtn       = document.getElementById('rejectBtn');
+  const approvalRemarks = document.getElementById('approvalRemarks');
+  const rejectionReason = document.getElementById('rejectionReason');
+
+  function showMessage(type, message) {
+    const colorMap = {
+      success: { bg:'rgba(31,122,108,.08)',  border:'#1F7A6C', text:'#1F7A6C' },
+      danger:  { bg:'rgba(193,72,61,.08)',   border:'#C1483D', text:'#C1483D' },
+      warning: { bg:'rgba(168,118,42,.08)',  border:'#A8762A', text:'#A8762A' },
+      info:    { bg:'rgba(46,111,158,.08)',  border:'#2E6F9E', text:'#2E6F9E' },
+    };
+    const c = colorMap[type] || colorMap.info;
+    formMessage.style.background  = c.bg;
+    formMessage.style.borderColor = c.border;
+    formMessage.style.color       = c.text;
+    formMessage.textContent       = message;
+    formMessage.className         = 'alert mb-3 show';
+    formMessage.style.display     = 'block';
+
+    setTimeout(() => {
+      formMessage.className     = 'alert d-none';
+      formMessage.style.display = 'none';
+    }, 5000);
+  }
+
+  // ---- APPROVE ----
+  if (approveBtn) {
+    approveBtn.addEventListener('click', async function() {
+      const remarks = approvalRemarks.value.trim();
+
+      const confirmed = await Swal.fire({
+        title: 'Approve Request?',
+        html: `<span style="color:#6B7686;">This will deduct the requested items from inventory. This action cannot be undone.</span>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, approve',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#1F7A6C',
+        cancelButtonColor: '#6B7686',
+      });
+
+      if (!confirmed.isConfirmed) return;
+
+      approveBtn.disabled   = true;
+      approveBtn.innerHTML  = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+
+      try {
+        const response = await fetch('/inventory/approval/{{request.request_id}}/approve', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ remarks })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          await Swal.fire({
+            title: 'Approved!',
+            text: result.message,
+            icon: 'success',
+            confirmButtonColor: '#1F7A6C',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          window.location.href = '/inventory/approval';
+        } else {
+          showMessage('danger', '❌ ' + result.message);
+          approveBtn.disabled  = false;
+          approveBtn.innerHTML = '<i class="fas fa-check me-1"></i> Approve Request';
+        }
+
+      } catch (error) {
+        console.error('Approve error:', error);
+        showMessage('danger', '❌ Failed to approve request. Please try again.');
+        approveBtn.disabled  = false;
+        approveBtn.innerHTML = '<i class="fas fa-check me-1"></i> Approve Request';
+      }
+    });
+  }
+
+  // ---- REJECT ----
+  if (rejectBtn) {
+    rejectBtn.addEventListener('click', async function() {
+      const reason = rejectionReason.value.trim();
+
+      if (!reason) {
+        showMessage('warning', 'Please provide a reason for rejection.');
+        rejectionReason.focus();
+        return;
+      }
+
+      const confirmed = await Swal.fire({
+        title: 'Reject Request?',
+        html: `
+          <div style="text-align:left; font-size:.9rem; color:#6B7686; line-height:1.8;">
+            <strong style="color:#0F2233;">Reason:</strong> ${reason}
+          </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, reject',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#C1483D',
+        cancelButtonColor: '#6B7686',
+      });
+
+      if (!confirmed.isConfirmed) return;
+
+      rejectBtn.disabled   = true;
+      rejectBtn.innerHTML  = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+
+      try {
+        const response = await fetch('/inventory/approval/{{request.request_id}}/reject', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rejection_reason: reason })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          await Swal.fire({
+            title: 'Rejected',
+            text: result.message,
+            icon: 'success',
+            confirmButtonColor: '#2E6F9E',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          window.location.href = '/inventory/approval';
+        } else {
+          showMessage('danger', '❌ ' + result.message);
+          rejectBtn.disabled  = false;
+          rejectBtn.innerHTML = '<i class="fas fa-times me-1"></i> Reject Request';
+        }
+
+      } catch (error) {
+        console.error('Reject error:', error);
+        showMessage('danger', '❌ Failed to reject request. Please try again.');
+        rejectBtn.disabled  = false;
+        rejectBtn.innerHTML = '<i class="fas fa-times me-1"></i> Reject Request';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

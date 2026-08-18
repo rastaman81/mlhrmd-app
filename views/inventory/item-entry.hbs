@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --ie-navy:      #16304A;
+      --ie-navy-deep: #0F2233;
+      --ie-blue:      #2E6F9E;
+      --ie-teal:      #1F7A6C;
+      --ie-gold:      #A8762A;
+      --ie-bg:        #F6F7F9;
+      --ie-surface:   #FFFFFF;
+      --ie-border:    #E3E6EB;
+      --ie-muted:     #6B7686;
+      --ie-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--ie-bg);
+    }
+
+    /* ---- Page header ---- */
+    .ie-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--ie-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .ie-title i{ color:var(--ie-blue); }
+    .ie-subtitle{ color:var(--ie-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Buttons ---- */
+    .btn-ie-teal{
+      background:var(--ie-teal); border-color:var(--ie-teal); color:#fff; font-weight:500;
+    }
+    .btn-ie-teal:hover{ background:#176255; border-color:#176255; color:#fff; }
+    .btn-ie-outline{
+      background:var(--ie-surface); border-color:var(--ie-border); color:var(--ie-navy-deep); font-weight:500;
+    }
+    .btn-ie-outline:hover{ background:var(--ie-bg); border-color:var(--ie-muted); color:var(--ie-navy-deep); }
+
+    /* ---- Alert ---- */
+    #formMessage{
+      border-radius:.55rem;
+      font-size:.9rem;
+      border:none;
+      border-left:4px solid transparent;
+    }
+
+    /* ---- Form card ---- */
+    .ie-card{
+      border:1px solid var(--ie-border);
+      border-radius:.65rem;
+      background:var(--ie-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+    }
+    .ie-card-header{
+      border-bottom:1px solid var(--ie-border);
+      padding:.85rem 1.15rem;
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+    }
+    .ie-card-header i{ color:var(--ie-blue); }
+    .ie-card-header strong{ color:var(--ie-navy-deep); font-weight:600; font-size:.97rem; }
+
+    /* ---- Field labels ---- */
+    .ie-label{
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--ie-navy);
+      display:block;
+      margin-bottom:.35rem;
+    }
+    .ie-required{ color:var(--ie-danger); }
+    .ie-label-note{
+      font-size:.7rem;
+      font-weight:400;
+      color:var(--ie-muted);
+      margin-left:.3rem;
+    }
+    .ie-hint{
+      font-size:.7rem;
+      color:var(--ie-muted);
+      margin-top:.3rem;
+      display:flex;
+      align-items:center;
+      gap:.3rem;
+    }
+
+    /* ---- Inputs ---- */
+    .form-control,
+    .form-select{
+      border-color:var(--ie-border);
+    }
+    .form-control:focus,
+    .form-select:focus{
+      border-color:var(--ie-blue);
+      box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+    }
+    .ie-readonly{
+      background:var(--ie-bg) !important;
+      border-color:var(--ie-border) !important;
+    }
+    .ie-code-value{
+      color:var(--ie-blue);
+      font-weight:600;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="ie-title">
+            <i class="fas fa-box"></i>
+            {{#if item}}Edit Item{{else}}Item Entry{{/if}}
+          </h1>
+          <p class="ie-subtitle">
+            {{#if item}}Update item details in the inventory.{{else}}Add a new item to the inventory system.{{/if}}
+          </p>
+        </div>
+        <a href="/inventory/items" class="btn btn-ie-outline">
+          <i class="fas fa-arrow-left me-1"></i> Back to Items
+        </a>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="formMessage" class="alert d-none mb-3"></div>
+
+      <!-- Item Form Card -->
+      <div class="ie-card">
+
+        <div class="ie-card-header">
+          <i class="fas fa-{{#if item}}edit{{else}}plus-circle{{/if}}"></i>
+          <strong>{{#if item}}Item Information{{else}}New Item Information{{/if}}</strong>
+        </div>
+
+        <form id="itemForm" style="padding:1.5rem;">
+          <input type="hidden" name="item_id" id="itemId" value="{{item.item_id}}">
+
+          <div class="row g-3">
+
+            <!-- Item Code -->
+            <div class="col-md-4">
+              <label class="ie-label">
+                Item Code <span class="ie-required">*</span>
+                {{#unless item}}
+                  <span class="ie-label-note">(Auto-generated)</span>
+                {{/unless}}
+              </label>
+              <input
+                type="text"
+                class="form-control ie-readonly {{#unless item}}ie-code-value{{/unless}}"
+                id="itemCode"
+                name="item_code"
+                value="{{itemCode}}"
+                readonly
+                required
+              >
+              <p class="ie-hint">
+                <i class="fas fa-info-circle"></i>
+                {{#if item}}Item code cannot be changed.{{else}}Code is automatically generated and cannot be changed.{{/if}}
+              </p>
+            </div>
+
+            <!-- Item Name -->
+            <div class="col-md-8">
+              <label class="ie-label">
+                Item Name <span class="ie-required">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="itemName"
+                name="item_name"
+                value="{{item.item_name}}"
+                placeholder="Enter item name..."
+                required
+              >
+            </div>
+
+            <!-- Description -->
+            <div class="col-12">
+              <label class="ie-label">Description</label>
+              <textarea
+                class="form-control"
+                id="itemDescription"
+                name="item_description"
+                rows="2"
+                placeholder="Enter item description (optional)"
+              >{{item.item_description}}</textarea>
+            </div>
+
+            <!-- Unit -->
+            <div class="col-md-3">
+              <label class="ie-label">
+                Unit <span class="ie-required">*</span>
+              </label>
+              <select class="form-select" id="itemUnit" name="item_unit" required>
+                <option value="bottle" {{#if (eq item.item_unit "bottle")}}selected{{/if}}>bottle</option>
+                <option value="box"    {{#if (eq item.item_unit "box")}}selected{{/if}}>box</option>
+                <option value="bundle" {{#if (eq item.item_unit "bundle")}}selected{{/if}}>bundle</option>
+                <option value="can"    {{#if (eq item.item_unit "can")}}selected{{/if}}>can</option>
+                <option value="g"      {{#if (eq item.item_unit "g")}}selected{{/if}}>g</option>
+                <option value="kg"     {{#if (eq item.item_unit "kg")}}selected{{/if}}>kg</option>
+                <option value="L"      {{#if (eq item.item_unit "L")}}selected{{/if}}>L</option>
+                <option value="mL"     {{#if (eq item.item_unit "mL")}}selected{{/if}}>mL</option>
+                <option value="pack"   {{#if (eq item.item_unit "pack")}}selected{{/if}}>pack</option>
+                <option value="pad"    {{#if (eq item.item_unit "pad")}}selected{{/if}}>pad</option>
+                <option value="pair"   {{#if (eq item.item_unit "pair")}}selected{{/if}}>pair</option>
+                <option value="pcs"    {{#if (eq item.item_unit "pcs")}}selected{{/if}}>pcs (pieces)</option>
+                <option value="ream"   {{#if (eq item.item_unit "ream")}}selected{{/if}}>ream</option>
+                <option value="roll"   {{#if (eq item.item_unit "roll")}}selected{{/if}}>roll</option>
+                <option value="set"    {{#if (eq item.item_unit "set")}}selected{{/if}}>set</option>
+              </select>
+            </div>
+
+            <!-- Initial Stock -->
+            <div class="col-md-3">
+              <label class="ie-label">Initial Stock</label>
+              <input
+                type="number"
+                class="form-control"
+                id="itemCount"
+                name="item_count"
+                value="{{item.stock}}"
+                min="0"
+                placeholder="0"
+              >
+              <p class="ie-hint">
+                <i class="fas fa-info-circle"></i> Starting quantity
+              </p>
+            </div>
+
+            <!-- Reorder Level -->
+            <div class="col-md-3">
+              <label class="ie-label">Reorder Level</label>
+              <input
+                type="number"
+                class="form-control"
+                id="itemOrderLevel"
+                name="item_order_level"
+                value="{{item.item_order_level}}"
+                min="0"
+                placeholder="10"
+              >
+              <p class="ie-hint">
+                <i class="fas fa-info-circle"></i> Notify when stock falls below this
+              </p>
+            </div>
+
+            <!-- Status (edit mode only) -->
+            {{#if item}}
+            <div class="col-md-3">
+              <label class="ie-label">Status</label>
+              <select class="form-select" name="is_active">
+                <option value="1" {{#if (eq item.is_active 1)}}selected{{/if}}>Active</option>
+                <option value="0" {{#if (eq item.is_active 0)}}selected{{/if}}>Inactive</option>
+              </select>
+            </div>
+            {{/if}}
+
+          </div>
+
+          <!-- Form Actions -->
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" id="saveBtn" class="btn btn-ie-teal" style="padding:.6rem 2rem;">
+              <i class="fas fa-save me-1"></i>
+              {{#if item}}Update Item{{else}}Create Item{{/if}}
+            </button>
+            <a href="/inventory/items" class="btn btn-ie-outline" style="padding:.6rem 2rem;">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // =============================================
+  // FORM HANDLING
+  // =============================================
+
+  const form        = document.getElementById('itemForm');
+  const formMessage = document.getElementById('formMessage');
+  const saveBtn     = document.getElementById('saveBtn');
+
+  function showMessage(type, message) {
+    const colorMap = {
+      success: { bg:'rgba(31,122,108,.08)',  border:'#1F7A6C', text:'#1F7A6C' },
+      danger:  { bg:'rgba(193,72,61,.08)',   border:'#C1483D', text:'#C1483D' },
+      warning: { bg:'rgba(168,118,42,.08)',  border:'#A8762A', text:'#A8762A' },
+      info:    { bg:'rgba(46,111,158,.08)',  border:'#2E6F9E', text:'#2E6F9E' },
+    };
+    const c = colorMap[type] || colorMap.info;
+    formMessage.style.background  = c.bg;
+    formMessage.style.borderColor = c.border;
+    formMessage.style.color       = c.text;
+    formMessage.textContent       = message;
+    formMessage.className         = 'alert mb-3 show';
+    formMessage.style.display     = 'block';
+
+    setTimeout(() => {
+      formMessage.className     = 'alert d-none';
+      formMessage.style.display = 'none';
+    }, 5000);
+  }
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const itemName = document.getElementById('itemName').value.trim();
+    if (!itemName) {
+      showMessage('warning', 'Item name is required.');
+      document.getElementById('itemName').focus();
+      return;
+    }
+
+    saveBtn.disabled   = true;
+    saveBtn.innerHTML  = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+    try {
+      const formData = new FormData(form);
+      const data = {};
+      for (let [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+
+      const response = await fetch('/inventory/items/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        showMessage('success', `✅ ${result.message}`);
+        setTimeout(() => { window.location.href = '/inventory/items'; }, 1500);
+      } else {
+        showMessage('danger', `❌ ${result.message}`);
+        saveBtn.disabled  = false;
+        saveBtn.innerHTML = '<i class="fas fa-save me-1"></i> {{#if item}}Update Item{{else}}Create Item{{/if}}';
+      }
+
+    } catch (error) {
+      console.error('Save error:', error);
+      showMessage('danger', '❌ Failed to save item. Please try again.');
+      saveBtn.disabled  = false;
+      saveBtn.innerHTML = '<i class="fas fa-save me-1"></i> {{#if item}}Update Item{{else}}Create Item{{/if}}';
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+<h4>Edit User</h4>
+<form method="POST">
+  <input type="text" name="username" value="{{user.username}}" class="form-control mb-2" required />
+  <input type="password" name="password" placeholder="Leave blank to keep current" class="form-control mb-2" />
+  <select name="role_id" class="form-control mb-2">
+    {{#each roles}}
+      <option value="{{this.id}}" {{#ifCond this.id ../user.role_id}}selected{{/ifCond}}>{{this.role_name}}</option>
+    {{/each}}
+  </select>
+  <button type="submit" class="btn btn-success">Update</button>
+</form>

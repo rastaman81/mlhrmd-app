@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .stat-card {
+      background: #fff;
+      border: 1px solid #E3E6EB;
+      border-radius: .65rem;
+      padding: 1.25rem;
+      transition: all 0.2s;
+    }
+    .stat-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    }
+    .stat-card .stat-number {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #0F2233;
+    }
+    .stat-card .stat-label {
+      font-size: .78rem;
+      color: #6B7686;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .stat-card .stat-icon {
+      font-size: 1.75rem;
+      opacity: 0.5;
+    }
+    .stat-blue .stat-number { color: #2E6F9E; }
+    .stat-green .stat-number { color: #1F7A6C; }
+    .stat-orange .stat-number { color: #A8762A; }
+    .stat-red .stat-number { color: #C1483D; }
+    .stat-purple .stat-number { color: #6F42C1; }
+    
+    .report-card {
+      border: 1px solid #E3E6EB;
+      border-radius: .65rem;
+      padding: 1.25rem;
+      transition: all 0.2s;
+      background: #fff;
+      cursor: pointer;
+    }
+    .report-card:hover {
+      border-color: #2E6F9E;
+      box-shadow: 0 4px 12px rgba(46,111,158,.1);
+      transform: translateY(-2px);
+    }
+    .report-card .report-icon {
+      font-size: 2rem;
+      color: #2E6F9E;
+      opacity: 0.7;
+    }
+    .report-card .report-title {
+      font-weight: 600;
+      color: #0F2233;
+      margin-top: .5rem;
+    }
+    .report-card .report-desc {
+      font-size: .85rem;
+      color: #6B7686;
+    }
+    
+    .activity-item {
+      padding: .6rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-chart-pie" style="color:#2E6F9E;"></i> Inventory Reports
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">
+            Monitor and analyze inventory activity.
+          </p>
+        </div>
+      </div>
+
+      <!-- Key Metrics -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card stat-blue">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stat-number">{{metrics.counts.total_items}}</div>
+                <div class="stat-label">Total Items</div>
+              </div>
+              <i class="fas fa-boxes stat-icon" style="color:#2E6F9E;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card stat-orange">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stat-number">{{metrics.counts.pending_requests}}</div>
+                <div class="stat-label">Pending Requests</div>
+              </div>
+              <i class="fas fa-clock stat-icon" style="color:#A8762A;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card stat-red">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stat-number">{{metrics.counts.low_stock_items}}</div>
+                <div class="stat-label">Low Stock Items</div>
+              </div>
+              <i class="fas fa-exclamation-triangle stat-icon" style="color:#C1483D;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card stat-green">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stat-number">{{metrics.counts.today_approved}}</div>
+                <div class="stat-label">Approved Today</div>
+              </div>
+              <i class="fas fa-check-circle stat-icon" style="color:#1F7A6C;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Cards -->
+      <h6 style="font-weight:600; color:#0F2233; margin-bottom:1rem;">Report Types</h6>
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+          <a href="/inventory/reports/request-summary" style="text-decoration:none;">
+            <div class="report-card text-center">
+              <div class="report-icon">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <div class="report-title">Request Summary</div>
+              <div class="report-desc">View request statistics by status, item, and requester</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <a href="/inventory/reports/movement" style="text-decoration:none;">
+            <div class="report-card text-center">
+              <div class="report-icon">
+                <i class="fas fa-exchange-alt"></i>
+              </div>
+              <div class="report-title">Movement Report</div>
+              <div class="report-desc">Track all inventory transactions (in/out)</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <a href="/inventory/reports/stock-status" style="text-decoration:none;">
+            <div class="report-card text-center">
+              <div class="report-icon">
+                <i class="fas fa-warehouse"></i>
+              </div>
+              <div class="report-title">Stock Status</div>
+              <div class="report-desc">Current inventory levels with low stock alerts</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <a href="/inventory/reports/user-activity" style="text-decoration:none;">
+            <div class="report-card text-center">
+              <div class="report-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="report-title">User Activity</div>
+              <div class="report-desc">User request patterns and activity</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- Recent Activity -->
+        <div class="col-md-6">
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+            <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem;">
+              <strong style="color:#0F2233; font-weight:600; font-size:.95rem;">
+                <i class="fas fa-clock me-2" style="color:#2E6F9E;"></i> Recent Activity
+              </strong>
+            </div>
+            <div style="padding:1rem 1.15rem;">
+              {{#each metrics.recentActivity}}
+                <div class="activity-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div style="font-weight:500; font-size:.9rem;">
+                      {{this.first_name}} {{this.last_name}}
+                    </div>
+                    <div style="font-size:.82rem; color:#6B7686;">
+                      {{this.reference}}
+                      <span class="badge bg-{{#if (eq this.status "pending")}}warning{{/if}}{{#if (eq this.status "approved")}}success{{/if}}{{#if (eq this.status "rejected")}}danger{{/if}}">
+                        {{this.status}}
+                      </span>
+                    </div>
+                  </div>
+                  <div style="font-size:.78rem; color:#6B7686;">
+                    {{formatDate this.created_at}}
+                  </div>
+                </div>
+              {{else}}
+                <div style="text-align:center; color:#6B7686; padding:1rem 0;">
+                  No recent activity
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Requested Items -->
+        <div class="col-md-6">
+          <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+            <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem;">
+              <strong style="color:#0F2233; font-weight:600; font-size:.95rem;">
+                <i class="fas fa-trophy me-2" style="color:#2E6F9E;"></i> Top Requested Items
+              </strong>
+            </div>
+            <div style="padding:1rem 1.15rem;">
+              {{#each metrics.topItems}}
+                <div class="activity-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div style="font-weight:500; font-size:.9rem;">{{this.item_name}}</div>
+                    <div style="font-size:.78rem; color:#6B7686;">{{this.item_code}}</div>
+                  </div>
+                  <div>
+                    <span style="font-weight:600; color:#2E6F9E;">{{this.total_requested}}</span>
+                    <span style="color:#6B7686; font-size:.78rem;"> requested</span>
+                  </div>
+                </div>
+              {{else}}
+                <div style="text-align:center; color:#6B7686; padding:1rem 0;">
+                  No data available
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

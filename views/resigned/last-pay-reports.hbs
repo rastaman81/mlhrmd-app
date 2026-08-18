@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+  <style>
+    :root {
+      --rb-navy: #16304A;
+      --rb-navy-deep: #0F2233;
+      --rb-blue: #2E6F9E;
+      --rb-bg: #F6F7F9;
+      --rb-surface: #FFFFFF;
+      --rb-border: #E3E6EB;
+      --rb-muted: #6B7686;
+      --rb-danger: #C1483D;
+    }
+
+    .main-content { font-family: 'Inter', sans-serif; background: var(--rb-bg); }
+    .rb-title { font-size: 1.65rem; font-weight: 700; color: var(--rb-navy-deep); display: flex; align-items: center; gap: .6rem; margin: 0; }
+    .rb-title i { color: var(--rb-danger); }
+    .rb-subtitle { color: var(--rb-muted); font-size: .92rem; margin: .35rem 0 0; }
+
+    .rb-card { border: 1px solid var(--rb-border); border-radius: .65rem; background: var(--rb-surface); box-shadow: 0 1px 2px rgba(16,24,40,.04); margin-bottom: 1.25rem; overflow: hidden; }
+    .rb-card-header { border-bottom: 1px solid var(--rb-border); padding: .85rem 1.15rem; display: flex; align-items: center; gap: .55rem; }
+    .rb-card-header i { color: var(--rb-blue); }
+    .rb-card-header strong { color: var(--rb-navy-deep); font-weight: 600; font-size: .97rem; }
+    .rb-card-header-between { justify-content: space-between; }
+    .rb-card-body { padding: 1.15rem; }
+
+    .form-label { font-size: .8rem; font-weight: 600; color: var(--rb-navy); margin-bottom: .35rem; }
+    .form-control, .form-select { border-color: var(--rb-border); font-size: .9rem; }
+    .form-control:focus, .form-select:focus { border-color: var(--rb-blue); box-shadow: 0 0 0 .2rem rgba(46,111,158,.12); }
+
+    .btn-rb-blue { background: var(--rb-blue); border-color: var(--rb-blue); color: #fff; font-weight: 500; font-size: .9rem; }
+    .btn-rb-blue:hover { background: #255e87; border-color: #255e87; color: #fff; }
+    .btn-rb-outline { color: var(--rb-blue); border-color: var(--rb-blue); background: transparent; }
+    .btn-rb-outline:hover { background: var(--rb-blue); color: #fff; }
+
+    .nav-tabs .nav-link { color: var(--rb-navy); font-weight: 500; }
+    .nav-tabs .nav-link.active { color: var(--rb-blue); border-bottom: 3px solid var(--rb-blue); }
+
+    #loading .spinner-border { color: var(--rb-blue) !important; }
+    #errorMessage { border-left: 4px solid var(--rb-danger) !important; border-radius: .55rem !important; font-size: .9rem; background: rgba(193,72,61,.07); color: var(--rb-danger); }
+
+    .employee-card { cursor: pointer; transition: all .2s ease; border: 1px solid var(--rb-border); border-radius: 8px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .employee-card:hover { background-color: #EBF3FA; border-color: var(--rb-blue); }
+    .employee-card.selected { background-color: #EBF3FA; border-color: var(--rb-blue); border-left: 4px solid var(--rb-blue); }
+    .employee-badge { font-size: .75rem; color: var(--rb-muted); }
+    .badge-resigned { background: var(--rb-danger); color: #fff; font-size: .7rem; padding: 2px 8px; border-radius: 12px; }
+
+    #computationsList .computation-item { border: 1px solid var(--rb-border); border-radius: 8px; padding: 12px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    #computationsList .computation-item:hover { background-color: #EBF3FA; }
+
+    #reportTable { width: 100%; font-size: .85rem; border-collapse: collapse; }
+    #reportTable thead th { background: var(--rb-navy) !important; color: #fff !important; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; padding: .5rem; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+    #reportTable thead th:first-child { text-align: left; }
+    #reportTable tbody td { padding: .5rem; border-bottom: 1px solid var(--rb-border); }
+    #reportTable tbody td:first-child { text-align: left; font-weight: 500; }
+    #reportTable tbody tr:nth-child(odd) td { background: var(--rb-bg); }
+
+    /* Table wrapper with scroll */
+    .table-wrapper { 
+      max-height: 500px; 
+      overflow-y: auto; 
+      border: 1px solid var(--rb-border);
+      border-radius: 8px;
+    }
+    .table-wrapper::-webkit-scrollbar { width: 6px; }
+    .table-wrapper::-webkit-scrollbar-track { background: #F1F1F1; border-radius: 3px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #C1C7CD; border-radius: 3px; }
+    .table-wrapper::-webkit-scrollbar-thumb:hover { background: #A0A7AE; }
+
+    .summary-box { background: var(--rb-bg); border: 1px solid var(--rb-border); border-radius: 8px; padding: 15px 20px; margin-bottom: 15px; }
+    .summary-box .stat { display: inline-block; margin-right: 30px; }
+    .summary-box .stat-label { font-size: .75rem; color: var(--rb-muted); }
+    .summary-box .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--rb-navy-deep); }
+
+    /* Pagination */
+    .pagination-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; flex-wrap: wrap; gap: 10px; }
+    .pagination-container .info { font-size: .85rem; color: var(--rb-muted); }
+    .pagination .page-link { color: var(--rb-blue); font-size: .85rem; padding: 5px 12px; }
+    .pagination .page-item.active .page-link { background-color: var(--rb-blue); border-color: var(--rb-blue); color: #fff; }
+    .pagination .page-item.disabled .page-link { color: var(--rb-muted); }
+    .pagination .page-link:hover { background-color: #EBF3FA; color: var(--rb-blue); }
+
+    @media (max-width: 768px) {
+      .summary-box .stat { display: block; margin-bottom: 8px; }
+      .action-buttons .btn { width: 100%; }
+      #reportTable { min-width: 600px; }
+      .pagination-container { flex-direction: column; align-items: center; }
+    }
+
+    .rb-chevron { color: #C1C7CD; margin-left: 10px; }
+    .rb-emp-name { font-weight: 600; color: var(--rb-navy-deep); }
+    .rb-emp-meta { display: flex; flex-wrap: wrap; gap: 8px 15px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <div class="mb-4">
+        <h1 class="rb-title"><i class="fas fa-file-alt"></i> Last Pay Reports</h1>
+        <p class="rb-subtitle">Generate deduction type reports or reprint saved computations.</p>
+      </div>
+
+      <!-- Tabs - SWAPPED: Deduction Type Report is now default (active) -->
+      <ul class="nav nav-tabs mb-4" id="reportTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="deduction-tab" data-bs-toggle="tab" data-bs-target="#deductionPanel" type="button" role="tab">
+            <i class="fas fa-list-alt me-2"></i>Deduction Type Report
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="reprint-tab" data-bs-toggle="tab" data-bs-target="#reprintPanel" type="button" role="tab">
+            <i class="fas fa-print me-2"></i>Reprint Last Pay
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <!-- ========================================================== -->
+        <!-- TAB 1: DEDUCTION TYPE REPORT (NOW DEFAULT)                  -->
+        <!-- ========================================================== -->
+        <div class="tab-pane fade show active" id="deductionPanel" role="tabpanel">
+          <div class="rb-card">
+            <div class="rb-card-header">
+              <i class="fas fa-sliders-h"></i>
+              <strong>Deduction Report Criteria</strong>
+            </div>
+            <div class="rb-card-body">
+              <form id="deductionReportForm">
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <label class="form-label">Deduction Type</label>
+                    <select name="deductionType" id="deductionTypeSelect" class="form-select">
+                      <option value="">All Types</option>
+                      {{#each deductionTypes}}
+                        <option value="{{this}}">{{this}}</option>
+                      {{/each}}
+                    </select>
+                    <small class="text-muted">Search will find types containing this text</small>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Date From</label>
+                    <input type="text" id="deductionDateFrom" class="form-control datepicker" placeholder="Select date">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Date To</label>
+                    <input type="text" id="deductionDateTo" class="form-control datepicker" placeholder="Select date">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Office</label>
+                    <select name="office" id="deductionOffice" class="form-select">
+                      <option value="">All Offices</option>
+                      {{#each offices}}
+                        <option value="{{this.office_name}}">{{this.office_name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <button type="submit" class="btn btn-rb-blue"><i class="fas fa-file-alt me-1"></i> Generate Report</button>
+                  <button type="button" id="deductionResetBtn" class="btn btn-outline-secondary"><i class="fas fa-redo me-1"></i> Reset</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div id="deductionLoading" class="text-center py-3" style="display:none;">
+            <div class="spinner-border spinner-border-sm" role="status"></div>
+            <span class="ms-2 text-muted">Generating report...</span>
+          </div>
+
+          <!-- Results -->
+          <div id="deductionResults" style="display:none;">
+            <div class="summary-box" id="deductionSummary"></div>
+            <div class="rb-card">
+              <div class="rb-card-header rb-card-header-between">
+                <strong>Deduction Details</strong>
+                <div>
+                  <button class="btn btn-sm btn-outline-success" id="exportDeductionExcel"><i class="fas fa-file-excel me-1"></i> Excel</button>
+                  <button class="btn btn-sm btn-outline-danger" id="exportDeductionPDF"><i class="fas fa-file-pdf me-1"></i> PDF</button>
+                </div>
+              </div>
+              <div class="rb-card-body">
+                <div class="table-wrapper">
+                  <table id="reportTable" class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>ID No.</th>
+                        <th>Employee Name</th>
+                        <th>Office</th>
+                        <th>Region</th>
+                        <th>Deduction Type</th>
+                        <th>Date</th>
+                        <th class="text-end">Outstanding</th>
+                        <th class="text-end">Deduction</th>
+                        <th class="text-end">Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody id="deductionReportBody"></tbody>
+                  </table>
+                </div>
+                <!-- Pagination -->
+                <div class="pagination-container" id="paginationContainer">
+                  <span class="info" id="paginationInfo">Showing 0 - 0 of 0 entries</span>
+                  <nav>
+                    <ul class="pagination mb-0" id="paginationControls">
+                      <li class="page-item disabled" id="prevPage"><a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a></li>
+                      <li class="page-item active" id="page1"><a class="page-link" href="#" data-page="1">1</a></li>
+                      <li class="page-item disabled" id="nextPage"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- TAB 2: REPRINT LAST PAY (NOW SECOND)                        -->
+        <!-- ========================================================== -->
+        <div class="tab-pane fade" id="reprintPanel" role="tabpanel">
+          <div class="rb-card">
+            <div class="rb-card-header">
+              <i class="fas fa-search"></i>
+              <strong>Search Employee</strong>
+            </div>
+            <div class="rb-card-body">
+              <form id="reprintSearchForm">
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <label class="form-label">Office</label>
+                    <select name="office" id="reprintOffice" class="form-select" required>
+                      <option value="" disabled selected>Select Office</option>
+                      {{#each offices}}
+                        <option value="{{this.office_name}}">{{this.office_name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">ID Number</label>
+                    <input type="text" id="reprintIdno" class="form-control" placeholder="Enter ID Number">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" id="reprintLastName" class="form-control" placeholder="Enter Last Name">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">First Name</label>
+                    <input type="text" id="reprintFirstName" class="form-control" placeholder="Enter First Name">
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <button type="submit" class="btn btn-rb-blue"><i class="fas fa-search me-1"></i> Search</button>
+                  <button type="button" id="reprintResetBtn" class="btn btn-outline-secondary"><i class="fas fa-redo me-1"></i> Reset</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div id="reprintLoading" class="text-center py-3" style="display:none;">
+            <div class="spinner-border spinner-border-sm" role="status"></div>
+            <span class="ms-2 text-muted">Loading...</span>
+          </div>
+
+          <!-- Employee list -->
+          <div id="reprintEmployeeListContainer" class="rb-card" style="display:none;">
+            <div class="rb-card-header rb-card-header-between">
+              <div class="d-flex align-items-center gap-2"><i class="fas fa-users"></i><strong>Select Employee</strong></div>
+              <span id="reprintEmployeeCount" class="rb-card-count"></span>
+            </div>
+            <div class="rb-card-body">
+              <div id="reprintEmployeeList"></div>
+            </div>
+          </div>
+
+          <!-- Computations list -->
+          <div id="computationsListContainer" class="rb-card" style="display:none;">
+            <div class="rb-card-header">
+              <i class="fas fa-history"></i>
+              <strong>Saved Computations for <span id="computedEmployeeName"></span></strong>
+            </div>
+            <div class="rb-card-body">
+              <div id="computationsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div id="errorMessage" class="alert alert-danger mt-3" style="display:none;"></div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Init date pickers
+  flatpickr('.datepicker', { 
+    dateFormat: 'Y-m-d', 
+    allowInput: true,
+    maxDate: new Date()
+  });
+
+  // ==============================================================
+  // TAB 1: Deduction Type Report (Default)
+  // ==============================================================
+  const deductionForm = document.getElementById('deductionReportForm');
+  const deductionTypeSelect = document.getElementById('deductionTypeSelect');
+  const deductionDateFrom = document.getElementById('deductionDateFrom');
+  const deductionDateTo = document.getElementById('deductionDateTo');
+  const deductionOffice = document.getElementById('deductionOffice');
+  const deductionResetBtn = document.getElementById('deductionResetBtn');
+  const deductionLoading = document.getElementById('deductionLoading');
+  const deductionResults = document.getElementById('deductionResults');
+  const deductionReportBody = document.getElementById('deductionReportBody');
+  const deductionSummary = document.getElementById('deductionSummary');
+  const exportExcelBtn = document.getElementById('exportDeductionExcel');
+  const exportPdfBtn = document.getElementById('exportDeductionPDF');
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationInfo = document.getElementById('paginationInfo');
+  const paginationControls = document.getElementById('paginationControls');
+  const prevPageBtn = document.getElementById('prevPage');
+  const nextPageBtn = document.getElementById('nextPage');
+
+  let allRows = [];
+  let currentPage = 1;
+  const rowsPerPage = 30;
+  let totalPages = 0;
+  let currentData = null;
+
+  deductionForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    await generateDeductionReport('json');
+  });
+
+  deductionResetBtn.addEventListener('click', function() {
+    deductionForm.reset();
+    deductionResults.style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+    allRows = [];
+    currentPage = 1;
+    
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (paginationContainer) {
+      paginationContainer.style.display = 'none';
+    }
+  });
+
+  exportExcelBtn.addEventListener('click', function() {
+    generateDeductionReport('excel');
+  });
+
+  exportPdfBtn.addEventListener('click', function() {
+    generateDeductionReport('pdf');
+  });
+
+  async function generateDeductionReport(format) {
+    const dateFrom = deductionDateFrom.value;
+    const dateTo = deductionDateTo.value;
+
+    if (!dateFrom || !dateTo) {
+      showError('Please select a date range');
+      return;
+    }
+
+    if (new Date(dateFrom) > new Date(dateTo)) {
+      showError('Date From must be earlier than Date To');
+      return;
+    }
+
+    deductionLoading.style.display = 'block';
+    deductionResults.style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+
+    try {
+      const body = {
+        deductionType: deductionTypeSelect.value || null,
+        dateFrom: dateFrom,
+        dateTo: dateTo,
+        office: deductionOffice.value || null,
+        format: format
+      };
+
+      const response = await fetch('/resigned/last-pay-reports/deduction-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (format === 'pdf' || format === 'excel') {
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const contentDisposition = response.headers.get('Content-Disposition');
+          let filename = `Deduction_Report_${dateFrom}_to_${dateTo}`;
+          if (contentDisposition) {
+            const match = contentDisposition.match(/filename="?(.+)"?/);
+            if (match) filename = match[1];
+          }
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        } else {
+          const text = await response.text();
+          let msg = 'Error generating report';
+          try { msg = JSON.parse(text).message || msg; } catch(e) {}
+          showError(msg);
+        }
+        deductionLoading.style.display = 'none';
+        return;
+      }
+
+      // JSON response
+      const result = await response.json();
+
+      if (result.success) {
+        currentData = result.data;
+        allRows = result.data.rows || [];
+        currentPage = 1;
+        displayDeductionResults(result.data);
+      } else {
+        showError(result.message || 'Error generating report');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error generating report: ' + error.message);
+    } finally {
+      deductionLoading.style.display = 'none';
+    }
+  }
+
+  function displayDeductionResults(data) {
+    const { rows, totals } = data;
+
+    allRows = rows;
+    totalPages = Math.ceil(allRows.length / rowsPerPage);
+    currentPage = 1;
+
+    // Summary
+    deductionSummary.innerHTML = `
+      <div class="stat">
+        <div class="stat-label">Total Outstanding</div>
+        <div class="stat-value">₱${formatCurrency(totals.totalOutstanding)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Deduction</div>
+        <div class="stat-value">₱${formatCurrency(totals.totalDeduction)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Balance</div>
+        <div class="stat-value">₱${formatCurrency(totals.totalBalance)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">No. of Employees</div>
+        <div class="stat-value">${totals.employeeCount}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Unique Employees</div>
+        <div class="stat-value">${totals.uniqueEmployees}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Deduction Types Found</div>
+        <div class="stat-value">${totals.deductionTypesFound}</div>
+      </div>
+    `;
+
+    deductionResults.style.display = 'block';
+    renderPage(1);
+  }
+
+  function renderPage(page) {
+    if (!allRows || allRows.length === 0) {
+      deductionReportBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No data found for the selected criteria.</td></tr>';
+      paginationContainer.style.display = 'none';
+      return;
+    }
+
+    currentPage = page;
+    const startIndex = (page - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, allRows.length);
+    const pageRows = allRows.slice(startIndex, endIndex);
+
+    deductionReportBody.innerHTML = '';
+    pageRows.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.idno || ''}</td>
+        <td>${row.fullname || ''}</td>
+        <td>${row.office || ''}</td>
+        <td>${row.region || ''}</td>
+        <td>${row.deductiontype || ''}</td>
+        <td>${formatDate(row.transdate)}</td>
+        <td class="text-end">${formatCurrency(row.outstanding)}</td>
+        <td class="text-end">${formatCurrency(row.deduction)}</td>
+        <td class="text-end">${formatCurrency(row.balance)}</td>
+      `;
+      deductionReportBody.appendChild(tr);
+    });
+
+    const totalEntries = allRows.length;
+    paginationInfo.textContent = `Showing ${startIndex + 1} - ${endIndex} of ${totalEntries} entries`;
+
+    updatePaginationControls(page, totalPages);
+    paginationContainer.style.display = 'flex';
+  }
+
+  function updatePaginationControls(currentPage, totalPages) {
+    const pageItems = paginationControls.querySelectorAll('.page-item:not(#prevPage):not(#nextPage)');
+    pageItems.forEach(item => item.remove());
+
+    prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+    nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
+
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    if (endPage - startPage < 4) {
+      if (startPage > 1) {
+        startPage = Math.max(1, endPage - 4);
+      } else {
+        endPage = Math.min(totalPages, startPage + 4);
+      }
+    }
+
+    if (startPage > 1) {
+      const li = createPageButton(1);
+      paginationControls.insertBefore(li, nextPageBtn);
+      if (startPage > 2) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationControls.insertBefore(ellipsis, nextPageBtn);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      const li = createPageButton(i);
+      if (i === currentPage) {
+        li.classList.add('active');
+      }
+      paginationControls.insertBefore(li, nextPageBtn);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const ellipsis = document.createElement('li');
+        ellipsis.className = 'page-item disabled';
+        ellipsis.innerHTML = '<span class="page-link">...</span>';
+        paginationControls.insertBefore(ellipsis, nextPageBtn);
+      }
+      const li = createPageButton(totalPages);
+      paginationControls.insertBefore(li, nextPageBtn);
+    }
+  }
+
+  function createPageButton(page) {
+    const li = document.createElement('li');
+    li.className = 'page-item';
+    const a = document.createElement('a');
+    a.className = 'page-link';
+    a.href = '#';
+    a.textContent = page;
+    a.dataset.page = page;
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      const pageNum = parseInt(this.dataset.page);
+      if (pageNum !== currentPage) {
+        renderPage(pageNum);
+      }
+    });
+    li.appendChild(a);
+    return li;
+  }
+
+  prevPageBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (currentPage > 1) {
+      renderPage(currentPage - 1);
+    }
+  });
+
+  nextPageBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (currentPage < totalPages) {
+      renderPage(currentPage + 1);
+    }
+  });
+
+  // ==============================================================
+  // TAB 2: Reprint Last Pay (with Pagination)
+  // ==============================================================
+  const reprintSearchForm = document.getElementById('reprintSearchForm');
+  const reprintOffice = document.getElementById('reprintOffice');
+  const reprintIdno = document.getElementById('reprintIdno');
+  const reprintLastName = document.getElementById('reprintLastName');
+  const reprintFirstName = document.getElementById('reprintFirstName');
+  const reprintResetBtn = document.getElementById('reprintResetBtn');
+  const reprintLoading = document.getElementById('reprintLoading');
+  const reprintEmployeeListContainer = document.getElementById('reprintEmployeeListContainer');
+  const reprintEmployeeList = document.getElementById('reprintEmployeeList');
+  const reprintEmployeeCount = document.getElementById('reprintEmployeeCount');
+  const computationsListContainer = document.getElementById('computationsListContainer');
+  const computationsList = document.getElementById('computationsList');
+  const computedEmployeeName = document.getElementById('computedEmployeeName');
+
+  let reprintSelectedEmployeeId = null;
+  let reprintSelectedOffice = null;
+  let allEmployees = [];
+  let employeeCurrentPage = 1;
+  const employeePerPage = 10;
+  let employeeTotalPages = 0;
+  let allComputations = [];
+  let computationsCurrentPage = 1;
+  const computationsPerPage = 20;
+  let computationsTotalPages = 0;
+
+  reprintSearchForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    await searchReprintEmployees();
+  });
+
+  reprintResetBtn.addEventListener('click', function() {
+    reprintSearchForm.reset();
+    reprintEmployeeListContainer.style.display = 'none';
+    computationsListContainer.style.display = 'none';
+    reprintSelectedEmployeeId = null;
+    reprintEmployeeList.innerHTML = '';
+    computationsList.innerHTML = '';
+    document.getElementById('errorMessage').style.display = 'none';
+    
+    const employeePagination = document.getElementById('employeePaginationContainer');
+    if (employeePagination) employeePagination.remove();
+    
+    const computationsPagination = document.getElementById('computationsPaginationContainer');
+    if (computationsPagination) computationsPagination.remove();
+    
+    allEmployees = [];
+    allComputations = [];
+    employeeCurrentPage = 1;
+    computationsCurrentPage = 1;
+  });
+
+  async function searchReprintEmployees() {
+    const office = reprintOffice.value;
+    const idno = reprintIdno.value.trim();
+    const lastName = reprintLastName.value.trim();
+    const firstName = reprintFirstName.value.trim();
+
+    if (!office) {
+      showError('Please select an office');
+      return;
+    }
+
+    if (!idno && !lastName && !firstName) {
+      showError('Please enter at least one search criteria');
+      return;
+    }
+
+    reprintLoading.style.display = 'block';
+    reprintEmployeeListContainer.style.display = 'none';
+    computationsListContainer.style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+
+    try {
+      const params = new URLSearchParams({ office });
+      if (idno) params.append('idno', idno);
+      if (lastName) params.append('lastName', lastName);
+      if (firstName) params.append('firstName', firstName);
+
+      const response = await fetch(`/resigned/last-pay-reports/search?${params.toString()}`);
+      const result = await response.json();
+
+      if (result.success && result.data.length > 0) {
+        allEmployees = result.data;
+        employeeCurrentPage = 1;
+        displayReprintEmployeeList(result.data);
+      } else {
+        showError('No resigned employees found matching your criteria');
+        reprintEmployeeListContainer.style.display = 'none';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error searching employees');
+    } finally {
+      reprintLoading.style.display = 'none';
+    }
+  }
+
+  function displayReprintEmployeeList(employees) {
+    employeeTotalPages = Math.ceil(employees.length / employeePerPage);
+    renderEmployeePage(1);
+  }
+
+  function renderEmployeePage(page) {
+    if (!allEmployees || allEmployees.length === 0) {
+      reprintEmployeeList.innerHTML = '<div class="text-center text-muted py-3">No employees found.</div>';
+      return;
+    }
+
+    employeeCurrentPage = page;
+    const startIndex = (page - 1) * employeePerPage;
+    const endIndex = Math.min(startIndex + employeePerPage, allEmployees.length);
+    const pageEmployees = allEmployees.slice(startIndex, endIndex);
+
+    reprintEmployeeList.innerHTML = '';
+    reprintEmployeeCount.textContent = `Showing ${startIndex + 1} - ${endIndex} of ${allEmployees.length} employee(s)`;
+
+    pageEmployees.forEach(emp => {
+      const card = document.createElement('div');
+      card.className = 'employee-card';
+      card.innerHTML = `
+        <div>
+          <div class="rb-emp-name">${emp.lastname || ''}, ${emp.firstname || ''}</div>
+          <div class="rb-emp-meta">
+            <span class="employee-badge"><strong>ID:</strong> ${emp.idno}</span>
+            <span class="employee-badge"><strong>Region:</strong> ${emp.region || 'N/A'}</span>
+            <span class="employee-badge"><strong>Resigned:</strong> ${formatDate(emp.dateresign)}</span>
+          </div>
+        </div>
+        <div><span class="badge-resigned">Resigned</span><i class="fas fa-chevron-right rb-chevron"></i></div>
+      `;
+      card.dataset.idno = emp.idno;
+      card.addEventListener('click', () => loadEmployeeComputations(emp.idno, emp.fullname));
+      reprintEmployeeList.appendChild(card);
+    });
+
+    updateEmployeePagination();
+    reprintEmployeeListContainer.style.display = 'block';
+  }
+
+  function updateEmployeePagination() {
+    const totalEntries = allEmployees.length;
+    const startIndex = (employeeCurrentPage - 1) * employeePerPage;
+    const endIndex = Math.min(startIndex + employeePerPage, totalEntries);
+    
+    let paginationHtml = '';
+    
+    paginationHtml += `<li class="page-item ${employeeCurrentPage <= 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${employeeCurrentPage - 1}"><i class="fas fa-chevron-left"></i></a>
+    </li>`;
+
+    let startPage = Math.max(1, employeeCurrentPage - 2);
+    let endPage = Math.min(employeeTotalPages, employeeCurrentPage + 2);
+
+    if (endPage - startPage < 4) {
+      if (startPage > 1) {
+        startPage = Math.max(1, endPage - 4);
+      } else {
+        endPage = Math.min(employeeTotalPages, startPage + 4);
+      }
+    }
+
+    if (startPage > 1) {
+      paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+      if (startPage > 2) {
+        paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      paginationHtml += `<li class="page-item ${i === employeeCurrentPage ? 'active' : ''}">
+        <a class="page-link" href="#" data-page="${i}">${i}</a>
+      </li>`;
+    }
+
+    if (endPage < employeeTotalPages) {
+      if (endPage < employeeTotalPages - 1) {
+        paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+      paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${employeeTotalPages}">${employeeTotalPages}</a></li>`;
+    }
+
+    paginationHtml += `<li class="page-item ${employeeCurrentPage >= employeeTotalPages ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${employeeCurrentPage + 1}"><i class="fas fa-chevron-right"></i></a>
+    </li>`;
+
+    const infoText = `Showing ${startIndex + 1} - ${endIndex} of ${totalEntries} entries`;
+    
+    let employeePaginationContainer = document.getElementById('employeePaginationContainer');
+    if (!employeePaginationContainer) {
+      employeePaginationContainer = document.createElement('div');
+      employeePaginationContainer.id = 'employeePaginationContainer';
+      employeePaginationContainer.className = 'pagination-container mt-3';
+      reprintEmployeeListContainer.querySelector('.rb-card-body').appendChild(employeePaginationContainer);
+    }
+
+    employeePaginationContainer.innerHTML = `
+      <span class="info">${infoText}</span>
+      <nav>
+        <ul class="pagination mb-0">${paginationHtml}</ul>
+      </nav>
+    `;
+
+    employeePaginationContainer.querySelectorAll('.page-link[data-page]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const pageNum = parseInt(this.dataset.page);
+        if (pageNum > 0 && pageNum <= employeeTotalPages && pageNum !== employeeCurrentPage) {
+          renderEmployeePage(pageNum);
+        }
+      });
+    });
+  }
+
+  async function loadEmployeeComputations(idno, fullname) {
+    reprintSelectedEmployeeId = idno;
+    reprintSelectedOffice = reprintOffice.value;
+    computedEmployeeName.textContent = fullname || idno;
+
+    reprintLoading.style.display = 'block';
+    computationsListContainer.style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+
+    try {
+      const response = await fetch(
+        `/resigned/last-pay-reports/computations?office=${encodeURIComponent(reprintSelectedOffice)}&idno=${encodeURIComponent(idno)}`
+      );
+      const result = await response.json();
+
+      if (result.success && result.data.length > 0) {
+        allComputations = result.data;
+        computationsCurrentPage = 1;
+        displayComputations(result.data);
+      } else {
+        computationsList.innerHTML = `<div class="text-center text-muted py-3">${result.message || 'No saved computations found.'}</div>`;
+        computationsListContainer.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error loading computations');
+    } finally {
+      reprintLoading.style.display = 'none';
+    }
+  }
+
+  function displayComputations(computations) {
+    computationsTotalPages = Math.ceil(computations.length / computationsPerPage);
+    renderComputationsPage(1);
+  }
+
+  function renderComputationsPage(page) {
+    if (!allComputations || allComputations.length === 0) {
+      computationsList.innerHTML = `<div class="text-center text-muted py-3">No saved computations found.</div>`;
+      return;
+    }
+
+    computationsCurrentPage = page;
+    const startIndex = (page - 1) * computationsPerPage;
+    const endIndex = Math.min(startIndex + computationsPerPage, allComputations.length);
+    const pageComputations = allComputations.slice(startIndex, endIndex);
+
+    computationsList.innerHTML = '';
+    
+    pageComputations.forEach(comp => {
+      const item = document.createElement('div');
+      item.className = 'computation-item';
+      item.innerHTML = `
+        <div>
+          <div><strong>Date:</strong> ${formatDate(comp.transDate)}</div>
+          <div class="text-muted" style="font-size:.85rem;">
+            <span><strong>Gross:</strong> ₱${formatCurrency(comp.gross)}</span>
+            <span class="ms-3"><strong>Net:</strong> ₱${formatCurrency(comp.netPay)}</span>
+            <span class="ms-3"><strong>Status:</strong> ${comp.status || 'Computed'}</span>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-rb-blue reprint-btn" data-transdate="${comp.transDate}">
+          <i class="fas fa-print me-1"></i> Reprint
+        </button>
+      `;
+      computationsList.appendChild(item);
+    });
+
+    computationsList.querySelectorAll('.reprint-btn').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const transDate = this.dataset.transdate;
+        await reprintComputation(transDate);
+      });
+    });
+
+    updateComputationsPagination();
+    computationsListContainer.style.display = 'block';
+  }
+
+  function updateComputationsPagination() {
+    const totalEntries = allComputations.length;
+    const startIndex = (computationsCurrentPage - 1) * computationsPerPage;
+    const endIndex = Math.min(startIndex + computationsPerPage, totalEntries);
+    
+    let paginationHtml = '';
+    
+    paginationHtml += `<li class="page-item ${computationsCurrentPage <= 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${computationsCurrentPage - 1}"><i class="fas fa-chevron-left"></i></a>
+    </li>`;
+
+    let startPage = Math.max(1, computationsCurrentPage - 2);
+    let endPage = Math.min(computationsTotalPages, computationsCurrentPage + 2);
+
+    if (endPage - startPage < 4) {
+      if (startPage > 1) {
+        startPage = Math.max(1, endPage - 4);
+      } else {
+        endPage = Math.min(computationsTotalPages, startPage + 4);
+      }
+    }
+
+    if (startPage > 1) {
+      paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+      if (startPage > 2) {
+        paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      paginationHtml += `<li class="page-item ${i === computationsCurrentPage ? 'active' : ''}">
+        <a class="page-link" href="#" data-page="${i}">${i}</a>
+      </li>`;
+    }
+
+    if (endPage < computationsTotalPages) {
+      if (endPage < computationsTotalPages - 1) {
+        paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+      paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${computationsTotalPages}">${computationsTotalPages}</a></li>`;
+    }
+
+    paginationHtml += `<li class="page-item ${computationsCurrentPage >= computationsTotalPages ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${computationsCurrentPage + 1}"><i class="fas fa-chevron-right"></i></a>
+    </li>`;
+
+    const infoText = `Showing ${startIndex + 1} - ${endIndex} of ${totalEntries} entries`;
+    
+    let computationsPaginationContainer = document.getElementById('computationsPaginationContainer');
+    if (!computationsPaginationContainer) {
+      computationsPaginationContainer = document.createElement('div');
+      computationsPaginationContainer.id = 'computationsPaginationContainer';
+      computationsPaginationContainer.className = 'pagination-container mt-3';
+      computationsListContainer.querySelector('.rb-card-body').appendChild(computationsPaginationContainer);
+    }
+
+    computationsPaginationContainer.innerHTML = `
+      <span class="info">${infoText}</span>
+      <nav>
+        <ul class="pagination mb-0">${paginationHtml}</ul>
+      </nav>
+    `;
+
+    computationsPaginationContainer.querySelectorAll('.page-link[data-page]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const pageNum = parseInt(this.dataset.page);
+        if (pageNum > 0 && pageNum <= computationsTotalPages && pageNum !== computationsCurrentPage) {
+          renderComputationsPage(pageNum);
+        }
+      });
+    });
+  }
+
+  async function reprintComputation(transDate) {
+    reprintLoading.style.display = 'block';
+
+    try {
+      const response = await fetch('/resigned/last-pay-reports/reprint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          office: reprintSelectedOffice,
+          idno: reprintSelectedEmployeeId,
+          transDate: transDate
+        })
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Last_Pay_Reprint_${reprintSelectedEmployeeId}_${transDate}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } else {
+        const text = await response.text();
+        let msg = 'Error reprinting';
+        try { msg = JSON.parse(text).message || msg; } catch(e) {}
+        showError(msg);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Error reprinting: ' + error.message);
+    } finally {
+      reprintLoading.style.display = 'none';
+    }
+  }
+
+  // ==============================================================
+  // Helpers
+  // ==============================================================
+  function formatDate(date) {
+    if (!date) return 'N/A';
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function formatCurrency(amount) {
+    return parseFloat(amount || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => {
+      errorDiv.style.display = 'none';
+    }, 8000);
+  }
+});
+</script>
+
+</body>
+</html>

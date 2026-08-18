@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --ah-navy: #16304A;
+      --ah-navy-deep: #0F2233;
+      --ah-blue: #2E6F9E;
+      --ah-teal: #1F7A6C;
+      --ah-gold: #A8762A;
+      --ah-bg: #F6F7F9;
+      --ah-surface: #FFFFFF;
+      --ah-border: #E3E6EB;
+      --ah-muted: #6B7686;
+      --ah-danger: #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--ah-bg);
+    }
+
+    /* ---- Page header ---- */
+    .ah-page-head{ margin-bottom:1.5rem; }
+    .ah-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--ah-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .ah-title i{ color:var(--ah-blue); }
+    .ah-subtitle{
+      color:var(--ah-muted);
+      font-size:.92rem;
+      margin:.35rem 0 0;
+    }
+
+    /* ---- Buttons ---- */
+    .btn-ah-teal{
+      background:var(--ah-teal);
+      border-color:var(--ah-teal);
+      color:#fff;
+      font-weight:500;
+    }
+    .btn-ah-teal:hover{ background:#176255; border-color:#176255; color:#fff; }
+
+    .btn-ah-blue{
+      background:var(--ah-blue);
+      border-color:var(--ah-blue);
+      color:#fff;
+      font-weight:500;
+    }
+    .btn-ah-blue:hover{ background:#255e87; border-color:#255e87; color:#fff; }
+
+    .btn-ah-outline{
+      background:var(--ah-surface);
+      border-color:var(--ah-border);
+      color:var(--ah-navy-deep);
+    }
+    .btn-ah-outline:hover{
+      background:var(--ah-bg);
+      border-color:var(--ah-muted);
+      color:var(--ah-navy-deep);
+    }
+
+    /* ---- Filter card ---- */
+    .ah-filter{
+      background:var(--ah-surface);
+      border:1px solid var(--ah-border);
+      border-radius:.65rem;
+      padding:1.1rem 1.15rem;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      margin-bottom:1.25rem;
+    }
+    .ah-filter .form-label{
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--ah-navy);
+      margin-bottom:.35rem;
+    }
+    .ah-filter .form-control,
+    .ah-filter .form-select{
+      border-color:var(--ah-border);
+      font-size:.9rem;
+    }
+    .ah-filter .form-control:focus,
+    .ah-filter .form-select:focus{
+      border-color:var(--ah-blue);
+      box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+    }
+
+    /* ---- Data card ---- */
+    .ah-card{
+      border:1px solid var(--ah-border);
+      border-radius:.65rem;
+      background:var(--ah-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+    }
+    .ah-card-header{
+      padding:.85rem 1.15rem;
+      border-bottom:1px solid var(--ah-border);
+      display:flex;
+      align-items:center;
+      gap:.45rem;
+    }
+    .ah-card-header i{ color:var(--ah-blue); }
+    .ah-card-header .ah-card-title{
+      color:var(--ah-navy-deep);
+      font-weight:600;
+      font-size:.97rem;
+      margin:0;
+    }
+    .ah-card-header .ah-record-count{
+      color:var(--ah-muted);
+      font-weight:400;
+      font-size:.85rem;
+      margin-left:.25rem;
+    }
+
+    /* ---- Table ---- */
+    .ah-card .table{ margin:0; }
+    .ah-card .table thead th{
+      background:var(--ah-navy) !important;
+      color:#fff !important;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:600;
+      border-color:#1e3e5e;
+      padding:.75rem 1rem;
+      white-space:nowrap;
+    }
+    .ah-card .table tbody td{
+      font-size:.88rem;
+      color:var(--ah-navy-deep);
+      padding:.7rem 1rem;
+      vertical-align:middle;
+      border-color:var(--ah-border);
+    }
+    .ah-card .table tbody tr:hover{ background:var(--ah-bg); }
+
+    /* ---- Item cell ---- */
+    .ah-item-name{ font-weight:600; }
+    .ah-item-code{ font-size:.78rem; color:var(--ah-muted); }
+
+    /* ---- Status badges ---- */
+    .status-badge{
+      padding:.25rem .75rem;
+      border-radius:1rem;
+      font-size:.72rem;
+      font-weight:600;
+      text-transform:uppercase;
+      display:inline-block;
+    }
+    .status-pending{
+      background:rgba(168,118,42,.12);
+      color:var(--ah-gold);
+    }
+    .status-approved{
+      background:rgba(31,122,108,.12);
+      color:var(--ah-teal);
+    }
+    .status-rejected{
+      background:rgba(193,72,61,.12);
+      color:var(--ah-danger);
+    }
+
+    /* ---- Action column ---- */
+    .ah-approved-by,
+    .ah-rejected-by{
+      font-size:.78rem;
+      color:var(--ah-muted);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:.3rem;
+    }
+
+    /* ---- Empty state ---- */
+    .ah-empty{
+      text-align:center;
+      padding:3rem 1rem;
+      color:var(--ah-muted);
+    }
+    .ah-empty i{
+      font-size:2rem;
+      color:var(--ah-border);
+      display:block;
+      margin-bottom:.5rem;
+    }
+
+    /* ---- Pagination ---- */
+    .ah-pagination-bar{
+      border-top:1px solid var(--ah-border);
+      padding:.85rem 1.15rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:.75rem;
+    }
+    .ah-pagination-bar .ah-page-info{
+      color:var(--ah-muted);
+      font-size:.85rem;
+    }
+    .pagination .page-link{
+      color:var(--ah-blue);
+      border-color:var(--ah-border);
+    }
+    .pagination .page-item.active .page-link{
+      background:var(--ah-navy);
+      border-color:var(--ah-navy);
+      color:#fff;
+    }
+    .pagination .page-item:not(.active) .page-link:hover{
+      background:var(--ah-bg);
+      color:var(--ah-navy-deep);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 ah-page-head">
+        <div>
+          <h1 class="ah-title">
+            <i class="fas fa-history"></i> Adjustment History
+          </h1>
+          <p class="ah-subtitle">View and manage all stock adjustments.</p>
+        </div>
+        <a href="/inventory/adjustment" class="btn btn-ah-teal">
+          <i class="fas fa-plus me-1"></i> New Adjustment
+        </a>
+      </div>
+
+      <!-- Filters -->
+      <div class="ah-filter">
+        <form method="GET" action="/inventory/adjustments" class="row g-3 align-items-end">
+
+          <div class="col-md-3">
+            <label class="form-label">Search</label>
+            <input
+              type="text"
+              name="search"
+              class="form-control"
+              placeholder="Item name, code, or adjustment #"
+              value="{{filters.search}}"
+            >
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option value="">All Status</option>
+              <option value="pending"  {{#if (eq filters.status "pending")}}selected{{/if}}>Pending</option>
+              <option value="approved" {{#if (eq filters.status "approved")}}selected{{/if}}>Approved</option>
+              <option value="rejected" {{#if (eq filters.status "rejected")}}selected{{/if}}>Rejected</option>
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">From Date</label>
+            <input type="date" name="startDate" class="form-control" value="{{filters.startDate}}">
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">To Date</label>
+            <input type="date" name="endDate" class="form-control" value="{{filters.endDate}}">
+          </div>
+
+          <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-ah-blue flex-grow-1">
+              <i class="fas fa-filter me-1"></i> Apply Filters
+            </button>
+            <a href="/inventory/adjustments" class="btn btn-ah-outline" title="Clear filters">
+              <i class="fas fa-times"></i>
+            </a>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Adjustments Table -->
+      <div class="ah-card">
+
+        <div class="ah-card-header">
+          <i class="fas fa-list"></i>
+          <span class="ah-card-title">
+            Adjustments
+            <span class="ah-record-count">({{pagination.totalItems}} records)</span>
+          </span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Adjustment #</th>
+                <th>Item</th>
+                <th class="text-center">Type</th>
+                <th class="text-center">Quantity</th>
+                <th class="text-center">Previous</th>
+                <th class="text-center">New</th>
+                <th>Reason</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Date</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#if adjustments.length}}
+                {{#each adjustments}}
+                  <tr>
+
+                    <td style="color:var(--ah-muted); font-weight:600;">{{add @index 1}}</td>
+
+                    <td style="font-weight:600; font-size:.85rem;">{{this.adjustment_number}}</td>
+
+                    <td>
+                      <div class="ah-item-name">{{this.item_name}}</div>
+                      <div class="ah-item-code">{{this.item_code}}</div>
+                    </td>
+
+                    <td class="text-center">
+                      {{#if (eq this.adjustment_type "add")}}
+                        <i class="fas fa-plus-circle" style="color:var(--ah-teal); font-size:1.1rem;" title="Add"></i>
+                      {{else}}
+                        <i class="fas fa-minus-circle" style="color:var(--ah-danger); font-size:1.1rem;" title="Subtract"></i>
+                      {{/if}}
+                    </td>
+
+                    <td class="text-center" style="font-weight:600;">{{this.quantity}}</td>
+                    <td class="text-center">{{this.previous_count}}</td>
+                    <td class="text-center" style="font-weight:600;">{{this.new_count}}</td>
+
+                    <td style="font-size:.85rem;">{{this.reason_name}}</td>
+
+                    <td class="text-center">
+                      <span class="status-badge status-{{this.status}}">{{this.status}}</span>
+                    </td>
+
+                    <td class="text-center" style="font-size:.82rem; color:var(--ah-muted);">
+                      {{formatDate this.created_at}}
+                    </td>
+
+                    <td class="text-center">
+                      {{#if (eq this.status "pending")}}
+                        <div class="d-flex justify-content-center gap-1">
+                          <button
+                            onclick="approveAdjustment({{this.adjustment_id}})"
+                            class="btn btn-sm btn-ah-teal"
+                            title="Approve"
+                          >
+                            <i class="fas fa-check"></i>
+                          </button>
+                          <button
+                            onclick="rejectAdjustment({{this.adjustment_id}})"
+                            class="btn btn-sm"
+                            style="background:var(--ah-danger); border-color:var(--ah-danger); color:#fff;"
+                            title="Reject"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      {{else}}
+                        {{#if (eq this.status "approved")}}
+                          <div class="ah-approved-by">
+                            <i class="fas fa-check-circle" style="color:var(--ah-teal);"></i>
+                            {{this.approved_by_name}}
+                            {{#if this.approved_by_idno}}({{this.approved_by_idno}}){{/if}}
+                          </div>
+                        {{else if (eq this.status "rejected")}}
+                          <div class="ah-rejected-by">
+                            <i class="fas fa-times-circle" style="color:var(--ah-danger);"></i>
+                            {{this.rejected_by_name}}
+                            {{#if this.rejected_by_idno}}({{this.rejected_by_idno}}){{/if}}
+                          </div>
+                        {{/if}}
+                      {{/if}}
+                    </td>
+
+                  </tr>
+                {{/each}}
+              {{else}}
+                <tr>
+                  <td colspan="11" class="ah-empty">
+                    <i class="fas fa-inbox"></i>
+                    No adjustments found matching your filters.
+                  </td>
+                </tr>
+              {{/if}}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {{#if (gt pagination.totalPages 1)}}
+          <div class="ah-pagination-bar">
+            <div class="ah-page-info">
+              Showing page {{pagination.currentPage}} of {{pagination.totalPages}}
+              ({{pagination.totalItems}} total records)
+            </div>
+            <nav>
+              <ul class="pagination pagination-sm mb-0">
+
+                <li class="page-item {{#if (eq pagination.currentPage 1)}}disabled{{/if}}">
+                  <a class="page-link" href="?page={{dec pagination.currentPage 1}}&status={{filters.status}}&search={{filters.search}}&startDate={{filters.startDate}}&endDate={{filters.endDate}}">
+                    Previous
+                  </a>
+                </li>
+
+                {{#each (range 1 pagination.totalPages)}}
+                  <li class="page-item {{#if (eq this ../pagination.currentPage)}}active{{/if}}">
+                    <a class="page-link" href="?page={{this}}&status={{../filters.status}}&search={{../filters.search}}&startDate={{../filters.startDate}}&endDate={{../filters.endDate}}">
+                      {{this}}
+                    </a>
+                  </li>
+                {{/each}}
+
+                <li class="page-item {{#if (eq pagination.currentPage pagination.totalPages)}}disabled{{/if}}">
+                  <a class="page-link" href="?page={{inc pagination.currentPage 1}}&status={{filters.status}}&search={{filters.search}}&startDate={{filters.startDate}}&endDate={{filters.endDate}}">
+                    Next
+                  </a>
+                </li>
+
+              </ul>
+            </nav>
+          </div>
+        {{/if}}
+
+      </div><!-- /.ah-card -->
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // =============================================
+  // APPROVE ADJUSTMENT
+  // =============================================
+  async function approveAdjustment(adjustmentId) {
+    const result = await Swal.fire({
+      title: 'Approve Adjustment?',
+      text: 'This will update the item stock permanently.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, approve',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#1F7A6C',
+      cancelButtonColor: '#6B7686',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const response = await fetch(`/inventory/adjustment/${adjustmentId}/approve`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        await Swal.fire({
+          title: 'Approved!',
+          text: data.message,
+          icon: 'success',
+          confirmButtonColor: '#1F7A6C',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        window.location.reload();
+      } else {
+        Swal.fire({ title: 'Error', text: data.message, icon: 'error', confirmButtonColor: '#C1483D' });
+      }
+
+    } catch (err) {
+      console.error('Approve error:', err);
+      Swal.fire({ title: 'Error', text: 'Failed to approve adjustment. Please try again.', icon: 'error', confirmButtonColor: '#C1483D' });
+    }
+  }
+
+  // =============================================
+  // REJECT ADJUSTMENT
+  // =============================================
+  async function rejectAdjustment(adjustmentId) {
+    const { value: reason, isConfirmed } = await Swal.fire({
+      title: 'Reject Adjustment',
+      input: 'textarea',
+      inputLabel: 'Reason for rejection',
+      inputPlaceholder: 'Enter a reason...',
+      inputAttributes: { rows: 3 },
+      showCancelButton: true,
+      confirmButtonText: 'Reject',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#C1483D',
+      cancelButtonColor: '#6B7686',
+      inputValidator: (value) => {
+        if (!value || !value.trim()) return 'Please enter a reason for rejection.';
+      }
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      const response = await fetch(`/inventory/adjustment/${adjustmentId}/reject`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rejection_reason: reason })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        await Swal.fire({
+          title: 'Rejected',
+          text: data.message,
+          icon: 'success',
+          confirmButtonColor: '#2E6F9E',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        window.location.reload();
+      } else {
+        Swal.fire({ title: 'Error', text: data.message, icon: 'error', confirmButtonColor: '#C1483D' });
+      }
+
+    } catch (err) {
+      console.error('Reject error:', err);
+      Swal.fire({ title: 'Error', text: 'Failed to reject adjustment. Please try again.', icon: 'error', confirmButtonColor: '#C1483D' });
+    }
+  }
+</script>
+
+</body>
+</html>

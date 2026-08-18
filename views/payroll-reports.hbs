@@ -1,0 +1,2837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    .form-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #16304A;
+      margin-bottom: .35rem;
+    }
+    .form-control, .form-select {
+      border-color: #E3E6EB;
+      font-size: .9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12);
+    }
+    .flatpickr-input { border-color: #E3E6EB !important; }
+    .flatpickr-input:focus {
+      border-color: #2E6F9E !important;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12) !important;
+    }
+    #report-table thead th {
+      background: #16304A;
+      color: #fff;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #1e3e5e;
+      padding: .65rem .85rem;
+      white-space: nowrap;
+    }
+    #report-table tbody td {
+      font-size: .85rem;
+      color: #0F2233;
+      padding: .6rem .85rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+    #report-table tbody tr:nth-child(odd) td  { background: #F6F7F9; }
+    #report-table tbody tr:nth-child(even) td { background: #fff; }
+    #report-table tbody tr:hover td           { background: #EBF3FA !important; }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+          <i class="fas fa-calculator" style="color:#2E6F9E;"></i> Payroll Reports
+        </h1>
+        <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Select filters and a report type to generate payroll output.</p>
+      </div>
+
+      <!-- Filter Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04); margin-bottom:1.25rem;">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-filter" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Report Filters</strong>
+        </div>
+
+        <div style="padding:1.15rem;">
+          <form id="payrollReportsForm">
+
+            <div class="row g-3 mb-3">
+
+              <div class="col-md-3">
+                <label class="form-label">Date Range</label>
+                <input type="text" id="dateRange" class="form-control datepicker"
+                  placeholder="Select date range" readonly style="border-color:#E3E6EB;">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Office</label>
+                <select name="office" id="officeSelect" class="form-select" style="border-color:#E3E6EB;">
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">{{this.office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Region</label>
+                <select name="region" id="regionSelect" class="form-select" style="border-color:#E3E6EB;">
+                  <option value="" selected>All Regions</option>
+                  {{#each regions}}
+                    <option value="{{this.region_name}}">{{this.region_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Report Type</label>
+                <select name="reportType" id="reportType" class="form-select" style="border-color:#E3E6EB;">
+                  <option value="" disabled selected>Select Report</option>
+                  {{#each reportTypes}}
+                    <option value="{{this.reporttype}}">{{this.reporttype}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+            </div>
+
+            <div class="row g-3 mb-3">
+
+              <div class="col-md-4 hidden" id="incomeTypeWrapper">
+                <label class="form-label">Income Type</label>
+                <select name="incomeType" id="incomeType" class="form-select" disabled style="border-color:#E3E6EB;">
+                  <option value="" disabled selected>Select Income Type</option>
+                  {{#each incomeTypes}}
+                    <option value="{{this.income_name}}">{{this.income_description}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-4 hidden" id="deductionTypeWrapper">
+                <label class="form-label">Deduction Type</label>
+                <select name="deductionType" id="deductionType" class="form-select" disabled style="border-color:#E3E6EB;">
+                  <option value="" disabled selected>Select Deduction Type</option>
+                  {{#each deductionTypes}}
+                    <option value="{{this.deduction_name}}">{{this.deduction_description}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <p style="font-size:.82rem; color:#6B7686; margin:0;">
+                <i class="fas fa-circle-info me-1"></i>Income / Deduction type fields appear based on report type selected.
+              </p>
+              <div class="d-flex gap-2">
+                <button type="button" id="resetBtn" class="btn btn-outline-secondary" style="font-size:.9rem;">
+                  <i class="fas fa-redo me-1"></i> Reset
+                </button>
+                <button type="submit" class="btn" style="background:#2E6F9E; border-color:#2E6F9E; color:#fff; font-weight:500; font-size:.9rem;">
+                  <i class="fas fa-file-export me-1"></i> Generate Report
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Loading -->
+      <div id="report-loading" class="text-center py-5" style="display:none;">
+        <div class="spinner-border" role="status" style="color:#2E6F9E; width:2.5rem; height:2.5rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2" style="color:#6B7686; font-size:.9rem;">Generating report...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error-message" class="alert border-0 mt-3" style="display:none; border-left:4px solid #C1483D !important; border-radius:.55rem; font-size:.9rem; background:rgba(193,72,61,.07); color:#C1483D;"></div>
+
+      <!-- Results Card -->
+      <div id="reportResults" style="display:none; border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; justify-content:space-between; border-radius:.65rem .65rem 0 0;">
+          <div style="display:flex; align-items:center; gap:.55rem;">
+            <i class="fas fa-table-list" style="color:#2E6F9E;"></i>
+            <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Report Results</strong>
+          </div>
+          <button id="exportBtn" class="btn btn-outline-secondary btn-sm" style="font-size:.82rem;">
+            <i class="fas fa-download me-1"></i> Export to Excel
+          </button>
+        </div>
+
+        <div style="padding:0;">
+          <div class="table-responsive">
+            <table id="report-table" class="table table-bordered mb-0">
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Name</th>
+                  <th>Office</th>
+                  <th>Region</th>
+                  <th>Gross Pay</th>
+                  <th>Deductions</th>
+                  <th>Net Pay</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="/js/scripts.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    flatpickr("#dateRange", { mode: "range", dateFormat: "Y-m-d", allowInput: true });
+
+    document.getElementById('payrollReportsForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      generateReport();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function () {
+      document.getElementById('payrollReportsForm').reset();
+      document.getElementById('reportResults').style.display = 'none';
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', function () {
+  // Get the current report type and data
+  const reportType = document.getElementById('reportType').value;
+  const selectedRegion = document.getElementById('regionSelect');
+  const selectedOffice = document.getElementById('officeSelect').value;
+  const dateRange = document.getElementById('dateRange').value;
+  const { endDate } = getDates(dateRange);
+
+  // Check if we have results data
+  const resultsData = window._reportResults; // Store results when generating report
+  
+  if (!resultsData || resultsData.length === 0) {
+    alert('No data to export. Please generate a report first.');
+    return;
+  }
+
+  // Handle monthly rate export
+  if (reportType.toLowerCase().trim() === 'monthly rate') {
+    generateMonthlyRateExcel(
+      resultsData, 
+      selectedOffice, 
+      selectedRegion.value || '', 
+      endDate
+    );
+  } else {
+    // Handle other report types (your existing logic)
+    alert('Export functionality for this report type will be implemented');
+  }
+});
+
+    const reportTypeSelect    = document.getElementById('reportType');
+    const incomeTypeSelect    = document.getElementById('incomeType');
+    const deductionTypeSelect = document.getElementById('deductionType');
+    const incomeWrapper       = document.getElementById('incomeTypeWrapper');
+    const deductionWrapper    = document.getElementById('deductionTypeWrapper');
+
+    incomeWrapper.classList.add('hidden');
+    deductionWrapper.classList.add('hidden');
+    incomeTypeSelect.disabled    = true;
+    deductionTypeSelect.disabled = true;
+
+    reportTypeSelect.addEventListener('change', function () {
+      const reportType = reportTypeSelect.value.toLowerCase();
+      if (reportType === 'income') {
+        incomeTypeSelect.disabled = false;
+        incomeWrapper.classList.remove('hidden');
+        deductionTypeSelect.disabled = true;
+        deductionWrapper.classList.add('hidden');
+        deductionTypeSelect.value = '';
+      } else if (reportType === 'deduction') {
+        deductionTypeSelect.disabled = false;
+        deductionWrapper.classList.remove('hidden');
+        incomeTypeSelect.disabled = true;
+        incomeWrapper.classList.add('hidden');
+        incomeTypeSelect.value = '';
+      } else {
+        incomeTypeSelect.disabled    = true;
+        incomeWrapper.classList.add('hidden');
+        incomeTypeSelect.value       = '';
+        deductionTypeSelect.disabled = true;
+        deductionWrapper.classList.add('hidden');
+        deductionTypeSelect.value    = '';
+      }
+    });
+  });
+
+  document.getElementById('officeSelect').addEventListener('change', async function () {
+    const office       = this.value;
+    const regionSelect = document.getElementById('regionSelect');
+    if (!office) { regionSelect.innerHTML = '<option value="" selected>All Regions</option>'; return; }
+    try {
+      regionSelect.disabled = true;
+      regionSelect.innerHTML = '<option value="">Loading regions...</option>';
+      const response = await fetch(`/payroll/reports/regions?office=${encodeURIComponent(office)}`);
+      const data     = await response.json();
+      if (data.success) {
+        regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+        data.regions.forEach(region => {
+          const option       = document.createElement('option');
+          option.value       = region.region_name;
+          option.textContent = region.region_name;
+          regionSelect.appendChild(option);
+        });
+      } else {
+        showError(data.message || 'Failed to load regions');
+        regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+      }
+    } catch (error) {
+      console.error('Error loading regions:', error);
+      showError('Failed to load regions');
+      regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+    } finally {
+      regionSelect.disabled = false;
+    }
+  });
+</script>
+
+<!-- !! ALL EXCEL / PDF / CSV GENERATOR FUNCTIONS BELOW — UNCHANGED !! -->
+<script>
+async function generateReport() {
+  const form = document.getElementById('payrollReportsForm');
+  const generateBtn = form.querySelector('button[type="submit"]');
+  const loadingText = document.querySelector('#report-loading p');
+  const selectedRegion = document.getElementById('regionSelect')
+  const deductionSelect = document.getElementById('deductionType');
+  const incomeSelect = document.getElementById('incomeType');
+  const formData = new FormData(form);
+  const dateRange = document.getElementById('dateRange').value;
+  const selectedOffice = officeSelect.value;
+  if (reportType.value.toLowerCase() === "kp wallet (csv file)" && selectedRegion.value.toLowerCase() === "") {
+    alert('Please select a specific region for this report.');
+    return;
+  }
+  const { startDate, endDate } = getDates(dateRange);
+  if (!startDate || !endDate) { alert("Invalid date range selected"); return; }
+  formData.append('startDate', startDate);
+  formData.append('endDate', endDate);
+  const formDataObj = {};
+  formData.forEach((value, key) => { formDataObj[key] = value; });
+  generateBtn.disabled = true;
+  const loading = document.getElementById('report-loading');
+  const results = document.getElementById('reportResults');
+  loading.style.display = 'block';
+  results.style.display = 'none';
+  document.getElementById('error-message').style.display = 'none';
+  loadingText.textContent = 'Fetching report data...';
+  await new Promise(resolve => requestAnimationFrame(resolve));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  try {
+    const response = await fetch('/payroll/reports/generate-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formDataObj)
+    });
+    const data = await response.json();
+    console.log('RAW RESPONSE:', data.success, data.results);
+    if (data.success) {
+        window._reportResults = data.results;
+      document.getElementById('reportResults').style.display = 'block';
+      loadingText.textContent = 'Building your file — this may take a moment';
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      if (!data.results || data.results.length === 0) { alert('No data found for the selected criteria'); return; }
+      data.results.officeSelect = officeSelect;
+      if (reportType.value.toLowerCase().trim() === "complete payroll details") {
+        if (selectedOffice.toLowerCase() === 'mlinc') { generateMLGExcelReport(data.results); }
+        else { await generateExcelReport(data.results); }
+      } else if (reportType.value.toLowerCase().trim() === "monthly contributions") {
+        generateContributionExcelReport(data.results, data.results.officeSelect.value, selectedRegion);
+      } else if (reportType.value.toLowerCase() === "deduction") {
+        const deductionMap = {"mlfund (xls)": { type: "mlfund (xls)", action: generateExcelMlFundLoan },"mlfund (pdf)": { type: "mlfund (pdf)", action: generatePdfReport, category: 'deduction' },"sako": { type: "sako", action: generatePdfReport, category: 'deduction' },"coated": { type: "coated", action: generatePdfReport, category: 'deduction' },"cooprecla": { type: "cooprecla", action: generatePdfReport, category: 'deduction' },"sakocommodity": { type: 'fake', action: generatePdfReport, category: 'deduction' },"deductionamount1": { type: 'gpa insurance', action: generatePdfReport, category: 'deduction' },"c_hmo": { type: 'hmo', action: generatePdfReport, category: 'deduction' },"incometax": { type: 'income tax', action: generatePdfReport, category: 'deduction' },"installaccount": { type: 'install account', action: generatePdfReport, category: 'deduction' },"lates": { type: 'lates', action: generatePdfReport, category: 'deduction' },"leaves": { type: 'leaves', action: generatePdfReport, category: 'deduction' },"sakoprovi": { type: 'mortuary', action: generatePdfReport, category: 'deduction' },"sakopettycash": { type: 'motor loan', action: generatePdfReport, category: 'deduction' },"opec": { type: 'opec', action: generatePdfReport, category: 'deduction' },"canteen": { type: 'opec support', action: generatePdfReport, category: 'deduction' },"ticket": { type: 'opec ticket', action: generatePdfReport, category: 'deduction' },"sakoprime": { type: 'sako deductions', action: generatePdfReport, category: 'deduction' },"overappraisal": { type: 'over appraisal', action: generatePdfReport, category: 'deduction' },"deductionamount2": { type: 'over payments', action: generatePdfReport, category: 'deduction' },"pagibigloan": { type: 'pagibig loan', action: generatePdfReport, category: 'deduction' },"sssloan": { type: 'sss loan', action: generatePdfReport, category: 'deduction' },"mobilebill": { type: 'telecoms', action: generatePdfReport, category: 'deduction' },"atd": { type: 'atd', action: generatePdfReport, category: 'deduction' },"ssscontri": { type: 'ssscontri', action: generatePdfReport, category: 'deduction' },"pagibigcontri": { type: 'pagibigcontri', action: generatePdfReport, category: 'deduction' },"car_motorloan": { type: 'car_motorloan', action: generatePdfReport, category: 'deduction' },"mlfund": { type: 'mlfund', action: generatePdfReport, category: 'deduction' },"mlcellphone": { type: 'mlcellphone', action: generatePdfReport, category: 'deduction' },"mlaccount": { type: 'mlaccount', action: generatePdfReport, category: 'deduction' },"odetteloan": { type: 'odetteloan', action: generatePdfReport, category: 'deduction' },"mllending": { type: 'mllending', action: generatePdfReport, category: 'deduction' },"payables": { type: 'payables', action: generatePdfReport, category: 'deduction' },"filmalending": { type: 'filmalending', action: generatePdfReport, category: 'deduction' },     // NEW: Add the three new deduction reports
+    'deduction_report_1': { type: "deduction_report_1", action: generatePdfReport, category: 'deduction' },
+    'deduction_report_2': { type: "deduction_report_2", action: generatePdfReport, category: 'deduction' },
+    'deduction_report_3': { type: "deduction_report_3", action: generatePdfReport, category: 'deduction' },
+};
+        const selectedDeduction = deductionSelect.value.toLowerCase();
+        if (deductionMap[selectedDeduction]) {
+          const { type, action, category } = deductionMap[selectedDeduction];
+          if (selectedDeduction === "mlfund (xls)") { await action(data.results); }
+          else { action(data.results, type, category, selectedRegion.value, selectedOffice); }
+        }
+      } else if (reportType.value.toLowerCase() === "income") {
+        const incomeMap = {"basicpay": { type: "basic pay", action: generatePdfReport, category: 'income' },"cola": { type: "cola", action: generatePdfReport, category: 'income' },"abmallow": { type: "hazard allowance", action: generatePdfReport, category: 'income' },"houseallow": { type: "housing allowance", action: generatePdfReport, category: 'income' },"incomeamount1": { type: "pb/excess pb", action: generatePdfReport, category: 'income' },"incomeamount2": { type: "other income", action: generatePdfReport, category: 'income' },"supervisoryallow2": { type: "location allowance", action: generatePdfReport, category: 'income' },"managementallow": { type: "management allowance", action: generatePdfReport, category: 'income' },"bmallow": { type: "positional allowance", action: generatePdfReport, category: 'income' },"auditorsallow": { type: "single post allowance", action: generatePdfReport, category: 'income' },"totalot": { type: "total overtime", action: generatePdfReport, category: 'income' },"travelallow": { type: "transportation allowance", action: generatePdfReport, category: 'income' }};
+        const selectedIncome = incomeSelect.value.toLowerCase();
+        if (incomeMap[selectedIncome]) { const { type, action, category } = incomeMap[selectedIncome]; action(data.results, type, category, selectedRegion.value); }
+      } else if (reportType.value.toLowerCase() === "kp") {
+        generatePdfReport(data.results, "kp", "kp category", selectedRegion.value || "", selectedOffice);
+      } else if (reportType.value.toLowerCase() === "monthly rate") {
+        generatePdfReport(data.results, "monthly rate", "monthly rate", selectedRegion.value || "", selectedOffice);
+      }
+      
+      
+      
+      else if (reportType.value.toLowerCase().trim() === "income report") {
+        generatePdfReport(data.results, "income report", "income report", selectedRegion.value || "", selectedOffice);
+      } else if (reportType.value.toLowerCase() === "kp wallet") {
+        generatePdfReport(data.results, "kp wallet", "kp wallet", selectedRegion.value || "", selectedOffice);
+      } else if (reportType.value.toLowerCase() === "payroll summary (net)") {
+        generatePdfReport(data.results, "payroll summary (net)", "payroll net pay", selectedRegion.value || "", selectedOffice);
+      } else if (reportType.value.toLowerCase() === "payroll summary (region)") {
+        generatePdfReport(data.results, "payroll summary (region)", "payroll net pay", selectedRegion.value || "", selectedOffice);
+      } else if (reportType.value.toLowerCase() === "kp wallet (csv file)") {
+        const regionVal = selectedRegion.value || "";
+        const regions   = [...new Set(data.results.map(item => item.region))];
+        const { endDate } = getDates(dateRange);
+        regions.forEach(region => {
+          const regionData  = data.results.filter(item => item.region === region);
+          const csvContent  = convertToCSV(regionData);
+          const fileName    = `KPWallet_${regionVal}_${endDate}.csv`;
+          downloadCSV(csvContent, fileName);
+        });
+      } else if (reportType.value.toLowerCase().trim() === "payslip") {
+        generatePdfReport(data.results, "payslip", "payslip", selectedRegion.value || "", selectedOffice);
+      } else if (reportType.value.toLowerCase().trim() === "wage increase") {
+        await generateWageIncreaseExcelReport(data.results, data.results.officeSelect.value, selectedRegion, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "edi payroll") {
+        await generateEDIPayrollExcelReport(data.results, selectedOffice, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "edi remittance report") {
+        await generateRemittanceExcelReport(data.results, selectedOffice, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "edi deduction details") {
+        await generateEDIDeductionDetailsExcelReport(data.results, selectedOffice, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "fs payroll") {
+        if (!selectedRegion.value || selectedRegion.value.trim() === "") { alert('Please select a specific region for FS Payroll.'); return; }
+        await generateFSPayrollExcelReport(data.results, selectedOffice, selectedRegion.value, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "payroll comparison") {
+        await generatePayrollComparison(data.results, selectedOffice, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "ot report") {
+        await generateOTReport(data.results, selectedOffice, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "payroll data") {
+        await generatePayrollData(data.results, selectedOffice, endDate);
+      } else if (reportType.value.toLowerCase().trim() === "direct payroll") {
+        await generateDirectPayroll(data.results, selectedOffice, endDate);
+      } 
+      
+      else {
+        console.log(deductionSelect.value, deductionSelect.text);
+      }
+    } else {
+      showError(data.message || 'Error generating report');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Failed to generate report: ' + error.message);
+  } finally {
+    document.getElementById('report-loading').style.display = 'none';
+    generateBtn.disabled = false;
+  }
+}
+
+function sanitizeLastName(str) { if (str) { return str.replace(/[Ññ]/g, 'N'); } return str; }
+function convertToCSV(data) { if (data.length === 0) return ''; const header = Object.keys(data[0]); const rows = data.map(item => header.map(field => { if (field.toLowerCase() === 'last name') { return `"${sanitizeLastName(item[field] || "")}"`;} return `"${item[field] || ""}"`;}).join(",")); return [header.join(","), ...rows].join("\n");}
+function downloadCSV(content, fileName) { const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); link.setAttribute("download", fileName); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link);}}
+function getDates(dateRange) { if (!dateRange) return { startDate: null, endDate: null }; let startDate, endDate; if (dateRange.includes(" to ")) { [startDate, endDate] = dateRange.split(" to "); } else { startDate = dateRange; endDate = dateRange; } const start = new Date(`${startDate}T00:00:00`); const end = new Date(`${endDate}T23:59:59`); if (isNaN(start.getTime()) || isNaN(end.getTime())) return { startDate: null, endDate: null }; return { startDate: start.toISOString().split("T")[0], endDate: end.toISOString().split("T")[0] };}
+function decodeMonth(month) { if (!month) return ''; if (typeof month === 'string') return month; if (month.type === 'Buffer' && Array.isArray(month.data)) { return new TextDecoder().decode(new Uint8Array(month.data)); } return String(month);}
+const formatNumber = (num) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+function formatDate(dateStr) { const date = new Date(dateStr); return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(date); }
+function loadScript(src) { return new Promise((resolve, reject) => { const script = document.createElement('script'); script.src = src; script.onload = resolve; script.onerror = reject; document.head.appendChild(script); });}
+function populateReportTable(data) { const tableBody = document.querySelector('#report-table tbody'); tableBody.innerHTML = ''; data.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${row.employeeid}</td><td>${row.name}</td><td>${row.office}</td><td>${row.region}</td><td>${formatCurrency(row.gross_pay)}</td><td>${formatCurrency(row.deductions)}</td><td>${formatCurrency(row.net_pay)}</td>`; tableBody.appendChild(tr); });}
+function formatCurrency(amount) { return amount ? parseFloat(amount).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }) : '₱0.00'; }
+function showError(message) { const errorDiv = document.getElementById('error-message'); errorDiv.textContent = message; errorDiv.style.display = 'block'; }
+const numberDate = (dateString) => new Date(dateString).toISOString().slice(0, 10);
+function capitalizeFirstLetter(word) {  if (typeof word === 'string' && word.length > 0) {    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();  }  return word; }
+const formatDateString = (dateString) => {  if (!dateString) return "N/A";  const date = new Date(dateString);  return date.toLocaleDateString("en-US", {    year: "numeric",    month: "2-digit",    day: "2-digit",  });};
+
+async function generateExcelMlFund(results) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+
+  // Define headers
+  const headers = [
+    'REGION CODE', 
+    'REGION DESCRIPTION', 
+    '#', 
+    'IDNO', 
+    'EMPLOYEE NAME', 
+    'AMOUNT'
+  ];
+
+  // Group data by region_description
+  results.forEach(employee => {
+    if (!groupedData[employee.region]) {
+      groupedData[employee.region] = {};
+    }
+    if (!groupedData[employee.region][employee.department]) {
+      groupedData[employee.region][employee.department] = [];
+    }
+    groupedData[employee.region][employee.department].push(employee);
+  });
+
+  // Sort regions alphabetically
+  const sortedRegionDescriptions = Object.keys(groupedData).sort();
+
+  sortedRegionDescriptions.forEach(regionDescription => {
+    const regionData = groupedData[regionDescription];
+    const wsData = [];
+    let columnWidths = headers.map(header => header.length); // Initialize with header widths
+    let rowIndex = 1;
+
+    // Add report headers
+    wsData.push([`Payroll Date: ${formatDate(results[0].enddate)}`]);
+    wsData.push(['ML FUND DEDUCTION']);
+    wsData.push(headers); // This is row 3 (0-based index 2)
+
+    // Process each department
+    Object.keys(regionData).forEach(department => {
+      const departmentEmployees = regionData[department];
+
+      departmentEmployees.forEach(emp => {
+        const row = [
+          emp.region_code || '',
+          emp.region_description || '',
+          rowIndex++,
+          emp.idno || '',
+          emp.employee || '',
+          Number(emp.mlfund) || 0
+        ];
+
+        // Update column widths based on content
+        row.forEach((cell, index) => {
+          const cellWidth = String(cell).length;
+          if (cellWidth > columnWidths[index]) {
+            columnWidths[index] = cellWidth;
+          }
+        });
+
+        wsData.push(row);
+      });
+
+      // Add department summary
+      const totals = Array(headers.length).fill(0);
+      const numericColumns = [5];
+      departmentEmployees.forEach(emp => {
+        numericColumns.forEach(col => {
+          totals[col] += parseFloat(emp.mlfund) || 0;
+        });
+      });
+
+      const summaryRow = new Array(headers.length).fill('');
+      summaryRow[0] = 'TOTAL EMPLOYEES:';
+      summaryRow[2] = departmentEmployees.length;
+      numericColumns.forEach(col => {
+        summaryRow[col] = totals[col];
+      });
+
+      // Update widths for summary row
+      summaryRow.forEach((cell, index) => {
+        const cellWidth = String(cell).length;
+        if (cellWidth > columnWidths[index]) {
+          columnWidths[index] = cellWidth;
+        }
+      });
+
+      wsData.push(summaryRow);
+      wsData.push([]); // Empty row between departments
+    });
+
+    // Create worksheet
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // Set column widths based on widest content (headers + data)
+    ws['!cols'] = columnWidths.map(width => ({
+      wch: Math.min(width + 2, 50) // Add 2 chars padding, max 50 chars wide
+    }));
+
+    // Format numeric columns
+    Object.keys(ws).forEach(cellAddress => {
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+      
+      // Format amount column (5th column)
+      if (colIndex === 5) {
+        cell.z = '#,##0.00';
+      }
+      
+      // Style header row (row 3 in 0-based index)
+      if (XLSX.utils.decode_cell(cellAddress).r === 2) {
+        cell.s = {
+          font: { bold: true },
+          fill: { fgColor: { rgb: "D3D3D3" } } // Light gray background
+        };
+      }
+      
+      // Style totals row
+      const lastDataRow = wsData.length - 2; // -2 because we added empty row
+      if (XLSX.utils.decode_cell(cellAddress).r === lastDataRow) {
+        cell.s = {
+          font: { bold: true },
+          border: { top: { style: 'thin', color: { rgb: '000000' } } }
+        };
+      }
+    });
+
+    // Add worksheet to workbook
+    const sheetName = regionDescription.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  // Generate filename with current date
+  const date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `MLFund_Report_${date}.xlsx`);
+}
+
+async function generateExcelMlFundLoan(results) {
+    if (typeof XLSX === 'undefined') {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+    }
+
+    const wb = XLSX.utils.book_new();
+
+    const wsData = [
+        [
+            'REGION',
+            'IDNO',
+            'LASTNAME',
+            'FIRSTNAME',
+            'MLFUND LOAN',
+            'ML FUND AMOUNT'
+        ]
+    ];
+
+    results.forEach(row => {
+        wsData.push([
+            row.region,
+            row.idno,
+            row.lastname,
+            row.firstname,
+            row.fundType,
+            Number(row.fundAmount)
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    ws['!cols'] = [
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 25 },
+        { wch: 25 },
+        { wch: 25 },
+        { wch: 18 }
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'ML Fund');
+
+    XLSX.writeFile(
+        wb,
+        `MLFund_${new Date().toISOString().slice(0,10)}.xlsx`
+    );
+}
+
+async function generatePdfReport(results, type, category, region, office) {
+  //console.log('new approach', region, office);
+  
+  try {
+    const endDate = results[0]?.enddate;
+
+    // Construct the base filename
+    let filename = `${capitalizeFirstLetter(type)}_${capitalizeFirstLetter(category)}_Report_${formatDateString(endDate)}.pdf`;
+
+
+    // If region is provided and not empty, add it to the filename
+    if (typeof region === 'string' && region.trim() !== "") {
+    filename = `${capitalizeFirstLetter(type)}_${capitalizeFirstLetter(category)}_Report_${capitalizeFirstLetter(region)}_${formatDateString(endDate)}.pdf`;
+}
+
+    const response = await fetch('/payroll/reports/generate-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        reportData: results,
+        reportType: type,
+        category: category,
+        office: office
+      })
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;  // Use the constructed filename
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } else {
+      throw new Error('Failed to generate PDF');
+    }
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    alert('Failed to generate PDF. Please try again.');
+  }
+}
+
+async function generatePdfReport(results, type, category, region, office) {
+  //console.log('new approach', region, office);
+  
+  try {
+    const endDate = results[0]?.enddate;
+
+    // Construct the base filename
+    let filename = `${capitalizeFirstLetter(type)}_${capitalizeFirstLetter(category)}_Report_${formatDateString(endDate)}.pdf`;
+
+
+    // If region is provided and not empty, add it to the filename
+    if (typeof region === 'string' && region.trim() !== "") {
+    filename = `${capitalizeFirstLetter(type)}_${capitalizeFirstLetter(category)}_Report_${capitalizeFirstLetter(region)}_${formatDateString(endDate)}.pdf`;
+}
+
+    const response = await fetch('/payroll/reports/generate-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        reportData: results,
+        reportType: type,
+        category: category,
+        office: office
+      })
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;  // Use the constructed filename
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } else {
+      throw new Error('Failed to generate PDF');
+    }
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    alert('Failed to generate PDF. Please try again.');
+  }
+}
+
+async function generateEDIPayrollExcelReport(results, office, endDate) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+  const wb = XLSX.utils.book_new();
+  const headers = [
+    'BOSCODE','BRANCH', 'DEPARTMENT', 
+    'REGULAR BASIC PAY', 'TRAINEE BASIC PAY', 'ALLOWANCES', 'BM ALLOWANCE',
+    'REGULAR OT', 'TRAINEE OT', 'COLA', 'INCOME 1', 'INCOME 2',
+    'NIGHT PREMIUM', 'REGULAR LATE', 'TRAINEE LATE', 'REGULAR LEAVE', 'TRAINEE LEAVE',
+    'OTHER DEDUCTIONS', 'TOTAL NET','EMPLOYEE COUNT',
+  ];
+
+  const headerRow1 = [
+    'BASIC PAY REGULAR','BASIC PAY TRAINEE', 'ALLOWANCE', 
+    'BM ALLOWANCE', 'OVERTIME REGULAR', 'OVERTIME TRAINEE', 'COLA',
+    'OTHER INCOME 1', 'OTHER INCOME 2', 'GRAVEYARD', 'LATE REGULAR', 'LATE TRAINEE',
+    'LEAVE REGULAR', 'LEAVE TRAINEE', 'ALL OTHER DEDUCTIONS', 'TOTAL', 'COST CENTER',
+    'NO. OF EMPLOYEE IN BRANCH', 'NO. OF EMPLOYEES ALLOCATED'
+  ];
+
+  const headerRow2 = [
+    '','', 'debit', 
+    'debit', 'debit', 'debit', 'debit',
+    'debit', 'debit', 'debit', 'debit', 'debit',
+    'credit', 'credit', 'credit', 'credit', 'credit',
+    
+  ];
+
+  const headerRow3 = [
+    'BOSCODE','BRANCH NAME', '5100001', 
+    '5100002', '5100001', '5212001', '5100003',
+    '5100002', '5210001', '5220002', '5220001', '5212001',
+    '5100001', '5100002', '5100001', '5100002', '3100001','3100001'
+    
+  ];
+
+  const numericColumns = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,];
+
+  const grouped = {};
+  results.forEach((row) => {
+    if (!grouped[row.region]) grouped[row.region] = [];
+    grouped[row.region].push(row);
+  });
+
+  Object.keys(grouped).sort().forEach((region) => {
+    const rows = grouped[region];
+    const wsData = [];
+    let columnWidths = headers.map((h) => h.length);
+
+    wsData.push(['',`PAYROLL DATE - ${endDate}`, ...headerRow1]);
+    wsData.push(headerRow2);
+    wsData.push(headerRow3);
+    wsData.push([]);
+
+    const totals = Array(headers.length).fill(0);
+    rows.sort((a, b) => a.branch.localeCompare(b.branch)).forEach((r) => {
+      const row = [
+        r.boscode, r.branch, 
+        r.branchRegularBasicPay, r.branchTraineeBasicPay, r.branchAllowances, r.branchBmAllowance,
+        r.branchRegularOT, r.branchTraineeOT, r.branchCola, r.branchIncome1, r.branchIncome2,
+        r.branchNightpremium, r.branchRegularLate, r.branchTraineeLate, r.branchRegularLeave, r.branchTraineeLeave,
+        r.branchOtherDeductions, r.branchtotalNet,'',r.employeeBranchCount, r.regionEmployeeCount,
+      ];
+      numericColumns.forEach((c) => { totals[c] += parseFloat(row[c]) || 0; });
+      wsData.push(row);
+      row.forEach((cell, i) => { columnWidths[i] = Math.max(columnWidths[i] || 0, String(cell).length); });
+    });
+
+//FOR TOTAL SUMMARY AT THE BOTTOM
+    // const summaryRow = new Array(headers.length).fill('');
+    //summaryRow[0] = `TOTAL BRANCHES: ${rows.length}`;
+    //numericColumns.forEach((c) => { summaryRow[c] = totals[c]; });
+    //wsData.push(summaryRow); 
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = columnWidths.map((w) => ({ wch: Math.min(Math.max(w + 2, 10), 50) }));
+    Object.keys(ws).forEach((addr) => {
+      if (addr[0] === '!') return;
+      const colIndex = XLSX.utils.decode_cell(addr).c;
+      if (numericColumns.includes(colIndex) && typeof ws[addr].v === 'number') ws[addr].z = '#,##0.00';
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  const date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `${office}_EDI_Payroll_${endDate}.xlsx`);
+}
+
+async function generateRemittanceExcelReport(results, office, endDate) {
+  
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+  const wb = XLSX.utils.book_new();
+  const firstRow = ['REMITTANCE REPORT','','','', 'SSS EMPLOYEE SHARE', 'SSS EMPLOYER SHARE', 'SSS PAYABLE', 'PAG-IBIG EMPLOYEE SHARE', 'PAG-IBIG EMPLOYEER SHARE', 'PAG-IBIG PAYABLE', 'PHILHEALTH EMPLOYEE SHARE', 'PHILHEALTH EMPLOYER SHARE', 'PHILHEALTH PAYABLE', 'NO. OF EMPLOYEES', 'NO. OF EMPLOYEES ALLOCATED'];
+  const thirdRow = [
+    'Region Code', 'Region Description', 'BOS CODE', 'BRANCH NAME',
+  ];
+  const numericColumns = [4,5,6,7,8,9,10,11,12];
+
+  const grouped = {};
+  results.forEach((row) => {
+    if (!grouped[row.region]) grouped[row.region] = [];
+    grouped[row.region].push(row);
+  });
+
+  Object.keys(grouped).sort().forEach((region) => {
+    const rows = grouped[region];
+    const wsData = [];
+    let columnWidths = firstRow.map((h) => h.length);
+
+    wsData.push(firstRow);
+    wsData.push([`PAYROLL DATE`, endDate]);
+    wsData.push(thirdRow);
+
+    const totals = Array(firstRow.length).fill(0);
+    rows.sort((a, b) => a.branch.localeCompare(b.branch)).forEach((r) => {
+      const row = [
+      r.region_code,
+      r.region_description,
+      r.boscode,
+        r.branch,  
+        r.branchSSSee, r.branchSSSer,  r.branchSSSee + r.branchSSSer,
+        r.branchPagibigee, r.branchPagibiger,  r.branchPagibigee + r.branchPagibiger,
+        r.branchPhilhealthee, r.branchPhilhealther, r.branchPhilhealthee + r.branchPhilhealther, 
+        r.employeeBranchCount, r.regionEmployeeCount
+      ];
+      numericColumns.forEach((c) => { totals[c] += parseFloat(row[c]) || 0; });
+      wsData.push(row);
+      row.forEach((cell, i) => { columnWidths[i] = Math.max(columnWidths[i] || 0, String(cell).length); });
+    });
+
+    const summaryRow = new Array(firstRow.length).fill('');
+    summaryRow[3] = `TOTAL`;
+    numericColumns.forEach((c) => { summaryRow[c] = totals[c]; });
+    wsData.push(summaryRow);
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = columnWidths.map((w) => ({ wch: Math.min(Math.max(w + 2, 10), 50) }));
+    Object.keys(ws).forEach((addr) => {
+      if (addr[0] === '!') return;
+      const colIndex = XLSX.utils.decode_cell(addr).c;
+      if (numericColumns.includes(colIndex) && typeof ws[addr].v === 'number') ws[addr].z = '#,##0.00';
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  const date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `${office}_Remittance_Report_${endDate}.xlsx`);
+}
+
+async function generateEDIDeductionDetailsExcelReport(results, office, endDate) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+  const headers = [
+    'INCOME TAX', 'SSS CONTRI', 'SSS LOAN', 'PAGIBIG CONTRI', 'PAGIBIG LOAN',
+    'PHILHEALTH', 'COATED', 'HMO', 'OPEC SUPPORT', 'GPA INSURANCE', 'OVER PAYMENTS',
+    'ML FUND', 'OPEC', 'OVER APPRAISAL', 'COOP RECLA', 'INSTALL ACCOUNT', 'TICKET',
+    'TELECOMS', 'MORTUARY', 'FAKE', 'OTHER DEDUCTIONS', 'SAKO', 'MOTOR LOAN',
+  ];
+
+  const subHeading = [
+    '', 'credit', 'credit', 'credit', 'credit', 'credit',
+    'credit', 'credit', 'credit', 'credit', 'credit', 'credit',
+    'credit', 'credit', 'credit', 'credit', 'credit', 'credit',
+    'credit', 'credit', 'credit', 'credit', 'credit', 'credit',
+  ];
+
+  const subHeading1 = [
+    'REGION', '3100001', '3100001', '3100001', '3100001', '3100001',
+    '3100001', '3100001', '3100001', '3100001', '3100001', '3100001',
+    '3100001', '3100001', '3100001', '3100001', '3100001', '3100001',
+    '3100001', '3100001', '3100001', '3100001', '3100001', '3100001',
+  ];
+
+  const numericColumns = headers.map((_, i) => i).filter((i) => i !== 0);
+
+  const wsData = [];
+  let columnWidths = headers.map((h) => h.length);
+
+  wsData.push([`PAYROLL DATE - ${endDate}`, ...headers]);
+  wsData.push(subHeading);
+  wsData.push(subHeading1);
+  wsData.push([]);
+
+  const totals = Array(headers.length).fill(0);
+  results.sort((a, b) => a.region.localeCompare(b.region)).forEach((r) => {
+    const row = [
+      r.region, r.tax, r.ssscontri, r.sssloan, r.pagibigcontri, r.pagibigloan,
+      r.philhealth, r.coated, r.hmo, r.opec_support, r.deduction1, r.deduction2,
+      r.mlfund, r.opec, r.over, r.coop_recla, r.install_account, r.ticket,
+      r.telecoms, r.mortuary, r.fake, r.other_deductions, r.sako, r.motor_loan,
+    ];
+    numericColumns.forEach((c) => { totals[c] += parseFloat(row[c]) || 0; });
+    wsData.push(row);
+    row.forEach((cell, i) => { columnWidths[i] = Math.max(columnWidths[i] || 0, String(cell).length); });
+  });
+
+// THIS IS FOR DISPLAYING THE TOTAL AT THE BOTTOM
+  //const summaryRow = new Array(headers.length).fill('');
+  //summaryRow[0] = `TOTAL REGIONS: ${results.length}`;
+  //numericColumns.forEach((c) => { summaryRow[c] = totals[c]; });
+  //wsData.push(summaryRow);
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = columnWidths.map((w) => ({ wch: Math.min(Math.max(w + 2, 10), 50) }));
+  Object.keys(ws).forEach((addr) => {
+    if (addr[0] === '!') return;
+    const colIndex = XLSX.utils.decode_cell(addr).c;
+    if (numericColumns.includes(colIndex) && typeof ws[addr].v === 'number') ws[addr].z = '#,##0.00';
+  });
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Deduction Details');
+  const dateStr = (endDate || new Date().toISOString().slice(0, 10));
+  XLSX.writeFile(wb, `${office}_EDI_Deduction_Details_${endDate}.xlsx`);
+}
+
+async function generateFSPayrollExcelReport(results, office, region, endDate) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript(
+      'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    );
+  }
+
+  const headers = [`PAYROLL DATE - ${endDate}`,
+    'BASIC PAY (DEBIT)', '', 'ALLOWANCES (DEBIT)', '', 'OVERTIME (DEBIT)', '',
+    'COLA', 'SALARY ADJUSTMENT', 'REFUND', 'GRAVEYARD', 'TOTAL',
+    
+    'LATE (CREDIT)', '', 'LEAVE (CREDIT)', '', 'INCOME TAX',
+    'SSS', '', 'PHILHEALTH', 'PAGIBIG', '', 'COATED', 'HMO',
+    'OPEC SUPPORT', 'GPA INSURANCE', 'OVER PAYMENTS', 'ML FUND',
+    'OPEC', 'OVER APPRAISAL', 'COOP RECLA','INSTALLMENT ACCOUNT', 'OPEC TICKET',
+    'TELECOMS', 'MORTUARY', 'FAKE', 'OTHER DEDUCTIONS', 'SAKO',
+    'MOTOR LOAN', 'TOTAL DEDUCTION', 'NET INCOME'
+  ];
+
+  const secondRow = [
+    'Regular', 'Trainee', 'Allowance', 'BM Allowance',
+    'Regular', 'Trainee', '(Debit)', '(Debit)', '(Debit)', '(Debit)','(Debit)',
+    'Regular', 'Trainee', 'Regular', 'Trainee', '(Credit)',
+    '(Credit)', '(Credit)', '(Credit)', '(Credit)', '(Credit)',
+    '(Credit)', '(Credit)', '(Credit)', '(Credit)', '(Credit)',
+    '(Credit)', '(Credit)', '(Credit)', '(Credit)', '(Credit)',
+    '(Credit)', '(Credit)', '(Credit)', '(Credit)', '(Credit)',
+    '(Credit)', '(Credit)', '(Credit)', '(Credit)', 
+  ];
+
+  const thirdRow = [
+    'BRANCH NAME/DIVISION',
+    '5100001', '5100002', '5100001', '5212001', '5100003',
+    '5100002', '5210001', '5220002', '5100001', '5212001',
+    '3100001', '5100001', '5100002', '5100001', '5100002',
+    '5100001', 'SSS Contribution', 'SSS Loan', '',
+    'Pagibig Contribution', 'Pagibig Loan'
+  ];
+
+  const numericColumns = headers
+    .map((_, i) => i)
+    .filter(i => i !== 0);
+
+  const wsData = [];
+
+  wsData.push(headers);
+  wsData.push([region.toUpperCase(), ...secondRow]);
+  wsData.push(thirdRow);
+  wsData.push([]);
+
+  const totals = Array(headers.length).fill(0);
+
+  results
+    .sort((a, b) => a.department.localeCompare(b.department))
+    .forEach(r => {
+      const row = [
+        r.department,
+        r.basic_regular,
+        r.basic_trainee,
+        r.allowances,
+        r.bm_allowance,
+        r.ot_regular,
+        r.ot_trainee,
+        r.cola,
+        r.salary_adjustment,
+        r.refund,
+        r.graveyard,
+        r.total_income,
+        r.late_regular,
+        r.late_trainee,
+        r.leave_regular,
+        r.leave_trainee,
+        r.income_tax,
+        r.sss_contribution,
+        r.sss_loan,
+        r.philhealth,
+        r.pagibig_contribution,
+        r.pagibig_loan,
+        r.coated,
+        r.hmo,
+        r.opec_support,
+        r.deduction1,
+        r.deduction2,
+        r.mlfund,
+        r.opec,
+        r.over_appraisal,
+        r.coop_recla,
+        r.installment_account,
+        r.ticket,
+        r.telecoms,
+        r.mortuary,
+        r.fake,
+        r.other_deductions,
+        r.sako,
+        r.motor_loan,
+        r.total_deduction,
+        r.total_net
+      ];
+
+      numericColumns.forEach(c => {
+        totals[c] += parseFloat(row[c]) || 0;
+      });
+console.log(headers.length);
+console.log(row.length);
+
+      wsData.push(row);
+    });
+
+  const summaryRow = new Array(headers.length).fill('');
+  summaryRow[0] = `TOTAL`;
+
+  numericColumns.forEach(c => {
+    summaryRow[c] = totals[c];
+  });
+console.log(summaryRow.length);
+  wsData.push(summaryRow);
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // AUTO SIZE COLUMNS
+  const columnWidths = [];
+
+  wsData.forEach(row => {
+    row.forEach((cell, colIndex) => {
+      const cellValue = cell == null ? '' : String(cell);
+
+      columnWidths[colIndex] = Math.max(
+        columnWidths[colIndex] || 0,
+        cellValue.length
+      );
+    });
+    
+  });
+
+  ws['!cols'] = columnWidths.map(width => ({
+    wch: width + 4 // extra padding
+  }));
+
+  // NUMBER FORMAT
+  Object.keys(ws).forEach(addr => {
+    if (addr.startsWith('!')) return;
+
+    const colIndex = XLSX.utils.decode_cell(addr).c;
+
+    if (
+      numericColumns.includes(colIndex) &&
+      typeof ws[addr].v === 'number'
+    ) {
+      ws[addr].z = '#,##0.00';
+    }
+  });
+
+  const wb = XLSX.utils.book_new();
+
+  const sheetName = region
+    .substring(0, 31)
+    .replace(/[\\/*[\]:?]/g, '');
+
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+  const date = new Date().toISOString().slice(0, 10);
+
+  XLSX.writeFile(
+    wb,
+    `${office}_FS_Payroll_${region}_${endDate}.xlsx`
+  );
+}
+
+async function generatePayrollComparison(results, office, endDate) {
+  console.log('generatePayrollComparison');
+  console.log(results)
+  if (typeof XLSX === 'undefined') {
+    await loadScript(
+      'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    );
+  }
+
+  const payrollYear = (dateString) => {
+    const date = new Date(dateString);
+    return date.getFullYear();
+  };
+
+  const formatNumberCell = (value) => {
+    return {
+      v: value,
+      t: "n",
+      z: "#,##0.00"
+    };
+  };
+
+  const autoFitColumns = (aoa) => {
+    const colWidths = aoa[0].map((_, colIndex) =>
+      Math.max(
+        ...aoa.map((row) =>
+          row[colIndex] ? row[colIndex].toString().length : 0
+        )
+      )
+    );
+    return colWidths.map((w) => ({ wch: w + 2 }));
+  };
+
+  const formatDateAndGetMonthName = (dateString) => {
+    const date = new Date(dateString);
+
+    const monthNames = [
+      "January","February","March","April","May","June",
+      "July","August","September","October","November","December"
+    ];
+
+    return {
+      formattedDate: `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}/${date.getFullYear()}`,
+      monthName: monthNames[date.getMonth()]
+    };
+  };
+
+  const nonSupportData = Array.isArray(results.nonSupportGroup) ? results.nonSupportGroup : [];
+  const supportData = Array.isArray(results.supportGroup) ? results.supportGroup : [];
+  const summaryData = Array.isArray(results.summaryResult) ? results.summaryResult : [];
+
+  const nonSupportPastData = Array.isArray(results.nonSupportPastGroup) ? results.nonSupportPastGroup : [];
+  const supportPastData = Array.isArray(results.supportPastGroup) ? results.supportPastGroup : [];
+  const summaryPastData = Array.isArray(results.summaryPastResult) ? results.summaryPastResult : [];
+
+  const wb = XLSX.utils.book_new();
+  const monthName = formatDateAndGetMonthName(endDate);
+
+  // -----------------------------
+  // OPERATIONS PAST
+  // -----------------------------
+  const operationsPastData = [
+    ["MONTH","REGION","LAST NAME","FIRST NAME","DEPARTMENT","BASIC PAY","TOTAL OVERTIME","TOTAL ALLOWANCE","OTHER INCOME"],
+    ...nonSupportPastData.map(item => [
+      monthName.monthName,
+      item.region,
+      item.lastname,
+      item.firstname,
+      item.department,
+      formatNumberCell(item.basicpay),
+      formatNumberCell(item.totalot),
+      formatNumberCell(item.totalallow),
+      formatNumberCell(item.income),
+    ])
+  ];
+
+  const wsPastOperations = XLSX.utils.aoa_to_sheet(operationsPastData);
+  wsPastOperations["!cols"] = autoFitColumns(operationsPastData);
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    wsPastOperations,
+    `OPERATIONS ${monthName.monthName} ${payrollYear(endDate) - 1}`
+  );
+
+  // -----------------------------
+  // OPERATIONS CURRENT
+  // -----------------------------
+  const operationsData = [
+    ["MONTH","REGION","LAST NAME","FIRST NAME","DEPARTMENT","BASIC PAY","TOTAL OVERTIME","TOTAL ALLOWANCE","OTHER INCOME"],
+    ...nonSupportData.map(item => [
+      monthName.monthName,
+      item.region,
+      item.lastname,
+      item.firstname,
+      item.department,
+      formatNumberCell(item.basicpay),
+      formatNumberCell(item.totalot),
+      formatNumberCell(item.totalallow),
+      formatNumberCell(item.income),
+    ])
+  ];
+
+  const wsOperations = XLSX.utils.aoa_to_sheet(operationsData);
+  wsOperations["!cols"] = autoFitColumns(operationsData);
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    wsOperations,
+    `OPERATIONS ${monthName.monthName} ${payrollYear(endDate)}`
+  );
+
+  // -----------------------------
+  // SUPPORT PAST
+  // -----------------------------
+  const supportPastSheet = [
+    ["MONTH","REGION","LAST NAME","FIRST NAME","DEPARTMENT","BASIC PAY","TOTAL OVERTIME","TOTAL ALLOWANCE","OTHER INCOME"],
+    ...supportPastData.map(item => [
+      monthName.monthName,
+      item.region,
+      item.lastname,
+      item.firstname,
+      item.department,
+      formatNumberCell(item.basicpay),
+      formatNumberCell(item.totalot),
+      formatNumberCell(item.totalallow),
+      formatNumberCell(item.income),
+    ])
+  ];
+
+  const wsPastSupport = XLSX.utils.aoa_to_sheet(supportPastSheet);
+  wsPastSupport["!cols"] = autoFitColumns(supportPastSheet);
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    wsPastSupport,
+    `SUPPORT ${monthName.monthName} ${payrollYear(endDate) - 1}`
+  );
+
+  // -----------------------------
+  // SUPPORT CURRENT
+  // -----------------------------
+  const supportSheet = [
+    ["MONTH","REGION","LAST NAME","FIRST NAME","DEPARTMENT","BASIC PAY","TOTAL OVERTIME","TOTAL ALLOWANCE","OTHER INCOME"],
+    ...supportData.map(item => [
+      monthName.monthName,
+      item.region,
+      item.lastname,
+      item.firstname,
+      item.department,
+      formatNumberCell(item.basicpay),
+      formatNumberCell(item.totalot),
+      formatNumberCell(item.totalallow),
+      formatNumberCell(item.income),
+    ])
+  ];
+
+  const wsSupport = XLSX.utils.aoa_to_sheet(supportSheet);
+  wsSupport["!cols"] = autoFitColumns(supportSheet);
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    wsSupport,
+    `SUPPORT ${monthName.monthName} ${payrollYear(endDate)}`
+  );
+
+  // -----------------------------
+  // SUMMARY
+  // -----------------------------
+  const combinedSummaryData = [
+    ["REGION","BASIC PAY","TOTAL OVERTIME","TOTAL ALLOWANCE","TOTAL INCOME","","","","REGION","BASIC PAY","TOTAL OVERTIME","TOTAL ALLOWANCE","TOTAL INCOME"],
+    ...summaryPastData.map(item => {
+      const match = summaryData.find(d => d.region === item.region) || {};
+      return [
+        item.region,
+        formatNumberCell(item.basicpay),
+        formatNumberCell(item.totalot),
+        formatNumberCell(item.totalallow),
+        formatNumberCell(item.income),
+        "",
+        "",
+        "",
+        match.region || "",
+        formatNumberCell(match.basicpay || 0),
+        formatNumberCell(match.totalot || 0),
+        formatNumberCell(match.totalallow || 0),
+        formatNumberCell(match.income || 0),
+      ];
+    })
+  ];
+
+  const wsSummary = XLSX.utils.aoa_to_sheet(combinedSummaryData);
+  wsSummary["!cols"] = autoFitColumns(combinedSummaryData);
+
+  XLSX.utils.book_append_sheet(wb, wsSummary, "SUMMARY");
+
+  // -----------------------------
+  // EXPORT FILE
+  // -----------------------------
+  XLSX.writeFile(
+    wb,
+    `Payroll Comparison ${office} ${endDate}.xlsx`
+  );
+}
+
+// sdfsdfs
+async function generateOTReport(result, selectedOffice, selectedDate) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript(
+      'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    );
+  }
+  const nonSupportData =
+    Array.isArray(result.nonSupportGroup)
+      ? result.nonSupportGroup
+      : [];
+
+  const supportData =
+    Array.isArray(result.supportGroup)
+      ? result.supportGroup
+      : [];
+
+  const summaryData =
+    Array.isArray(result.summaryResult)
+      ? result.summaryResult
+      : [];
+
+  const wb = XLSX.utils.book_new();
+
+  function formatNumberCell(value) {
+    return {
+      v: Number(value || 0),
+      t: "n",
+      z: "#,##0.00"
+    };
+  }
+
+  function autoFitColumns(data) {
+  const widths = [];
+
+  data.forEach(row => {
+    row.forEach((cell, index) => {
+      const value =
+        cell !== null && typeof cell === "object"
+          ? String(cell.v ?? "")
+          : String(cell ?? "");
+
+      widths[index] =
+        Math.max(widths[index] || 0, value.length);
+    });
+  });
+
+  return widths.map(w => ({ wch: w + 2 }));
+}
+
+  function formatDate(dateString) {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+
+    if (isNaN(date)) return "";
+
+    const month =
+      String(date.getMonth() + 1).padStart(2, "0");
+
+    const day =
+      String(date.getDate()).padStart(2, "0");
+
+    const year =
+      date.getFullYear();
+
+    return `${month}/${day}/${year}`;
+  }
+
+  const headers = [
+    "REGION",
+    "LAST NAME",
+    "FIRST NAME",
+    "DATE HIRED",
+    "DESIGNATION",
+    "BRANCH",
+    "DEPARTMENT",
+    "BASIC PAY",
+    "OT Ordinary in Hours",
+    "OT Ordinary",
+    "SHOT in Hours",
+    "SHOT",
+    "LHOT in Hours",
+    "LHOT",
+    "ESHOT in Hours",
+    "OT EXCES SPECIAL",
+    "ELHOT in Hours",
+    "OT EXCES HOLIDAY",
+    "NIGHT PREMIUM"
+  ];
+
+  function buildRows(data) {
+    return [
+      headers,
+      ...data.map(item => [
+        item.region,
+        item.lastname,
+        item.firstname,
+        formatDate(item.datehired),
+
+        item.designation,
+        item.branch,
+        item.department,
+
+        formatNumberCell(item.basicpay),
+
+        item.OTHours,
+        formatNumberCell(item.OTORD),
+
+        item.SHOTHours,
+        formatNumberCell(item.SHOT),
+
+        item.LHOTHours,
+        formatNumberCell(item.LHOT),
+
+        item.ESHOTHours,
+        formatNumberCell(item.otsx),
+
+        item.ELHOTHours,
+        formatNumberCell(item.OTEXCSHOLIDAY),
+
+        formatNumberCell(item.nprem)
+      ])
+    ];
+  }
+
+  const operationsSheet =
+    XLSX.utils.aoa_to_sheet(
+      buildRows(nonSupportData)
+    );
+
+  operationsSheet["!cols"] =
+    autoFitColumns(
+      buildRows(nonSupportData)
+    );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    operationsSheet,
+    "OPERATIONS"
+  );
+
+  const supportSheet =
+    XLSX.utils.aoa_to_sheet(
+      buildRows(supportData)
+    );
+
+  supportSheet["!cols"] =
+    autoFitColumns(
+      buildRows(supportData)
+    );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    supportSheet,
+    "SUPPORT"
+  );
+
+  const summarySheetData = [
+    [
+      "Region",
+      "Count",
+      "OT Hours (ORD)",
+      "OT Pay (ORD)",
+      "SHOT Hours",
+      "SHOT Pay",
+      "LHOT Hours",
+      "LHOT Pay",
+      "ESHOT Hours",
+      "ESHOT Pay",
+      "ELHOT Hours",
+      "ELHOT Pay",
+      "Night Premium"
+    ],
+
+    ...summaryData.map(item => [
+      item.REGION,
+      item.count,
+
+      item.otordhours,
+      formatNumberCell(item.otordsum),
+
+      item.shotothours,
+      formatNumberCell(item.shot),
+
+      item.lhotothours,
+      formatNumberCell(item.lhot),
+
+      item.eshotothours,
+      formatNumberCell(item.OTEXCSSPECIAL),
+
+      item.elhotothours,
+      formatNumberCell(item.OTEXCSHOLIDAY),
+
+      formatNumberCell(item.nprem)
+    ])
+  ];
+
+  const summarySheet =
+    XLSX.utils.aoa_to_sheet(
+      summarySheetData
+    );
+
+  summarySheet["!cols"] =
+    autoFitColumns(
+      summarySheetData
+    );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    summarySheet,
+    "SUMMARY"
+  );
+
+  XLSX.writeFile(
+    wb,
+    `OT Report ${selectedOffice} ${selectedDate}.xlsx`
+  );
+}
+
+async function generatePayrollData(result, selectedOffice, selectedDate) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript(
+      'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    );
+  }
+
+  const nonSupportData =
+    Array.isArray(result.nonSupportGroup)
+      ? result.nonSupportGroup
+      : [];
+
+  const supportData =
+    Array.isArray(result.supportGroup)
+      ? result.supportGroup
+      : [];
+
+  const mancommData =
+    Array.isArray(result.mancommGroup)
+      ? result.mancommGroup
+      : [];
+
+  const summaryData =
+    Array.isArray(result.summaryResult)
+      ? result.summaryResult
+      : [];
+
+  const wb = XLSX.utils.book_new();
+
+  function formatNumberCell(value) {
+    return {
+      v: Number(value || 0),
+      t: "n",
+      z: "#,##0.00"
+    };
+  }
+
+  function autoFitColumns(data) {
+    const widths = [];
+
+    data.forEach(row => {
+      row.forEach((cell, index) => {
+        const value =
+          cell !== null && typeof cell === "object"
+            ? String(cell.v ?? "")
+            : String(cell ?? "");
+
+        widths[index] =
+          Math.max(widths[index] || 0, value.length);
+      });
+    });
+
+    return widths.map(w => ({
+      wch: w + 2
+    }));
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+
+    if (isNaN(date)) return "";
+
+    const month =
+      String(date.getMonth() + 1).padStart(2, "0");
+
+    const day =
+      String(date.getDate()).padStart(2, "0");
+
+    const year =
+      date.getFullYear();
+
+    return `${month}/${day}/${year}`;
+  }
+
+  const headers = [
+    "REGION",
+    "DEPARTMENT",
+    "PAYROLL DATE",
+    "EMPLOYMENT STATUS",
+    "LAST NAME",
+    "FIRST NAME",
+    "DESIGNATION",
+    "DATE HIRED",
+    "BRANCH",
+    "BASIC PAY",
+    "MANAGEMENT ALLOWANCE",
+    "TRAVEL ALLOWANCE",
+    "BM ALLOWANCE",
+    "ABM ALLOWANCE",
+    "HOUSING ALLOWANCE",
+    "SUPERVISORY ALLOWANCE 1",
+    "SUPERVISORY ALLOWANCE 2",
+    "AUDITORS ALLOWANCE",
+    "TOTAL ALLOWANCE",
+    "TOTAL OVERTIME",
+    "COLA",
+    "INCOME DESCRIPTION 1",
+    "INCOME AMOUNT 1",
+    "INCOME DESCRIPTION 2",
+    "INCOME AMOUNT 2",
+    "GROSS",
+    "LATES",
+    "LEAVES",
+    "INCOME TAX",
+    "SSS CONTRIBUTION",
+    "SSS LOAN",
+    "PAGIBIG CONTRIBUTION",
+    "PAGIBIG LOAN",
+    "PHILHEALTH",
+    "ML FUND",
+    "OPEC",
+    "OVER APPRAISAL",
+    "COOP RECLA",
+    "INSTALL ACCOUNT",
+    "TICKET",
+    "TELECOMS",
+    "OPEC SUPPORT",
+    "MORTUARY",
+    "FAKE",
+    "OTHER DEDUCTIONS",
+    "SAKO",
+    "MOTOR LOAN",
+    "DEDUCTION DESCRIPTON 1",
+    "DEDUCTION AMOUNT 1",
+    "DEDUCTION DESCRIPTON 2",
+    "DEDUCTION AMOUNT 2",
+    "COATED",
+    "HMO",
+    "TOTAL NET"
+  ];
+
+  function buildRows(data) {
+    return [
+      headers,
+      ...data.map(item => [
+        item.region,
+        item.department,
+        formatDate(item.enddate),
+        item.employmentstatus,
+        item.lastname,
+        item.firstname,
+        item.designation,
+        formatDate(item.datehired),
+        item.branch,
+
+        formatNumberCell(item.basicpay),
+        formatNumberCell(item.managementallow),
+        formatNumberCell(item.travelallow),
+        formatNumberCell(item.bmallow),
+        formatNumberCell(item.abmallow),
+        formatNumberCell(item.housingallow),
+        formatNumberCell(item.supervisoryallow1),
+        formatNumberCell(item.supervisoryallow2),
+        formatNumberCell(item.auditorsallow),
+        formatNumberCell(item.totalallow),
+        formatNumberCell(item.totalot),
+        formatNumberCell(item.cola),
+
+        item.otherincdesc1,
+        formatNumberCell(item.incomeamount1),
+        item.otherincdesc2,
+        formatNumberCell(item.incomeamount2),
+
+        formatNumberCell(item.gross),
+        formatNumberCell(item.lates),
+        formatNumberCell(item.leaves),
+        formatNumberCell(item.incometax),
+        formatNumberCell(item.ssscontri),
+        formatNumberCell(item.sssloan),
+        formatNumberCell(item.pagibigcontri),
+        formatNumberCell(item.pagibigloan),
+        formatNumberCell(item.philhealth),
+        formatNumberCell(item.mlfund),
+        formatNumberCell(item.opec),
+        formatNumberCell(item.overappraisal),
+        formatNumberCell(item.cooprecla),
+        formatNumberCell(item.installaccount),
+        formatNumberCell(item.ticket),
+        formatNumberCell(item.mobilebill),
+        formatNumberCell(item.canteen),
+        formatNumberCell(item.sakoprovi),
+        formatNumberCell(item.sakocommodity),
+        formatNumberCell(item.sakoprime),
+        formatNumberCell(item.sakoemergency),
+        formatNumberCell(item.sakopettycash),
+
+        item.deductiondesc1,
+        formatNumberCell(item.deductionamount1),
+        item.deductiondesc2,
+        formatNumberCell(item.deductionamount2),
+
+        formatNumberCell(item.coated),
+        formatNumberCell(item.c_hmo),
+        formatNumberCell(item.totalnet),
+      ])
+    ];
+  }
+
+  const operationsSheet =
+    XLSX.utils.aoa_to_sheet(
+      buildRows(nonSupportData)
+    );
+
+  operationsSheet["!cols"] =
+    autoFitColumns(
+      buildRows(nonSupportData)
+    );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    operationsSheet,
+    "OPERATIONS"
+  );
+
+  const supportSheet =
+    XLSX.utils.aoa_to_sheet(
+      buildRows(supportData)
+    );
+
+  supportSheet["!cols"] =
+    autoFitColumns(
+      buildRows(supportData)
+    );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    supportSheet,
+    "SUPPORT"
+  );
+
+  const mancommSheet =
+    XLSX.utils.aoa_to_sheet(
+      buildRows(mancommData)
+    );
+
+  mancommSheet["!cols"] =
+    autoFitColumns(
+      buildRows(mancommData)
+    );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    mancommSheet,
+    "MANCOMM"
+  );
+
+  const summarySheetData = [
+    [
+      "REGION",
+      "PAYROLL DATE",
+      "COUNT",
+      "BASIC PAY",
+      "MANAGEMENT ALLOWANCE",
+      "TRAVEL ALLOWANCE",
+      "BM ALLOWANCE",
+      "ABM ALLOWANCE",
+      "HOUSING ALLOWANCE",
+      "SUPERVISORY ALLOWANCE 1",
+      "SUPERVISORY ALLOWANCE 2",
+      "AUDITOR ALLOWANCE",
+      "OT Ordinay in Hours",
+      "OT ORDINARY",
+      "SHOT in Hours",
+      "SHOT",
+      "LHOT in Hours",
+      "LHOT",
+      "ESHOT in Hours",
+      "OTEXCS SPECIAL",
+      "ELHOT in Hours",
+      "OTEXCS HOLIDAY",
+      "NIGHT PREMIUM",
+      "TOTAL DEDUCTION"
+    ],
+
+    ...summaryData.map(item => [
+      item.region,
+      formatDate(item.enddate),
+      item.count,
+
+      formatNumberCell(item.basicpay),
+      formatNumberCell(item.managementallow),
+      formatNumberCell(item.travelallow),
+      formatNumberCell(item.bmallow),
+      formatNumberCell(item.abmallow),
+      formatNumberCell(item.housingallow),
+      formatNumberCell(item.supervisoryallow1),
+      formatNumberCell(item.supervisoryallow2),
+      formatNumberCell(item.auditorsallow),
+
+      formatNumberCell(item.otordinhours),
+      formatNumberCell(item.otord),
+      formatNumberCell(item.shotinhours),
+      formatNumberCell(item.shot),
+      formatNumberCell(item.lhotinhours),
+      formatNumberCell(item.lhot),
+      formatNumberCell(item.eshotinhours),
+      formatNumberCell(item.otexcsspecial),
+      formatNumberCell(item.elhotinhours),
+      formatNumberCell(item.otexcsholiday),
+      formatNumberCell(item.nprem),
+      formatNumberCell(item.totaldeduction),
+    ])
+  ];
+
+  const summarySheet =
+    XLSX.utils.aoa_to_sheet(
+      summarySheetData
+    );
+
+  summarySheet["!cols"] =
+    autoFitColumns(
+      summarySheetData
+    );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    summarySheet,
+    "SUMMARY"
+  );
+
+  XLSX.writeFile(
+    wb,
+    `Payroll Data ${selectedOffice} ${selectedDate}.xlsx`
+  );
+}
+
+async function generateMLGExcelReport(results) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+  
+  // Define headers
+  const headers = [
+    'AREA/DEPARTMENT',
+    'LAST NAME',
+    'FIRST NAME',
+    'PAYROLL TYPE',
+    'DAILY RATE',
+    'NO. DAYS',
+    'BASIC PAY',
+    'ALLOWANCES',
+    'OVERTIME',
+    'COLA',
+    'OTHER INCOME',
+    'GROSS PAY',
+    'LATES',
+    'LEAVE W/O PAY', 
+    'INCOME TAX', 
+    'SSS CONTRIBUTION', 
+    'PAGIBIG CONTRIBUTION', 
+    'SSS LOAN', 
+    'PAGIBIG LOAN', 
+    'CAR-MOTOR LOAN', 
+    'ML FUND', 
+    'HMO', 
+    'ML CELLPHONE',
+    'PHILHEALTH', 
+    'ML ACCOUNT', 
+    'ATD', 
+    'ODETTE LOAN', 
+    'ML LENDING', 
+    'PAYABLES',
+    '', // deductionDesc1
+    '', // deductionDesc2
+    'TOTAL DEDUCTION', 
+    'TOTAL NET',
+  ];
+let payrollDate = '';
+  results.forEach(employee => {
+    if (!groupedData[employee.region]) {
+      groupedData[employee.region] = {};
+    }
+    if (!groupedData[employee.region][employee.department]) {
+      groupedData[employee.region][employee.department] = [];
+    }
+    groupedData[employee.region][employee.department].push(employee);
+  });
+
+  const sortedRegions = Object.keys(groupedData).sort();
+
+  sortedRegions.forEach(region => {
+    const regionData = groupedData[region];
+    const sortedDepartments = Object.keys(regionData).sort();
+    const wsData = [];
+    let columnWidths = [];
+
+    wsData.push(['M. Lhuillier Financial Services Inc - Complete Payroll Report']);
+    wsData.push([]);
+
+    sortedDepartments.forEach(department => {
+      
+      const departmentEmployees = regionData[department];
+      const employeeCount = departmentEmployees.length;
+      const firstEmployee = departmentEmployees[0];
+      
+      const departmentHeaders = [...headers];
+      departmentHeaders[29] = firstEmployee.deductionDesc1 || '';
+      departmentHeaders[30] = firstEmployee.deductionDesc2 || '';
+      payrollDate = `${firstEmployee.endDate}`;
+      wsData.push([`${region} - ${department}`]);
+      wsData.push([`Payroll Period - ${formatDate(firstEmployee.startDate)} to ${formatDate(firstEmployee.endDate)}`]);
+      wsData.push(departmentHeaders);
+
+      departmentHeaders.forEach((header, index) => {
+        columnWidths[index] = Math.max(columnWidths[index] || 0, header.length);
+      });
+
+      const sortedEmployees = departmentEmployees.sort((a, b) => {
+        const lastNameCompare = a.lastname.localeCompare(b.lastname);
+        return lastNameCompare !== 0 ? lastNameCompare : a.firstname.localeCompare(b.firstname);
+      });
+
+      // Initialize totals - all numeric columns start at 0
+      const totals = Array(headers.length).fill(0);
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+      sortedEmployees.forEach(emp => {
+        const row = [
+          emp.department,
+          emp.lastname,
+          emp.firstname,
+          emp.payrollType.toUpperCase(),
+          emp.dailyrate,
+          Number(emp.minutesworked) || 0,    
+          emp.basicpay,
+          emp.totalallow,
+          emp.totalot,
+          emp.cola,
+          emp.otherincome,
+          emp.gross,
+          emp.lates,
+          emp.absent, 
+          emp.incometax, 
+          emp.ssscontri, 
+          emp.pagibigcontri, 
+          emp.sssloan, 
+          emp.pagibigloan, 
+          emp.carloan,
+          emp.mlfund, 
+          emp.hmo, 
+          emp.mlcellphone,
+          emp.philhealth, 
+          emp.mlaccount, 
+          emp.atd, 
+          emp.odetteloan, 
+          emp.deductionamount1, 
+          emp.deductionamount2, 
+          emp.mllending,
+          emp.payables,
+          Number(emp.totaldeduction) || 0, 
+          emp.totalnet,
+        ];
+
+        // Update totals - all numeric columns will show 0 even if no values
+        numericColumns.forEach(col => {
+          const value = parseFloat(row[col]) || 0;
+          totals[col] += value;
+          row[col] = value === 0 ? 0 : row[col]; // Ensure 0 values are explicit
+        });
+
+        wsData.push(row);
+        row.forEach((cell, index) => {
+          columnWidths[index] = Math.max(columnWidths[index] || 0, String(cell).length);
+        });
+      });
+
+      // Add summary row with all totals (including zeros)
+      const summaryRow = new Array(headers.length).fill('');
+      summaryRow[0] = `TOTAL EMPLOYEES: ${employeeCount}`;
+      
+      numericColumns.forEach(col => {
+        summaryRow[col] = totals[col]; // Will show 0 for zero totals
+      });
+
+      wsData.push(summaryRow);
+      wsData.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = columnWidths.map(width => ({ wch: Math.min(Math.max(width + 2, 10), 50) }));
+
+    // Apply only number formatting (no styling)
+    Object.keys(ws).forEach(cellAddress => {
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+      if (numericColumns.includes(colIndex)) {
+        cell.z = '#,##0.00';
+      }
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  //const date = Date(payrollDate).toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `${results.officeSelect.value}_Payroll_Report_${numberDate(payrollDate)}.xlsx`);
+}
+
+async function generateExcelReport(results) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+  
+  // Define headers
+  const headers = [
+    'AREA/DEPARTMENT',
+    'LAST NAME',
+    'FIRST NAME',
+    'PAYROLL TYPE',
+    'DAILY RATE',
+    'NO. DAYS',
+    'BASIC PAY',
+    'ALLOWANCES',
+    'OVERTIME',
+    'COLA',
+    'OTHER INCOME',
+    'GROSS PAY',
+    'LATES',
+    'LEAVE W/O PAY', 
+    'INCOME TAX', 
+    'SSS CONTRIBUTION', 
+    'PAGIBIG CONTRIBUTION', 
+    'SSS LOAN', 
+    'PAGIBIG LOAN', 
+    'ML FUND', 
+    'OPEC', 
+    'OVER APPRAISAL',
+    'COOP RECLA', 
+    'PHILHEALTH', 
+    'INSTALL ACCOUNT', 
+    'OPEC TICKET', 
+    'TELECOMS', 
+    'OPEC SUPPORT', 
+    'MORTUARY', 
+    'FAKE', 
+    'OTHER DEDUCTIONS', 
+    'SAKO',
+    'MOTOR LOAN', 
+    'HMO',
+    'ISPD INSURANCE', // deductionDesc1
+    'OVER PAYMENTS', // deductionDesc2
+    'TOTAL DEDUCTION', 
+    'TOTAL NET',
+  ];
+let payrollDate = '';
+  results.forEach(employee => {
+    if (!groupedData[employee.region]) {
+      groupedData[employee.region] = {};
+    }
+    if (!groupedData[employee.region][employee.department]) {
+      groupedData[employee.region][employee.department] = [];
+    }
+    groupedData[employee.region][employee.department].push(employee);
+  });
+
+  const sortedRegions = Object.keys(groupedData).sort();
+
+  sortedRegions.forEach(region => {
+    const regionData = groupedData[region];
+    const sortedDepartments = Object.keys(regionData).sort();
+    const wsData = [];
+    let columnWidths = [];
+
+    wsData.push(['M. Lhuillier Financial Services Inc - Complete Payroll Report']);
+    wsData.push([]);
+
+    sortedDepartments.forEach(department => {
+      
+      const departmentEmployees = regionData[department];
+      const employeeCount = departmentEmployees.length;
+      const firstEmployee = departmentEmployees[0];
+      
+      const departmentHeaders = [...headers];
+      departmentHeaders[34] = firstEmployee.deductionDesc1 || '';
+      departmentHeaders[35] = firstEmployee.deductionDesc2 || '';
+      payrollDate = `${firstEmployee.endDate}`;
+      wsData.push([`${region} - ${department}`]);
+      wsData.push([`Payroll Period - ${formatDate(firstEmployee.startDate)} to ${formatDate(firstEmployee.endDate)}`]);
+      wsData.push(departmentHeaders);
+
+      departmentHeaders.forEach((header, index) => {
+        columnWidths[index] = Math.max(columnWidths[index] || 0, header.length);
+      });
+
+      const sortedEmployees = departmentEmployees.sort((a, b) => {
+        const lastNameCompare = a.lastname.localeCompare(b.lastname);
+        return lastNameCompare !== 0 ? lastNameCompare : a.firstname.localeCompare(b.firstname);
+      });
+
+      // Initialize totals - all numeric columns start at 0
+      const totals = Array(headers.length).fill(0);
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37];
+      sortedEmployees.forEach(emp => {
+        const row = [
+          emp.department,
+          emp.lastname,
+          emp.firstname,
+          emp.payrollType.toUpperCase(),
+          emp.dailyrate,
+          Number(emp.minutesworked) || 0,    
+          emp.basicpay,
+          emp.totalallow,
+          emp.totalot,
+          emp.cola,
+          emp.otherincome,
+          emp.gross,
+          emp.lates,
+          emp.absent, 
+          emp.incometax, 
+          emp.ssscontri, 
+          emp.pagibigcontri, 
+          emp.sssloan, 
+          emp.pagibigloan, 
+          emp.mlfund, 
+          emp.opec, 
+          emp.overappraisal,
+          emp.cooprecla, 
+          emp.philhealth, 
+          emp.installaccount, 
+          emp.ticket, 
+          emp.mobilebill, 
+          emp.canteen, 
+          emp.sakoprovi, 
+          emp.sakocommodity, 
+          emp.sakoprime, 
+          emp.sakoemergency,
+          emp.sakopettycash, 
+          emp.hmo,
+          emp.deductionamount1, 
+          emp.deductionamount2, 
+          
+          Number(emp.totaldeduction) || 0, 
+          emp.totalnet,
+        ];
+
+        // Update totals - all numeric columns will show 0 even if no values
+        numericColumns.forEach(col => {
+          const value = parseFloat(row[col]) || 0;
+          totals[col] += value;
+          row[col] = value === 0 ? 0 : row[col]; // Ensure 0 values are explicit
+        });
+
+        wsData.push(row);
+        row.forEach((cell, index) => {
+          columnWidths[index] = Math.max(columnWidths[index] || 0, String(cell).length);
+        });
+      });
+
+      // Add summary row with all totals (including zeros)
+      const summaryRow = new Array(headers.length).fill('');
+      summaryRow[0] = `TOTAL EMPLOYEES: ${employeeCount}`;
+      
+      numericColumns.forEach(col => {
+        summaryRow[col] = totals[col]; // Will show 0 for zero totals
+      });
+
+      wsData.push(summaryRow);
+      wsData.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = columnWidths.map(width => ({ wch: Math.min(Math.max(width + 2, 10), 50) }));
+
+    // Apply only number formatting (no styling)
+    Object.keys(ws).forEach(cellAddress => {
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+      const numericColumns = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37];
+      if (numericColumns.includes(colIndex)) {
+        cell.z = '#,##0.00';
+      }
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  //const date = Date(payrollDate).toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `${results.officeSelect.value}_Payroll_Report_${numberDate(payrollDate)}.xlsx`);
+}
+
+async function generateContributionExcelReport(results, office, selectedRegion) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  if (!results || results.length === 0) {
+    console.warn('No data to export');
+    return;
+  }
+console.log('there is data to export')
+let month_name;
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+
+  // ✅ Correct headers
+  const headers = [
+    'IDNO',
+    'LAST NAME',
+    'FIRST NAME',
+    'SSS EMPLOYER SHARE',
+    'SSS EMPLOYEE SHARE',
+    'SSS TOTAL',
+    'PAGIBIG EMPLOYER SHARE',
+    'PAGIBIG EMPLOYEE SHARE',
+    'PAGIBIG TOTAL',
+    'PHILHEALTH EMPLOYER SHARE',
+    'PHILHEALTH EMPLOYEE SHARE',
+    'PHILHEALTH TOTAL',
+  ];
+
+  // ✅ Use first record for payroll date
+  //const payrollDate = results[0]?.endDate || '';
+
+  // ✅ Group data by region → department
+  results.forEach(emp => {
+    if (!groupedData[emp.region]) {
+      groupedData[emp.region] = {};
+    }
+    if (!groupedData[emp.region][emp.department]) {
+      groupedData[emp.region][emp.department] = [];
+    }
+    groupedData[emp.region][emp.department].push(emp);
+  });
+
+  const sortedRegions = Object.keys(groupedData).sort();
+
+  sortedRegions.forEach(region => {
+    const regionData = groupedData[region];
+    const sortedDepartments = Object.keys(regionData).sort();
+
+    const wsData = [];
+    let columnWidths = [];
+
+    const normalizedOffice = (office || '').toUpperCase().trim();
+
+if (normalizedOffice === 'LUZON' || normalizedOffice === 'VISMIN') {
+  wsData.push(['MLFSI - Statutory Contribution Report']);
+} else {
+  wsData.push(['ML Inc. - Statutory Contribution Report']);
+}
+    wsData.push([]);
+
+    sortedDepartments.forEach(department => {
+      const departmentEmployees = regionData[department];
+      const employeeCount = departmentEmployees.length;
+      const firstEmployee = departmentEmployees[0];
+      
+      month_name = decodeMonth(firstEmployee.month_name);
+
+
+
+
+      wsData.push([`${region} - ${department}`]);
+      wsData.push([
+        `Payroll Month - ${month_name}`
+      ]);
+      wsData.push(headers);
+
+      // Track column width
+      headers.forEach((header, i) => {
+        columnWidths[i] = Math.max(columnWidths[i] || 0, header.length);
+      });
+
+      // ✅ Do NOT mutate original array
+      const sortedEmployees = [...departmentEmployees].sort((a, b) => {
+        const last = a.lastname.localeCompare(b.lastname);
+        return last !== 0 ? last : a.firstname.localeCompare(b.firstname);
+      });
+
+      // ✅ Correct numeric column indexes
+      const numericColumns = [3,4,5,6,7,8,9,10,11];
+      const totals = Array(headers.length).fill(0);
+
+      sortedEmployees.forEach(emp => {
+        const row = [
+          //decodeMonth(emp.month_name),
+          emp.idno,
+          emp.lastname,
+          emp.firstname,
+          parseFloat(emp.sss_employer) || 0,
+          parseFloat(emp.sss_employee) || 0,
+          parseFloat(emp.sss_total) || 0,
+          parseFloat(emp.pagibig_employer) || 0,
+          parseFloat(emp.pagibig_employee) || 0,
+          parseFloat(emp.pagibig_total) || 0,
+          parseFloat(emp.philhealth_employer) || 0,
+          parseFloat(emp.philhealth_employee) || 0,
+          parseFloat(emp.philhealth_total) || 0,
+        ];
+
+        // ✅ Compute totals correctly
+        numericColumns.forEach(col => {
+          totals[col] += row[col];
+        });
+
+        wsData.push(row);
+
+        // Update column widths
+        row.forEach((cell, i) => {
+          columnWidths[i] = Math.max(columnWidths[i] || 0, String(cell).length);
+        });
+      });
+
+      // ✅ Summary row
+      const summaryRow = Array(headers.length).fill('');
+      summaryRow[0] = `TOTAL EMPLOYEES: ${employeeCount}`;
+
+      numericColumns.forEach(col => {
+        summaryRow[col] = totals[col];
+      });
+
+      wsData.push(summaryRow);
+      wsData.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // ✅ Safe column width assignment
+    ws['!cols'] = columnWidths.map(w => ({
+      wch: Math.min(Math.max(w + 2, 10), 50)
+    }));
+
+    // ✅ Apply number formatting safely
+    const numericColumns = [3,4,5,6,7,8,9,10,11];
+
+    Object.keys(ws).forEach(cellAddress => {
+      if (cellAddress[0] === '!') return; // skip metadata
+
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+
+      if (numericColumns.includes(colIndex) && typeof cell.v === 'number') {
+        cell.z = '#,##0.00';
+      }
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  // ✅ Safe filename
+  const safeOffice = office || 'Payroll';
+  // check if selectedRegion has value
+const hasRegion = selectedRegion && selectedRegion.value;
+
+// sanitize region if exists
+const safeRegion = hasRegion
+  ? selectedRegion.value.toUpperCase().replace(/[\\/*[\]:?]/g, '').trim()
+  : '';
+
+// build filename
+const fileName = hasRegion
+  ? `${safeOffice}_${safeRegion}_Contribution_${month_name}.xlsx`
+  : `${safeOffice}_Contribution_${month_name}.xlsx`;
+
+XLSX.writeFile(wb, fileName);
+}
+
+async function generateWageIncreaseExcelReport(results, office, selectedRegion, endDate) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  if (!results || results.length === 0) {
+    console.warn('No data to export');
+    return;
+  }
+console.log('there is data to export')
+const formattedEndDate = endDate
+  ? new Date(endDate).toISOString().split('T')[0]
+  : 'NO_DATE';
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+
+  // ✅ Correct headers
+  const headers = [
+    'REGION',
+    'IDNO',
+    'LAST NAME',
+    'FIRST NAME',
+    'BRANCH',
+    'DEPARTMENT',
+    'DESIGNATION',
+    'DATE HIRED',
+    'MONTHLY RATE',
+    'DAILY RATE',
+    
+  ];
+
+  // ✅ Use first record for payroll date
+  //const payrollDate = results[0]?.endDate || '';
+
+  
+    // ✅ Group data by region only
+results.forEach(emp => {
+  if (!groupedData[emp.region]) {
+    groupedData[emp.region] = [];
+  }
+
+  groupedData[emp.region].push(emp);
+});
+
+  const sortedRegions = Object.keys(groupedData).sort();
+
+  sortedRegions.forEach(region => {
+    const regionEmployees = groupedData[region];
+
+const wsData = [];
+let columnWidths = [];
+
+const normalizedOffice = (office || '').toUpperCase().trim();
+
+if (normalizedOffice === 'LUZON' || normalizedOffice === 'VISMIN') {
+  wsData.push(['MLFSI - Wage Increase Report']);
+} else {
+  wsData.push(['ML Inc. - Wage Increase Report']);
+}
+
+wsData.push([]);
+wsData.push([`${region}`]);
+wsData.push(headers);
+
+// Track column width
+headers.forEach((header, i) => {
+  columnWidths[i] = Math.max(columnWidths[i] || 0, header.length);
+});
+
+// Sort employees
+const sortedEmployees = [...regionEmployees].sort((a, b) => {
+  const last = a.lastname.localeCompare(b.lastname);
+  return last !== 0 ? last : a.firstname.localeCompare(b.firstname);
+});
+
+// Add employee rows
+sortedEmployees.forEach(emp => {
+
+  const row = [
+    emp.region,
+    emp.idno,
+    emp.lastname,
+    emp.firstname,
+    emp.branch,
+    emp.department,
+    emp.designation,
+    emp.datehired,
+    parseFloat(emp.monthlyrate) || 0,
+    parseFloat(emp.dailyrate) || 0,
+  ];
+
+  wsData.push(row);
+
+  // Update column widths
+  row.forEach((cell, i) => {
+    columnWidths[i] = Math.max(
+      columnWidths[i] || 0,
+      String(cell).length
+    );
+  });
+});
+
+// ✅ ONLY total employee count
+wsData.push([]);
+wsData.push([`TOTAL EMPLOYEES: ${sortedEmployees.length}`]);
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // ✅ Safe column width assignment
+    ws['!cols'] = columnWidths.map(w => ({
+      wch: Math.min(Math.max(w + 2, 10), 50)
+    }));
+
+    // ✅ Apply number formatting safely
+   const numericColumns = [7, 8];
+
+    Object.keys(ws).forEach(cellAddress => {
+      if (cellAddress[0] === '!') return; // skip metadata
+
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+
+      if (numericColumns.includes(colIndex) && typeof cell.v === 'number') {
+        cell.z = '#,##0.00';
+      }
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  // ✅ Safe filename
+  const safeOffice = office || 'Payroll';
+  // check if selectedRegion has value
+const hasRegion = selectedRegion && selectedRegion.value;
+
+// sanitize region if exists
+const safeRegion = hasRegion
+  ? selectedRegion.value.toUpperCase().replace(/[\\/*[\]:?]/g, '').trim()
+  : '';
+
+// build filename
+const fileName = hasRegion
+  ? `${safeOffice}_${safeRegion}_Wage_Increase_${formattedEndDate}.xlsx`
+  : `${safeOffice}_Wage_Increase_${formattedEndDate}.xlsx`;
+
+XLSX.writeFile(wb, fileName);
+}
+
+
+
+async function generateDirectPayroll(results, office, selectedRegion) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  if (!results || results.length === 0) {
+    console.warn('No data to export');
+    return;
+  }
+
+  const dataArray = Array.isArray(results) ? results : (results.results || []);
+  
+  if (dataArray.length === 0) {
+    console.warn('No data to export after extraction');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+  
+  let combinedData = [];
+
+  const ws_data = [
+    [
+      "*ID",
+      "*NAME",
+      "*MONTH",
+      "*YEAR",
+      "*CYCLE",
+      "*DAYS WORKED",
+      "*TOTAL WORKING DAYS",
+      "*NET PAY",
+    ],
+  ];
+
+  const formatIDForCSV = (id) => {
+    const paddedID = id.toString().padStart(8, "0");
+    return `="${paddedID}"`;
+  };
+
+  dataArray.forEach((item) => {
+    combinedData.push([
+      item.id ? formatIDForCSV(item.id) : "",
+      item.name || "",
+      item.month || "",
+      item.year ? item.year.toString() : "",
+      item.cycle || "",
+      Math.round(item.daysworked || 0),      // ✅ Integer
+      Math.round(item.totaldays || 0),       // ✅ Integer
+      parseFloat(item.netpay) || 0,          // ✅ Raw number (no formatting)
+    ]);
+  });
+
+  ws_data.push(...combinedData);
+
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+  // ✅ Apply column-specific formatting
+  ws_data.forEach((row, rIndex) => {
+    row.forEach((cell, cIndex) => {
+      if (typeof cell === "number") {
+        const cellRef = XLSX.utils.encode_cell({
+          c: cIndex,
+          r: rIndex,
+        });
+        if (!ws[cellRef]) ws[cellRef] = {};
+        
+        // Column-specific formatting
+        if (cIndex === 7) { // NET PAY column - raw number, no formatting
+          ws[cellRef].t = "n";
+          ws[cellRef].z = "General";  // ✅ No formatting - just raw number
+          ws[cellRef].v = cell;
+        } else if (cIndex === 5 || cIndex === 6) { // DAYS WORKED or TOTAL WORKING DAYS
+          ws[cellRef].t = "n";
+          ws[cellRef].z = "0";  // No decimals
+          ws[cellRef].v = Math.round(cell);
+        }
+      }
+    });
+  });
+
+  // Bold and center-align the header row
+  ws_data[0].forEach((_, colIndex) => {
+    const cellRef = XLSX.utils.encode_cell({ c: colIndex, r: 0 });
+    const cell = ws[cellRef];
+    if (cell) {
+      cell.s = {
+        font: { bold: true },
+        alignment: { horizontal: "center" },
+      };
+    }
+  });
+
+  ws["!cols"] = autoFitColumns(ws_data);
+
+  XLSX.utils.book_append_sheet(wb, ws, "Direct Payroll");
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  const safeRegion = (selectedRegion || '').replace(/[\\/*[\]:?]/g, '') || 'ALL';
+  const safeOffice = (office || 'Payroll').replace(/[\\/*[\]:?]/g, '');
+  
+  XLSX.writeFile(
+    wb,
+    `Direct_Payroll_${safeOffice}_${safeRegion}_${dateStr}.csv`
+  );
+
+  function autoFitColumns(aoa) {
+    const colWidths = aoa[0].map((_, colIndex) =>
+      Math.max(
+        ...aoa.map((row) =>
+          row[colIndex] ? row[colIndex].toString().length : 0
+        )
+      )
+    );
+    return colWidths.map((width) => ({ wch: width + 2 }));
+  }
+}
+
+async function generateMonthlyRateExcel(results, office, selectedRegion, endDate) {
+  if (typeof XLSX === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }
+
+  if (!results || results.length === 0) {
+    console.warn('No data to export');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+  const groupedData = {};
+
+  // Headers for Monthly Rate report
+  const headers = [
+    'REGION',
+    'IDNO',
+    'DEPARTMENT',
+    'EMPLOYEE NAME',
+    'MONTHLY RATE'
+  ];
+
+  // Group by region
+  results.forEach(emp => {
+    if (!groupedData[emp.region]) {
+      groupedData[emp.region] = [];
+    }
+    groupedData[emp.region].push(emp);
+  });
+
+  const sortedRegions = Object.keys(groupedData).sort();
+
+  sortedRegions.forEach(region => {
+    const regionEmployees = groupedData[region];
+    const wsData = [];
+    let columnWidths = [];
+
+    // Report header
+    const formattedEndDate = endDate ? new Date(endDate).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }) : 'N/A';
+
+    wsData.push([`Monthly Rate Report - ${region}`]);
+    wsData.push([`Payroll Date: ${formattedEndDate}`]);
+    wsData.push([]);
+    wsData.push(headers);
+
+    // Track column widths
+    headers.forEach((header, i) => {
+      columnWidths[i] = Math.max(columnWidths[i] || 0, header.length);
+    });
+
+    // Sort employees
+    const sortedEmployees = [...regionEmployees].sort((a, b) => {
+      return a.employee.localeCompare(b.employee);
+    });
+
+    // Add employee rows
+    sortedEmployees.forEach(emp => {
+      const row = [
+        emp.region || '',
+        emp.idno || '',
+        emp.department || '',
+        emp.employee || '',
+        parseFloat(emp.amount) || 0
+      ];
+
+      wsData.push(row);
+
+      // Update column widths
+      row.forEach((cell, i) => {
+        columnWidths[i] = Math.max(
+          columnWidths[i] || 0,
+          String(cell).length
+        );
+      });
+    });
+
+    // Add total employee count
+    wsData.push([]);
+    wsData.push([`TOTAL EMPLOYEES: ${sortedEmployees.length}`]);
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Set column widths
+    ws['!cols'] = columnWidths.map(w => ({
+      wch: Math.min(Math.max(w + 2, 10), 50)
+    }));
+
+    // Apply number formatting to Monthly Rate column (index 4)
+    Object.keys(ws).forEach(cellAddress => {
+      if (cellAddress[0] === '!') return;
+
+      const cell = ws[cellAddress];
+      const colIndex = XLSX.utils.decode_cell(cellAddress).c;
+
+      if (colIndex === 4 && typeof cell.v === 'number') {
+        cell.z = '#,##0.00';
+      }
+    });
+
+    const sheetName = region.substring(0, 31).replace(/[\\/*[\]:?]/g, '');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  // Generate filename
+  const safeOffice = office || 'Payroll';
+  const safeRegion = selectedRegion ? selectedRegion.toUpperCase().replace(/[\\/*[\]:?]/g, '').trim() : 'ALL';
+  const dateStr = endDate ? new Date(endDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  
+  const fileName = safeRegion !== 'ALL'
+    ? `${safeOffice}_${safeRegion}_Monthly_Rate_${dateStr}.xlsx`
+    : `${safeOffice}_Monthly_Rate_${dateStr}.xlsx`;
+
+  XLSX.writeFile(wb, fileName);
+}
+
+
+</script>
+
+<!-- Large Excel/PDF generator functions — preserved exactly, not duplicated here for brevity.
+     Copy generateExcelMlFund, generatePdfReport, generateEDIPayrollExcelReport,
+     generateRemittanceExcelReport, generateEDIDeductionDetailsExcelReport,
+     generateFSPayrollExcelReport, generatePayrollComparison, generateOTReport,
+     generatePayrollData, generateMLGExcelReport, generateExcelReport,
+     generateContributionExcelReport, generateWageIncreaseExcelReport
+     from the original file into a <script> tag here. -->
+
+     
+
+</body>
+</html>

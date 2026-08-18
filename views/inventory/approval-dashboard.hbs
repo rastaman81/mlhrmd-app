@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --ra-navy:      #16304A;
+      --ra-navy-deep: #0F2233;
+      --ra-blue:      #2E6F9E;
+      --ra-teal:      #1F7A6C;
+      --ra-gold:      #A8762A;
+      --ra-bg:        #F6F7F9;
+      --ra-surface:   #FFFFFF;
+      --ra-border:    #E3E6EB;
+      --ra-muted:     #6B7686;
+      --ra-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--ra-bg);
+    }
+
+    /* ---- Page header ---- */
+    .ra-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--ra-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .ra-title i{ color:var(--ra-blue); }
+    .ra-subtitle{ color:var(--ra-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Buttons ---- */
+    .btn-ra-blue{
+      background:var(--ra-blue); border-color:var(--ra-blue); color:#fff; font-weight:500;
+    }
+    .btn-ra-blue:hover{ background:#255e87; border-color:#255e87; color:#fff; }
+
+    /* ---- Stats cards ---- */
+    .stats-card{
+      background:var(--ra-surface);
+      border:1px solid var(--ra-border);
+      border-radius:.65rem;
+      padding:1rem 1.25rem;
+      transition:box-shadow .2s;
+    }
+    .stats-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,.06); }
+    .stats-number{
+      font-size:1.5rem;
+      font-weight:700;
+      color:var(--ra-navy-deep);
+    }
+    .stats-label{
+      font-size:.78rem;
+      color:var(--ra-muted);
+      font-weight:500;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+    .stats-icon{ font-size:1.5rem; opacity:.6; }
+    .stat-total    .stats-number{ color:var(--ra-blue);      }
+    .stat-pending  .stats-number{ color:var(--ra-gold);      }
+    .stat-approved .stats-number{ color:var(--ra-teal);      }
+    .stat-items    .stats-number{ color:var(--ra-navy);      }
+
+    /* ---- Status badges ---- */
+    .status-badge{
+      padding:.25rem .75rem;
+      border-radius:1rem;
+      font-size:.72rem;
+      font-weight:600;
+      text-transform:uppercase;
+      display:inline-block;
+    }
+    .status-pending{  background:rgba(168,118,42,.12); color:var(--ra-gold);   }
+    .status-approved{ background:rgba(31,122,108,.12);  color:var(--ra-teal);   }
+    .status-rejected{ background:rgba(193,72,61,.12);   color:var(--ra-danger); }
+
+    /* ---- Data card ---- */
+    .ra-card{
+      border:1px solid var(--ra-border);
+      border-radius:.65rem;
+      background:var(--ra-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+    }
+    .ra-card-header{
+      border-bottom:1px solid var(--ra-border);
+      padding:.85rem 1.15rem;
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+    }
+    .ra-card-header i{ color:var(--ra-gold); }
+    .ra-card-header strong{ color:var(--ra-navy-deep); font-weight:600; font-size:.97rem; }
+    .ra-card-header .ra-badge{
+      background:var(--ra-gold);
+      color:#fff;
+      font-size:.72rem;
+      font-weight:600;
+      padding:.2rem .6rem;
+      border-radius:1rem;
+    }
+    .ra-view-all{
+      margin-left:auto;
+      color:var(--ra-blue);
+      font-size:.85rem;
+      text-decoration:none;
+    }
+    .ra-view-all:hover{ text-decoration:underline; color:var(--ra-navy); }
+
+    /* ---- Table ---- */
+    .ra-card .table{ margin:0; }
+    .ra-card .table thead th{
+      background:var(--ra-navy) !important;
+      color:#fff !important;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:600;
+      border-color:#1e3e5e;
+      padding:.75rem 1rem;
+      white-space:nowrap;
+    }
+    .ra-card .table tbody td{
+      font-size:.88rem;
+      color:var(--ra-navy-deep);
+      padding:.7rem 1rem;
+      vertical-align:middle;
+      border-color:var(--ra-border);
+    }
+    .ra-card .table tbody tr:hover{ background:var(--ra-bg); }
+
+    /* ---- Requester cell ---- */
+    .ra-requester-name{ font-weight:600; }
+    .ra-requester-meta{ font-size:.78rem; color:var(--ra-muted); }
+
+    /* ---- Empty / all-clear state ---- */
+    .ra-empty{
+      text-align:center;
+      color:var(--ra-muted);
+      padding:2.5rem 1rem;
+    }
+    .ra-empty i{
+      font-size:2rem;
+      display:block;
+      margin-bottom:.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="ra-title">
+            <i class="fas fa-check-double"></i> Request Approval
+          </h1>
+          <p class="ra-subtitle">Review and approve/reject pending item requests.</p>
+        </div>
+        <a href="/inventory/approval/pending" class="btn btn-ra-blue">
+          <i class="fas fa-list me-1"></i> View All Pending
+        </a>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="row g-3 mb-4">
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-total">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.total}}</div>
+                <div class="stats-label">Total Requests</div>
+              </div>
+              <i class="fas fa-clipboard-list stats-icon" style="color:var(--ra-blue);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-pending">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.pending}}</div>
+                <div class="stats-label">Pending</div>
+              </div>
+              <i class="fas fa-clock stats-icon" style="color:var(--ra-gold);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-approved">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.approved}}</div>
+                <div class="stats-label">Approved</div>
+              </div>
+              <i class="fas fa-check-circle stats-icon" style="color:var(--ra-teal);"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stats-card stat-items">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="stats-number">{{stats.pending_items}}</div>
+                <div class="stats-label">Items Pending</div>
+              </div>
+              <i class="fas fa-box stats-icon" style="color:var(--ra-navy);"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pending Requests Card -->
+      <div class="ra-card">
+
+        <div class="ra-card-header">
+          <i class="fas fa-clock"></i>
+          <strong>Pending Requests</strong>
+          <span class="ra-badge">{{stats.pending}}</span>
+          <a href="/inventory/approval/pending" class="ra-view-all">
+            View All <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Request #</th>
+                <th>Requester</th>
+                <th>Items</th>
+                <th class="text-center">Total</th>
+                <th>Date</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#if pendingRequests.length}}
+                {{#each pendingRequests}}
+                  <tr>
+
+                    <td style="font-weight:600; font-size:.85rem;">
+                      {{this.request_number}}
+                    </td>
+
+                    <td>
+                      <div class="ra-requester-name">{{this.first_name}} {{this.last_name}}</div>
+                      <div class="ra-requester-meta">{{this.idno}} | {{this.designation}}</div>
+                    </td>
+
+                    <td style="font-size:.82rem; color:var(--ra-muted);">
+                      {{this.items_summary}}
+                    </td>
+
+                    <td class="text-center" style="font-weight:600;">
+                      {{this.total_items}}
+                    </td>
+
+                    <td style="font-size:.82rem; color:var(--ra-muted);">
+                      {{formatDate this.created_at}}
+                    </td>
+
+                    <td class="text-center">
+                      <a href="/inventory/approval/{{this.request_id}}" class="btn btn-sm btn-ra-blue">
+                        <i class="fas fa-eye me-1"></i> Review
+                      </a>
+                    </td>
+
+                  </tr>
+                {{/each}}
+              {{else}}
+                <tr>
+                  <td colspan="6" class="ra-empty">
+                    <i class="fas fa-check-circle" style="color:var(--ra-teal);"></i>
+                    No pending requests — all caught up!
+                  </td>
+                </tr>
+              {{/if}}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

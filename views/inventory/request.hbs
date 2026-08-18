@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    #requestTable thead th {
+      background: #16304A;
+      color: #fff;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 600;
+      border-color: #1e3e5e;
+      padding: .75rem 1rem;
+      white-space: nowrap;
+    }
+    #requestTable tbody td {
+      font-size: .88rem;
+      color: #0F2233;
+      padding: .7rem 1rem;
+      vertical-align: middle;
+      border-color: #E3E6EB;
+    }
+    #requestTable tbody tr:nth-child(odd) td  { background: #F6F7F9; }
+    #requestTable tbody tr:nth-child(even) td { background: #fff; }
+    #requestTable tbody tr:hover td           { background: #EBF3FA !important; }
+
+    .search-results {
+      max-height: 250px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #E3E6EB;
+      border-radius: .45rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      display: none;
+      position: absolute;
+      width: 100%;
+      z-index: 1000;
+    }
+    .search-result-item {
+      padding: .6rem .8rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.15s;
+    }
+    .search-result-item:hover {
+      background: #EBF3FA;
+    }
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    .search-result-item .item-name {
+      font-weight: 600;
+      color: #0F2233;
+    }
+    .search-result-item .item-detail {
+      font-size: .78rem;
+      color: #6B7686;
+    }
+    .search-result-item .stock-badge {
+      font-size: .7rem;
+      padding: .15rem .5rem;
+      border-radius: 1rem;
+      background: rgba(31,122,108,.1);
+      color: #1F7A6C;
+    }
+    .search-result-item .stock-low {
+      background: rgba(193,72,61,.1);
+      color: #C1483D;
+    }
+    
+    .selected-item-info {
+      background: #F6F9FC;
+      border: 1px solid #E3E6EB;
+      border-radius: .45rem;
+      padding: .6rem .8rem;
+      font-size: .85rem;
+    }
+    
+    .btn-remove-item {
+      color: #C1483D;
+      background: transparent;
+      border: 1px solid #C1483D;
+      font-size: .75rem;
+      padding: .25rem .6rem;
+      border-radius: .35rem;
+      transition: all 0.15s;
+    }
+    .btn-remove-item:hover {
+      background: #C1483D;
+      color: #fff;
+    }
+
+    #requestTable tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-item-count {
+      background: #E3E6EB;
+      color: #0F2233;
+      font-weight: 500;
+      font-size: .75rem;
+      padding: .25rem .65rem;
+      border-radius: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-clipboard-list" style="color:#2E6F9E;"></i> Item Request
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Request items from the inventory.</p>
+        </div>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="formMessage" class="alert d-none mb-3" style="border-radius:.55rem; font-size:.9rem; border:none; border-left:4px solid transparent;"></div>
+
+      <!-- Request Form Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04); margin-bottom:1.25rem;">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; gap:.55rem; border-radius:.65rem .65rem 0 0;">
+          <i class="fas fa-plus-circle" style="color:#2E6F9E;"></i>
+          <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Add Item to Request</strong>
+        </div>
+
+        <div style="padding:1.15rem;">
+          <form id="requestForm">
+            <div class="row g-3 align-items-start">
+
+              <!-- Item Search -->
+              <div class="col-md-5">
+                <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">
+                  Search Item <span style="color:#C1483D;">*</span>
+                </label>
+                <div class="position-relative">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="itemSearch"
+                    placeholder="Type item name, code, or description..."
+                    autocomplete="off"
+                    style="border-color:#E3E6EB;"
+                  >
+                  <div class="search-results" id="searchResults"></div>
+                </div>
+                <div id="selectedItemInfo" class="selected-item-info mt-2" style="display:none;">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span id="selectedItemName" style="font-weight:600;"></span>
+                      <span id="selectedItemDetails" style="color:#6B7686; font-size:.78rem;"></span>
+                    </div>
+                    <button type="button" id="clearSelectedItem" class="btn btn-sm" style="color:#6B7686;">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quantity -->
+              <div class="col-md-2">
+                <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">
+                  Quantity <span style="color:#C1483D;">*</span>
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="quantity"
+                  value="1"
+                  min="1"
+                  style="border-color:#E3E6EB;"
+                >
+                <small id="stockInfo" style="color:#6B7686; font-size:.72rem;"></small>
+              </div>
+
+              <!-- Reason -->
+              <div class="col-md-3">
+                <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">
+                  Reason <span style="color:#C1483D;">*</span>
+                </label>
+                <select class="form-select" id="reasonSelect" style="border-color:#E3E6EB;">
+                  <option value="">Select reason...</option>
+                  {{#each reasons}}
+                    <option value="{{this.reason_id}}">{{this.reason_name}}</option>
+                  {{/each}}
+                </select>
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  id="customReason"
+                  placeholder="Please specify reason..."
+                  style="border-color:#E3E6EB; display:none;"
+                >
+              </div>
+
+              <!-- Add Button -->
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="button" id="addItemBtn" class="btn w-100"
+                  style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-weight:500; font-size:.9rem;">
+                  <i class="fas fa-plus me-1"></i> Add Item
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Request Items Table Card -->
+      <div style="border:1px solid #E3E6EB; border-radius:.65rem; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);">
+
+        <div style="border-bottom:1px solid #E3E6EB; padding:.85rem 1.15rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; border-radius:.65rem .65rem 0 0; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:.55rem;">
+            <i class="fas fa-table-list" style="color:#2E6F9E;"></i>
+            <strong style="color:#0F2233; font-weight:600; font-size:.97rem;">Requested Items</strong>
+            <span id="itemCount" class="badge-item-count">0 items</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:.65rem;">
+            <button type="button" id="clearAllBtn" class="btn btn-sm" style="color:#C1483D; border:1px solid #C1483D; font-size:.82rem;">
+              <i class="fas fa-trash me-1"></i> Clear All
+            </button>
+            <button type="button" id="submitRequestBtn" class="btn btn-sm" style="background:#1F7A6C; color:#fff; font-size:.82rem;">
+              <i class="fas fa-paper-plane me-1"></i> Submit Request
+            </button>
+          </div>
+        </div>
+
+        <div style="padding:0;">
+          <div class="table-responsive">
+            <table class="table mb-0" id="requestTable">
+              <thead>
+                <tr>
+                  <th style="width:40px;">#</th>
+                  <th>Item</th>
+                  <th style="width:100px;">Quantity</th>
+                  <th>Reason</th>
+                  <th style="width:100px; text-align:center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="requestTableBody">
+                <tr>
+                  <td colspan="5" style="text-align:center; color:#6B7686; padding:2.5rem 1rem; font-size:.9rem;">
+                    <i class="fas fa-box-open" style="color:#E3E6EB; font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                    No items added yet. Search and add items above.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Remarks Section -->
+        <div style="border-top:1px solid #E3E6EB; padding:.85rem 1.15rem; border-radius:0 0 .65rem .65rem;">
+          <div class="row">
+            <div class="col-md-8">
+              <label style="font-size:.8rem; font-weight:600; color:#16304A; display:block; margin-bottom:.35rem;">
+                Remarks (Optional)
+              </label>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                id="remarks"
+                placeholder="Add any additional notes..."
+                style="border-color:#E3E6EB;"
+              >
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // =============================================
+  // STATE MANAGEMENT
+  // =============================================
+  
+  const state = {
+    cart: [], // { item_id, item_name, item_code, item_unit, quantity, reason_id, custom_reason, reason_name }
+    selectedItem: null,
+    searchTimeout: null
+  };
+
+  // =============================================
+  // DOM REFERENCES
+  // =============================================
+  
+  const itemSearch = document.getElementById('itemSearch');
+  const searchResults = document.getElementById('searchResults');
+  const selectedItemInfo = document.getElementById('selectedItemInfo');
+  const selectedItemName = document.getElementById('selectedItemName');
+  const selectedItemDetails = document.getElementById('selectedItemDetails');
+  const clearSelectedItem = document.getElementById('clearSelectedItem');
+  const quantityInput = document.getElementById('quantity');
+  const stockInfo = document.getElementById('stockInfo');
+  const reasonSelect = document.getElementById('reasonSelect');
+  const customReason = document.getElementById('customReason');
+  const addItemBtn = document.getElementById('addItemBtn');
+  const requestTableBody = document.getElementById('requestTableBody');
+  const itemCount = document.getElementById('itemCount');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  const submitRequestBtn = document.getElementById('submitRequestBtn');
+  const remarksInput = document.getElementById('remarks');
+  const formMessage = document.getElementById('formMessage');
+
+  // =============================================
+  // UTILITY FUNCTIONS
+  // =============================================
+  
+  function showMessage(type, message) {
+    const colorMap = {
+      success: { bg: 'rgba(31,122,108,.08)', border: '#1F7A6C', text: '#1F7A6C' },
+      danger:  { bg: 'rgba(193,72,61,.08)',  border: '#C1483D', text: '#C1483D' },
+      warning: { bg: 'rgba(168,118,42,.08)', border: '#A8762A', text: '#A8762A' },
+      info:    { bg: 'rgba(46,111,158,.08)', border: '#2E6F9E', text: '#2E6F9E' },
+    };
+    const c = colorMap[type] || colorMap.info;
+    formMessage.style.background    = c.bg;
+    formMessage.style.borderColor   = c.border;
+    formMessage.style.color         = c.text;
+    formMessage.textContent = message;
+    formMessage.className = `alert mb-3 show`;
+    formMessage.style.display = 'block';
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      formMessage.className = 'alert d-none';
+      formMessage.style.display = 'none';
+    }, 5000);
+  }
+
+  function clearMessage() {
+    formMessage.className = 'alert d-none';
+    formMessage.style.display = 'none';
+    formMessage.textContent = '';
+  }
+
+  function updateItemCount() {
+    const count = state.cart.length;
+    itemCount.textContent = `${count} item${count !== 1 ? 's' : ''}`;
+  }
+
+  function renderCart() {
+    if (state.cart.length === 0) {
+      requestTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center; color:#6B7686; padding:2.5rem 1rem; font-size:.9rem;">
+            <i class="fas fa-box-open" style="color:#E3E6EB; font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+            No items added yet. Search and add items above.
+          </td>
+        </tr>
+      `;
+      updateItemCount();
+      return;
+    }
+
+    let html = '';
+    state.cart.forEach((item, index) => {
+      html += `
+        <tr>
+          <td style="font-weight:600; color:#6B7686;">${index + 1}</td>
+          <td>
+            <div style="font-weight:600;">${item.item_name}</div>
+            <div style="font-size:.78rem; color:#6B7686;">${item.item_code} | ${item.item_unit}</div>
+          </td>
+          <td style="font-weight:600;">${item.quantity}</td>
+          <td>${item.custom_reason || item.reason_name || 'No reason specified'}</td>
+          <td style="text-align:center;">
+            <button type="button" class="btn-remove-item" onclick="removeItem(${index})">
+              <i class="fas fa-times"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    requestTableBody.innerHTML = html;
+    updateItemCount();
+  }
+
+  // =============================================
+  // ITEM SEARCH
+  // =============================================
+  
+  async function searchItems(query) {
+    if (!query || query.trim().length < 2) {
+      searchResults.style.display = 'none';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/inventory/items/search?q=${encodeURIComponent(query.trim())}`);
+      const data = await response.json();
+      
+      if (!data.items || data.items.length === 0) {
+        searchResults.innerHTML = `
+          <div style="padding:.8rem; color:#6B7686; text-align:center;">
+            <i class="fas fa-search"></i> No items found
+          </div>
+        `;
+        searchResults.style.display = 'block';
+        return;
+      }
+
+      let html = '';
+      data.items.forEach(item => {
+        const isLowStock = item.stock <= item.item_order_level;
+        html += `
+          <div class="search-result-item" onclick="selectItem(${item.item_id})">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="item-name">${item.item_name}</span>
+              <span class="stock-badge ${isLowStock ? 'stock-low' : ''}">
+                ${item.stock} ${item.item_unit}
+              </span>
+            </div>
+            <div class="item-detail">
+              ${item.item_code} 
+              ${item.item_description ? `| ${item.item_description}` : ''}
+              ${isLowStock ? '| ⚠️ Low stock' : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      searchResults.innerHTML = html;
+      searchResults.style.display = 'block';
+      
+    } catch (error) {
+      console.error('Search error:', error);
+      searchResults.innerHTML = `
+        <div style="padding:.8rem; color:#C1483D; text-align:center;">
+          <i class="fas fa-exclamation-circle"></i> Error searching items
+        </div>
+      `;
+      searchResults.style.display = 'block';
+    }
+  }
+
+  // =============================================
+  // ITEM SELECTION
+  // =============================================
+  
+  async function selectItem(itemId) {
+    try {
+      const response = await fetch(`/inventory/items/${itemId}`);
+      const data = await response.json();
+      
+      if (!data.item) {
+        showMessage('danger', 'Item not found');
+        return;
+      }
+      
+      state.selectedItem = data.item;
+      
+      // Update UI
+      selectedItemName.textContent = data.item.item_name;
+      selectedItemDetails.textContent = `${data.item.item_code} | ${data.item.stock} ${data.item.item_unit} available`;
+      selectedItemInfo.style.display = 'block';
+      
+      // Update stock info
+      stockInfo.textContent = `${data.item.stock} ${data.item.item_unit} available`;
+      if (data.item.stock <= data.item.item_order_level) {
+        stockInfo.style.color = '#C1483D';
+        stockInfo.textContent += ' ⚠️ Low stock';
+      } else {
+        stockInfo.style.color = '#6B7686';
+      }
+      
+      // Update quantity max
+      quantityInput.max = data.item.stock;
+      quantityInput.value = 1;
+      
+      // Hide search results
+      searchResults.style.display = 'none';
+      itemSearch.value = data.item.item_name;
+      
+      // Clear any previous messages
+      clearMessage();
+      
+    } catch (error) {
+      console.error('Error selecting item:', error);
+      showMessage('danger', 'Failed to load item details');
+    }
+  }
+
+  // =============================================
+  // EVENT LISTENERS
+  // =============================================
+  
+  // Search input with debounce
+  itemSearch.addEventListener('input', function() {
+    clearTimeout(state.searchTimeout);
+    const query = this.value.trim();
+    
+    if (!query) {
+      searchResults.style.display = 'none';
+      if (state.selectedItem) {
+        // If we had a selected item, clear it
+        state.selectedItem = null;
+        selectedItemInfo.style.display = 'none';
+        stockInfo.textContent = '';
+        clearMessage();
+      }
+      return;
+    }
+    
+    state.searchTimeout = setTimeout(() => searchItems(query), 300);
+  });
+
+  // Clear selected item
+  clearSelectedItem.addEventListener('click', function() {
+    state.selectedItem = null;
+    selectedItemInfo.style.display = 'none';
+    itemSearch.value = '';
+    stockInfo.textContent = '';
+    quantityInput.value = 1;
+    searchResults.style.display = 'none';
+    clearMessage();
+    itemSearch.focus();
+  });
+
+  // Reason select change
+  reasonSelect.addEventListener('change', function() {
+    if (this.value === '') {
+      customReason.style.display = 'none';
+      customReason.value = '';
+      return;
+    }
+    
+    // Check if "Other" is selected (assuming OTHER has reason_id = 8)
+    const selectedOption = this.options[this.selectedIndex];
+    const isOther = selectedOption.text === 'Other (Please specify)';
+    
+    if (isOther) {
+      customReason.style.display = 'block';
+      customReason.focus();
+    } else {
+      customReason.style.display = 'none';
+      customReason.value = '';
+    }
+  });
+
+  // Add item to cart
+  addItemBtn.addEventListener('click', function() {
+    // Validate selected item
+    if (!state.selectedItem) {
+      showMessage('warning', 'Please search and select an item first.');
+      itemSearch.focus();
+      return;
+    }
+    
+    // Validate quantity
+    const quantity = parseInt(quantityInput.value);
+    if (!quantity || quantity < 1) {
+      showMessage('warning', 'Please enter a valid quantity.');
+      quantityInput.focus();
+      return;
+    }
+    
+    // Check stock
+    if (quantity > state.selectedItem.stock) {
+      showMessage('danger', `Only ${state.selectedItem.stock} ${state.selectedItem.item_unit} available.`);
+      quantityInput.focus();
+      return;
+    }
+    
+    // Validate reason
+    let reasonId = parseInt(reasonSelect.value);
+    let customReasonText = customReason.value.trim();
+    
+    if (!reasonId) {
+      showMessage('warning', 'Please select a reason.');
+      reasonSelect.focus();
+      return;
+    }
+    
+    // If "Other", require custom reason
+    const selectedOption = reasonSelect.options[reasonSelect.selectedIndex];
+    if (selectedOption.text === 'Other (Please specify)' && !customReasonText) {
+      showMessage('warning', 'Please specify the reason.');
+      customReason.focus();
+      return;
+    }
+    
+    // Check if item already in cart
+    const existingItem = state.cart.find(item => item.item_id === state.selectedItem.item_id);
+    if (existingItem) {
+      showMessage('warning', `${state.selectedItem.item_name} is already in the request. You can remove it and add again.`);
+      return;
+    }
+    
+    // Add to cart
+    const cartItem = {
+      item_id: state.selectedItem.item_id,
+      item_name: state.selectedItem.item_name,
+      item_code: state.selectedItem.item_code,
+      item_unit: state.selectedItem.item_unit,
+      quantity: quantity,
+      reason_id: reasonId,
+      reason_name: selectedOption.text,
+      custom_reason: customReasonText || null
+    };
+    
+    state.cart.push(cartItem);
+    renderCart();
+    
+    // Reset form
+    state.selectedItem = null;
+    selectedItemInfo.style.display = 'none';
+    itemSearch.value = '';
+    stockInfo.textContent = '';
+    quantityInput.value = 1;
+    reasonSelect.value = '';
+    customReason.style.display = 'none';
+    customReason.value = '';
+    
+    showMessage('success', `${cartItem.item_name} added to request.`);
+    itemSearch.focus();
+  });
+
+  // Remove item from cart
+  window.removeItem = function(index) {
+    const removedItem = state.cart[index];
+    state.cart.splice(index, 1);
+    renderCart();
+    showMessage('info', `${removedItem.item_name} removed from request.`);
+  };
+
+  // Clear all items
+  clearAllBtn.addEventListener('click', function() {
+    if (state.cart.length === 0) {
+      showMessage('warning', 'No items to clear.');
+      return;
+    }
+    
+    if (confirm('Are you sure you want to clear all items?')) {
+      state.cart = [];
+      renderCart();
+      showMessage('info', 'All items cleared.');
+    }
+  });
+
+  // Submit request
+  // Submit request
+submitRequestBtn.addEventListener('click', async function() {
+  if (state.cart.length === 0) {
+    showMessage('warning', 'Please add at least one item to request.');
+    return;
+  }
+  
+  // Confirm submission
+  if (!confirm(`Submit request with ${state.cart.length} item(s)?`)) {
+    return;
+  }
+  
+  // Prepare data
+  const requestData = {
+    items: state.cart.map(item => ({
+      item_id: item.item_id,
+      quantity: item.quantity,
+      reason_id: item.reason_id,
+      custom_reason: item.custom_reason
+    })),
+    remarks: remarksInput.value.trim() || null
+  };
+  
+  // Disable submit button
+  submitRequestBtn.disabled = true;
+  submitRequestBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Submitting...';
+  
+  try {
+    const response = await fetch('/inventory/request/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showMessage('success', `✅ ${result.message} Request #${result.requestNumber}`);
+      
+      // Reset everything
+      state.cart = [];
+      renderCart();
+      remarksInput.value = '';
+      submitRequestBtn.disabled = false;
+      submitRequestBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Submit Request';
+      
+      // ✅ Redirect to My Requests after 1.5 seconds
+      setTimeout(() => {
+        window.location.href = '/inventory/my-requests';
+      }, 1500);
+      
+    } else {
+      showMessage('danger', `❌ ${result.message}`);
+      submitRequestBtn.disabled = false;
+      submitRequestBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Submit Request';
+    }
+    
+  } catch (error) {
+    console.error('Submit error:', error);
+    showMessage('danger', '❌ Failed to submit request. Please try again.');
+    submitRequestBtn.disabled = false;
+    submitRequestBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Submit Request';
+  }
+});
+
+  // Enter key support
+  itemSearch.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (state.selectedItem) {
+        addItemBtn.click();
+      } else {
+        // If no item selected, try to select the first result
+        const firstResult = document.querySelector('.search-result-item');
+        if (firstResult) {
+          firstResult.click();
+        }
+      }
+    }
+  });
+
+  quantityInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addItemBtn.click();
+    }
+  });
+
+  reasonSelect.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addItemBtn.click();
+    }
+  });
+
+  customReason.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addItemBtn.click();
+    }
+  });
+
+  // Click outside to close search results
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.position-relative')) {
+      searchResults.style.display = 'none';
+    }
+  });
+
+  // =============================================
+  // INITIALIZATION
+  // =============================================
+  
+  // Focus on search input on load
+  itemSearch.focus();
+  
+  // Initial render
+  renderCart();
+</script>
+
+</body>
+</html>

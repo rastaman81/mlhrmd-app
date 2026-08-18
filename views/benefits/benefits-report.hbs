@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+ 
+ <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    :root{
+      --br-navy:      #16304A;
+      --br-navy-deep: #0F2233;
+      --br-blue:      #2E6F9E;
+      --br-teal:      #1F7A6C;
+      --br-gold:      #A8762A;
+      --br-bg:        #F6F7F9;
+      --br-surface:   #FFFFFF;
+      --br-border:    #E3E6EB;
+      --br-muted:     #6B7686;
+      --br-danger:    #C1483D;
+    }
+
+    .main-content{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:var(--br-bg);
+    }
+
+    /* ---- Page header ---- */
+    .br-title{
+      font-size:1.65rem;
+      font-weight:700;
+      color:var(--br-navy-deep);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin:0;
+    }
+    .br-title i{ color:var(--br-blue); }
+    .br-subtitle{ color:var(--br-muted); font-size:.92rem; margin:.35rem 0 0; }
+
+    /* ---- Filter card ---- */
+    .br-card{
+      border:1px solid var(--br-border);
+      border-radius:.65rem;
+      background:var(--br-surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+    }
+    .br-card-header{
+      border-bottom:1px solid var(--br-border);
+      padding:.85rem 1.15rem;
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+    }
+    .br-card-header i{ color:var(--br-blue); }
+    .br-card-header strong{ color:var(--br-navy-deep); font-weight:600; font-size:.97rem; }
+    .br-card-body{ padding:1.15rem; }
+
+    /* ---- Form labels and inputs ---- */
+    .br-label{
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--br-navy);
+      display:block;
+      margin-bottom:.35rem;
+    }
+    .form-control,
+    .form-select{
+      border-color:var(--br-border);
+    }
+    .form-control:focus,
+    .form-select:focus{
+      border-color:var(--br-blue);
+      box-shadow:0 0 0 .2rem rgba(46,111,158,.12);
+    }
+    .br-help{
+      font-size:.82rem;
+      color:var(--br-muted);
+      margin:0;
+    }
+
+    /* ---- Flatpickr align ---- */
+    .flatpickr-input{ border-color:var(--br-border) !important; }
+    .flatpickr-input:focus{
+      border-color:var(--br-blue) !important;
+      box-shadow:0 0 0 .2rem rgba(46,111,158,.12) !important;
+    }
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange{
+      background:var(--br-blue) !important;
+      border-color:var(--br-blue) !important;
+    }
+    .flatpickr-day.inRange{
+      background:rgba(46,111,158,.12) !important;
+      border-color:rgba(46,111,158,.12) !important;
+      box-shadow:-5px 0 0 rgba(46,111,158,.12),5px 0 0 rgba(46,111,158,.12) !important;
+    }
+
+    /* ---- Buttons ---- */
+    .btn-br-blue{
+      background:var(--br-blue); border-color:var(--br-blue); color:#fff; font-weight:500;
+    }
+    .btn-br-blue:hover{ background:#255e87; border-color:#255e87; color:#fff; }
+
+    /* ---- Loading ---- */
+    #report-loading .spinner-border{ color:var(--br-blue) !important; }
+    #report-loading p{ color:var(--br-muted); font-size:.9rem; }
+
+    /* ---- Error ---- */
+    #error-message{
+      border:none !important;
+      border-left:4px solid var(--br-danger) !important;
+      border-radius:.55rem !important;
+      font-size:.9rem;
+      background:rgba(193,72,61,.06);
+      color:var(--br-danger);
+    }
+
+    /* ---- Comparison table (dynamically created by JS) ---- */
+    #comparison-results-container.card{
+      border:1px solid var(--br-border);
+      border-radius:.65rem;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+    }
+    #comparison-results-container .card-header{
+      background:var(--br-surface);
+      border-bottom:1px solid var(--br-border);
+      color:var(--br-navy-deep);
+      font-weight:600;
+      font-size:.97rem;
+      padding:.85rem 1.15rem;
+    }
+    #comparison-results-container .card-footer{
+      background:var(--br-surface);
+      border-top:1px solid var(--br-border);
+      padding:.75rem 1.15rem;
+    }
+    #comp-record-count{ color:var(--br-muted); }
+
+    /* Comparison table thead — JS injects table-dark; override to match our navy */
+    #comparisonTable thead.table-dark th,
+#comparisonTable thead th{
+  background:var(--br-navy) !important;
+  color:#fff !important;
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  font-weight:600;
+  border-color:#1e3e5e !important;
+
+  /* Allow wrapping */
+  white-space: normal;
+  word-break: break-word;
+  vertical-align: middle;
+  text-align: center;
+
+  padding:.4rem .5rem;
+}
+    #comparisonTable{
+  font-size:.72rem;
+  table-layout: auto;
+  width:100%;
+}
+    #comparisonTable tbody td {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  padding: .4rem .5rem;
+}
+
+/* Name columns - display full names without truncation */
+#comparisonTable tbody td:nth-child(3) { /* Last Name */
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  min-width: 150px;
+  padding-right: 12px;
+}
+
+#comparisonTable tbody td:nth-child(4) { /* First Name - give more room */
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  min-width: 180px; /* Adjust this value as needed */
+  padding-right: 12px;
+}
+
+#comparisonTable tbody td:nth-child(5) {
+  width: 80px;
+  white-space: nowrap;
+}
+    #comparisonTable tbody tr{ cursor:pointer; }
+    #comparisonTable tbody tr:hover td{ background-color:#f0f7ff !important; }
+
+    /* Row selection ---- */
+    #comparisonTable tbody tr.selected-row td{ background-color:#cfe2ff !important; border-left:4px solid var(--br-blue); }
+    #comparisonTable tbody tr.selected-row td.changed-cell{ background-color:#b7d4f5 !important; }
+    #comparisonTable tbody tr.selected-row:hover td{ background-color:#cfe2ff !important; }
+
+    /* Comparison pagination ---- */
+    #comp-pagination-controls .page-link{ color:var(--br-blue); border-color:var(--br-border); }
+    #comp-pagination-controls .page-item.active .page-link{
+      background:var(--br-navy); border-color:var(--br-navy); color:#fff;
+    }
+
+    /* ---- Comparison summary card (dynamically created) ---- */
+    #comparison-summary.card{
+      border:1px solid var(--br-border);
+      border-radius:.65rem;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+    }
+    #comparison-summary .card-header{
+      background:var(--br-surface);
+      border-bottom:1px solid var(--br-border);
+      color:var(--br-navy-deep);
+      font-weight:600;
+      font-size:.97rem;
+      padding:.85rem 1.15rem;
+    }
+    #comparison-summary .table thead.table-light th{
+      background:var(--br-bg) !important;
+      color:var(--br-navy) !important;
+      font-size:.78rem;
+      font-weight:600;
+      border-color:var(--br-border);
+    }
+    #comparison-summary .table td{
+      font-size:.88rem;
+      color:var(--br-navy-deep);
+      border-color:var(--br-border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="br-title">
+            <i class="fas fa-file-invoice"></i> Benefits Reports
+          </h1>
+          <p class="br-subtitle">Select filters and a report type to generate and export benefit records.</p>
+        </div>
+      </div>
+
+      <!-- Filter Card -->
+      <div class="br-card mb-4">
+
+        <div class="br-card-header">
+          <i class="fas fa-filter"></i>
+          <strong>Report Filters</strong>
+        </div>
+
+        <div class="br-card-body">
+          <form id="benefitsReportsForm">
+            <div class="row g-3 align-items-end">
+
+              <div class="col-md-3">
+                <label class="br-label">Date Range</label>
+                <input
+                  type="text"
+                  id="dateRange"
+                  class="form-control datepicker"
+                  placeholder="Select date range"
+                  readonly
+                >
+              </div>
+
+              <div class="col-md-3">
+                <label class="br-label">Office</label>
+                <select name="office" id="officeSelect" class="form-select">
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">{{this.office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="br-label">Region</label>
+                <select name="region" id="regionSelect" class="form-select">
+                  <option value="" selected>All Regions</option>
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="br-label">Report Type</label>
+                <select name="reportType" id="reportType" class="form-select">
+                  <option value="" disabled selected>Select Report</option>
+                  {{#each reportTypes}}
+                    <option value="{{this.reporttype}}">{{this.reporttype}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+              <p class="br-help">
+                <i class="fas fa-circle-info me-1"></i>All filters are required before generating a report.
+              </p>
+              <div class="d-flex gap-2">
+                <button type="button" id="resetBtn" class="btn btn-outline-secondary" style="font-size:.9rem;">
+                  <i class="fas fa-redo me-1"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-br-blue" style="font-size:.9rem;">
+                  <i class="fas fa-file-export me-1"></i> Generate Report
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Loading -->
+      <div id="report-loading" class="text-center py-5" style="display:none;">
+        <div class="spinner-border" role="status" style="width:2.5rem; height:2.5rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Generating report...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error-message" class="alert mt-3" style="display:none;"></div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="/js/scripts.js"></script>
+<script>document.addEventListener('DOMContentLoaded', function () {
+  flatpickr('#dateRange', {
+    mode: 'range',
+    dateFormat: 'Y-m-d',
+    allowInput: true,
+  });
+
+  document.getElementById('benefitsReportsForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    generateReport();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    document.getElementById('benefitsReportsForm').reset();
+    document.getElementById('regionSelect').innerHTML =
+      '<option value="" selected>All Regions</option>';
+    document.getElementById('error-message').style.display = 'none';
+  });
+});
+
+// ── REGION LOADER ────────────────────────────────────────────────────────────
+document.getElementById('officeSelect').addEventListener('change', async function () {
+  const office = this.value;
+  const regionSelect = document.getElementById('regionSelect');
+
+  if (!office) {
+    regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+    return;
+  }
+
+  try {
+    regionSelect.disabled = true;
+    regionSelect.innerHTML = '<option value="">Loading regions...</option>';
+
+    const response = await fetch(`/benefits/reports/regions?office=${encodeURIComponent(office)}`);
+    const data = await response.json();
+
+    if (data.success) {
+      regionSelect.innerHTML = '<option value="" selected>All Regions</option>';
+      data.regions.forEach((region) => {
+        const option = document.createElement('option');
+        option.value = region.region_name;
+        option.textContent = region.region_name;
+        regionSelect.appendChild(option);
+      });
+    } else {
+      showError(data.message || 'Failed to load regions');
+    }
+  } catch (error) {
+    console.error(error);
+    showError('Failed to load regions');
+  } finally {
+    regionSelect.disabled = false;
+  }
+});
+
+// ── DATE PARSER ──────────────────────────────────────────────────────────────
+function getDates(dateRange) {
+  if (!dateRange) return { startDate: null, endDate: null };
+
+  let startDate, endDate;
+
+  if (dateRange.includes(' to ')) {
+    [startDate, endDate] = dateRange.split(' to ');
+  } else {
+    startDate = endDate = dateRange;
+  }
+
+  return {
+    startDate: startDate,
+    endDate: endDate,
+  };
+}
+
+// ── MAIN GENERATOR ───────────────────────────────────────────────────────────
+async function generateReport() {
+  const form = document.getElementById('benefitsReportsForm');
+  const regionSelectEl = document.getElementById('regionSelect');
+  const reportTypeEl = document.getElementById('reportType');
+  const selectedOffice = document.getElementById('officeSelect').value;
+
+  const dateRange = document.getElementById('dateRange').value;
+  const { startDate, endDate } = getDates(dateRange);
+
+  if (!startDate || !endDate) return showError('Invalid date range');
+  if (!selectedOffice) return showError('Select office');
+  if (!reportTypeEl.value) return showError('Select report type');
+
+  const formDataObj = {};
+  new FormData(form).forEach((v, k) => (formDataObj[k] = v));
+  formDataObj.startDate = startDate;
+  formDataObj.endDate = endDate;
+
+  document.getElementById('report-loading').style.display = 'block';
+  document.getElementById('error-message').style.display = 'none';
+
+  try {
+    const response = await fetch('/benefits/reports/generate-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formDataObj),
+    });
+
+    const data = await response.json();
+
+    if (!data.success || !data.results.length) {
+      return showError('No data found');
+    }
+
+    // Comparison types → render table instead of Excel
+    if (data.isComparison) {
+      renderComparisonTable(data.results, data.reportType, data.previousEndDate);
+      renderComparisonSummary(data.summary || []);
+
+      return;
+    }
+
+    const type = reportTypeEl.value.toLowerCase().trim();
+    const region = regionSelectEl.value;
+
+    // In generateReport function, update the Excel calls to use await:
+if (type === 'sss contribution') {
+  await generateSSSContributionExcel(data.results, selectedOffice, region, endDate);
+} else if (type === 'pagibig contribution') {
+  await generatePagibigContributionExcel(data.results, selectedOffice, region, endDate);
+} else if (type === 'pagibig contribution final') {
+  await generatePagibigContributionFinalExcel(data.results, selectedOffice, region, endDate);
+} else if (type === 'philhealth contribution') {
+  await generatePhilhealthContributionExcel(data.results, selectedOffice, region, endDate);
+} else if (type === 'sss loan') {
+  await generateSSSLoanExcel(data.results, selectedOffice, region, endDate);
+} else if (type === 'pagibig loan') {
+  await generatePagibigLoanExcel(data.results, selectedOffice, region, endDate);
+}
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    document.getElementById('report-loading').style.display = 'none';
+  }
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function groupByRegion(results) {
+  const grouped = {};
+  results.forEach((e) => {
+    const key = (e.region || 'UNKNOWN').toUpperCase();
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(e);
+  });
+  return grouped;
+}
+
+function safeSheetName(name) {
+  return name.substring(0, 31).replace(/[\\/*?:[\]]/g, '');
+}
+
+function buildFileName(report, office, region, date) {
+  return `${report} ${office} ${region || 'ALL'} ${date}.xlsx`;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return '';
+  const d = new Date(dateString);
+  return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
+}
+
+const PAGIBIG_ER = 200;
+
+// ── APPLY CALIBRI 10 FONT USING EXCELJS ──────────────────────────────────
+function applyCalibriFont(worksheet) {
+  worksheet.eachRow({ includeEmpty: true }, function(row) {
+    row.eachCell({ includeEmpty: true }, function(cell) {
+      cell.font = { name: 'Calibri', size: 10, family: 2 };
+    });
+  });
+}
+
+function applyNumericFormat(ws, cols) {
+  Object.keys(ws).forEach((k) => {
+    if (k[0] === '!') return;
+    const c = XLSX.utils.decode_cell(k).c;
+    if (cols.includes(c) && typeof ws[k].v === 'number') {
+      ws[k].t = 'n';
+      ws[k].z = '#,##0.00';
+    }
+  });
+}
+
+
+
+// ── SSS CONTRIBUTION ───────────────────────────────────────────────────────
+async function generateSSSContributionExcel(results, office, region, endDate) {
+  const ExcelJS = window.ExcelJS;
+  const workbook = new ExcelJS.Workbook();
+  const grouped = groupByRegion(results);
+
+  for (const [reg, employees] of Object.entries(grouped)) {
+    const worksheet = workbook.addWorksheet(reg.substring(0, 31));
+    
+    // Add headers
+    worksheet.addRow(['SSS CONTRIBUTION']);
+    worksheet.addRow([`${reg} - ${endDate}`]);
+    worksheet.addRow(['DIVISION/AREA', 'IDNO', 'LAST NAME', 'FIRST NAME', 'M.I.', 'ER', 'EE', 'TOTAL']);
+    worksheet.addRow([]);
+
+    let er = 0, ee = 0;
+
+    employees.forEach((e) => {
+      const s = parseFloat(e.ssser) || 0;
+      const e2 = parseFloat(e.sssee) || 0;
+      er += s;
+      ee += e2;
+      worksheet.addRow([e.department, e.idno, e.lastname, e.firstname, e.middlename, s, e2, s + e2]);
+    });
+
+    worksheet.addRow([`Employees:`, `${employees.length}`, '', 'TOTAL', '', er, ee, er + ee]);
+
+    // Apply Calibri 10 font to all cells
+    applyCalibriFont(worksheet);
+
+    // Format number columns
+    [5, 6, 7].forEach(col => {
+      const column = worksheet.getColumn(col + 1);
+      column.numFmt = '#,##0.00';
+    });
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = buildFileName('SSS Contribution', office, region, endDate);
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// ── PAGIBIG CONTRIBUTION ───────────────────────────────────────────────────
+async function generatePagibigContributionExcel(results, office, region, endDate) {
+  const ExcelJS = window.ExcelJS;
+  const workbook = new ExcelJS.Workbook();
+  const grouped = groupByRegion(results);
+
+  for (const [reg, employees] of Object.entries(grouped)) {
+    const worksheet = workbook.addWorksheet(reg.substring(0, 31));
+    
+    worksheet.addRow(['PAGIBIG CONTRIBUTION']);
+    worksheet.addRow([`${reg} - ${endDate}`]);
+    worksheet.addRow(['DIVISION/AREA', 'IDNO', 'LAST NAME', 'FIRST NAME', 'M.I.', 'ER', 'EE', 'TOTAL']);
+    worksheet.addRow([]);
+
+    let er = 0, ee = 0;
+
+    employees.forEach((e) => {
+      const eeVal = parseFloat(e.pagibigcontri) || 0;
+      er += PAGIBIG_ER;
+      ee += eeVal;
+      worksheet.addRow([e.department, e.idno, e.lastname, e.firstname, e.middlename, PAGIBIG_ER, eeVal, PAGIBIG_ER + eeVal]);
+    });
+
+    worksheet.addRow([`Employees:`, `${employees.length}`, '', 'TOTAL', '', er, ee, er + ee]);
+
+    applyCalibriFont(worksheet);
+
+    [5, 6, 7].forEach(col => {
+      const column = worksheet.getColumn(col + 1);
+      column.numFmt = '#,##0.00';
+    });
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = buildFileName('Pagibig Contribution', office, region, endDate);
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// ── PAGIBIG FINAL ───────────────────────────────────────────────────────────
+async function generatePagibigContributionFinalExcel(results, office, region, endDate) {
+  const ExcelJS = window.ExcelJS;
+  const workbook = new ExcelJS.Workbook();
+  const grouped = groupByRegion(results);
+
+  for (const [reg, employees] of Object.entries(grouped)) {
+    const worksheet = workbook.addWorksheet(reg.substring(0, 31));
+    
+    worksheet.addRow(['PAGIBIG CONTRIBUTION']);
+    worksheet.addRow([`${reg} - ${endDate}`]);
+    worksheet.addRow(['DIVISION/AREA', 'IDNO', 'LAST NAME', 'FIRST NAME', 'M.I.', 'ER', 'EE', 'TOTAL', 'PAGIBIG NO.', 'BIRTH DATE']);
+    worksheet.addRow([]);
+
+    employees.forEach((e) => {
+      const ee = parseFloat(e.pagibigcontri) || 0;
+      worksheet.addRow([
+        e.department,
+        e.idno,
+        e.lastname,
+        e.firstname,
+        e.middlename,
+        PAGIBIG_ER,
+        ee,
+        PAGIBIG_ER + ee,
+        e.pagibigno || '',
+        formatDate(e.birthdate)
+      ]);
+    });
+
+    applyCalibriFont(worksheet);
+
+    [5, 6, 7].forEach(col => {
+      const column = worksheet.getColumn(col + 1);
+      column.numFmt = '#,##0.00';
+    });
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = buildFileName('Pagibig Final', office, region, endDate);
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// ── PHILHEALTH ──────────────────────────────────────────────────────────────
+async function generatePhilhealthContributionExcel(results, office, region, endDate) {
+  const ExcelJS = window.ExcelJS;
+  const workbook = new ExcelJS.Workbook();
+  const grouped = groupByRegion(results);
+
+  for (const [reg, employees] of Object.entries(grouped)) {
+    const worksheet = workbook.addWorksheet(reg.substring(0, 31));
+    
+    worksheet.addRow(['PHILHEALTH CONTRIBUTION']);
+    worksheet.addRow([`${reg} - ${endDate}`]);
+    worksheet.addRow(['DIVISION/AREA', 'IDNO', 'LAST NAME', 'FIRST NAME', 'M.I.', 'ER', 'EE', 'TOTAL']);
+    worksheet.addRow([]);
+
+    let er = 0, ee = 0;
+
+    employees.forEach((e) => {
+      const ph = parseFloat(e.philhealth) || 0;
+      er += ph;
+      ee += ph;
+      worksheet.addRow([e.department, e.idno, e.lastname, e.firstname, e.middlename, ph, ph, ph * 2]);
+    });
+
+    worksheet.addRow([`Employees:`, `${employees.length}`, '', 'TOTAL', '', er, ee, er + ee]);
+
+    applyCalibriFont(worksheet);
+
+    [5, 6, 7].forEach(col => {
+      const column = worksheet.getColumn(col + 1);
+      column.numFmt = '#,##0.00';
+    });
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = buildFileName('Philhealth', office, region, endDate);
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+
+// ── SSS LOAN ───────────────────────────────────────────────────────────────
+async function generateSSSLoanExcel(results, office, region, endDate) {
+  const ExcelJS = window.ExcelJS;
+  const workbook = new ExcelJS.Workbook();
+  const grouped = groupByRegion(results);
+
+  for (const [reg, employees] of Object.entries(grouped)) {
+    const worksheet = workbook.addWorksheet(reg.substring(0, 31));
+    
+    worksheet.addRow(['SSS LOAN']);
+    worksheet.addRow([`${reg} - ${endDate}`]);
+    worksheet.addRow(['DIVISION/AREA', 'IDNO', 'LAST NAME', 'FIRST NAME', 'M.I.', 'AMOUNT']);
+    worksheet.addRow([]);
+
+    let total = 0;
+
+    employees.forEach((e) => {
+      const amt = parseFloat(e.sssloan) || 0;
+      total += amt;
+      worksheet.addRow([e.department, e.idno, e.lastname, e.firstname, e.middlename, amt]);
+    });
+
+    worksheet.addRow([`Employees:`, `${employees.length}`, '', 'TOTAL', '', total]);
+
+    applyCalibriFont(worksheet);
+
+    const amountCol = worksheet.getColumn(6);
+    amountCol.numFmt = '#,##0.00';
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = buildFileName('SSS Loan', office, region, endDate);
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// ── PAGIBIG LOAN ───────────────────────────────────────────────────────────
+async function generatePagibigLoanExcel(results, office, region, endDate) {
+  const ExcelJS = window.ExcelJS;
+  const workbook = new ExcelJS.Workbook();
+  const grouped = groupByRegion(results);
+
+  for (const [reg, employees] of Object.entries(grouped)) {
+    const worksheet = workbook.addWorksheet(reg.substring(0, 31));
+    
+    worksheet.addRow(['PAGIBIG LOAN']);
+    worksheet.addRow([`${reg} - ${endDate}`]);
+    worksheet.addRow(['DIVISION/AREA', 'IDNO', 'LAST NAME', 'FIRST NAME', 'M.I.', 'AMOUNT']);
+    worksheet.addRow([]);
+
+    let total = 0;
+
+    employees.forEach((e) => {
+      const amt = parseFloat(e.pagibigloan) || 0;
+      total += amt;
+      worksheet.addRow([e.department, e.idno, e.lastname, e.firstname, e.middlename, amt]);
+    });
+
+    worksheet.addRow([`Employees:`, `${employees.length}`, '', 'TOTAL', '', total]);
+
+    applyCalibriFont(worksheet);
+
+    const amountCol = worksheet.getColumn(6);
+    amountCol.numFmt = '#,##0.00';
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = buildFileName('Pagibig Loan', office, region, endDate);
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// ── PAGIBIG LOAN ───────────────────────────────────────────────────────────
+function generatePagibigLoanExcel(results, office, region, endDate) {
+  const wb = XLSX.utils.book_new();
+  const grouped = groupByRegion(results);
+
+  Object.keys(grouped).forEach((reg) => {
+    const wsData = [
+      ['PAGIBIG LOAN'],
+      [`${reg} - ${endDate}`],
+      ['DIVISION/AREA', 'IDNO', 'LAST NAME', 'FIRST NAME', 'M.I.', 'AMOUNT'],
+      [],
+    ];
+
+    let total = 0;
+
+    grouped[reg].forEach((e) => {
+      const amt = parseFloat(e.pagibigloan) || 0;
+      total += amt;
+
+      wsData.push([e.department, e.idno, e.lastname, e.firstname, e.middlename, amt]);
+    });
+
+    wsData.push([`Employees:`, `${grouped[reg].length}`, '', 'TOTAL', '', total]);
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    applyNumericFormat(ws, [5]);
+    XLSX.utils.book_append_sheet(wb, ws, safeSheetName(reg));
+  });
+
+  XLSX.writeFile(wb, buildFileName('Pagibig Loan', office, region, endDate));
+}
+
+// ── ERROR ────────────────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('error-message');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── COMPARISON TABLE ─────────────────────────────────────────────────────────
+let allComparisonResults = [];
+let comparisonPage = 1;
+const COMP_PAGE_SIZE = 25;
+
+function renderComparisonTable(results, reportType, previousEndDate) {
+  allComparisonResults = results;
+  comparisonPage = 1;
+
+  const type = (reportType || '').toLowerCase().trim();
+  const benefitIdLabel = type.includes('sss')
+    ? 'SSS ID No'
+    : type.includes('pagibig')
+      ? 'Pagibig ID No'
+      : type.includes('philhealth')
+        ? 'Philhealth ID No'
+        : 'Benefit ID No';
+
+  const headers = [
+    benefitIdLabel,
+    'ID No',
+    'Last Name',
+    'First Name',
+    'Middle Name',
+    'Current EE',
+    'Current ER',
+    'Current Total',
+    'Current Payroll Date',
+    'Previous Payroll Date',
+    'Previous EE',
+    'Previous ER',
+    'Previous Total',
+  ];
+
+  // Show comparison result card
+  let container = document.getElementById('comparison-results-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'comparison-results-container';
+    container.className = 'card mt-4';
+    container.innerHTML = `
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span id="comp-title">Comparison Results</span>
+        <span id="comp-record-count" class="text-muted small"></span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-bordered mb-0" id="comparisonTable">
+            <thead class="table-dark sticky-top">
+              <tr id="comp-headers"></tr>
+            </thead>
+            <tbody id="comparisonTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <span id="comp-pagination-info" class="text-muted small"></span>
+        <nav><ul class="pagination pagination-sm mb-0" id="comp-pagination-controls"></ul></nav>
+      </div>
+    `;
+    document.querySelector('.main-content').appendChild(container);
+  }
+
+  // Inject headers
+  document.getElementById('comp-headers').innerHTML = headers.map((h) => `<th>${h}</th>`).join('');
+
+  document.getElementById('comp-title').textContent = reportType;
+  document.getElementById('comp-record-count').textContent = `${results.length} record(s) found`;
+
+  // Add CSS for green highlight and red row if not already added
+  if (!document.getElementById('comp-highlight-style')) {
+    const style = document.createElement('style');
+    style.id = 'comp-highlight-style';
+    style.textContent = `
+  #comparisonTable tbody td.changed-cell {
+    background-color: #198754 !important;
+    color: #000000 !important;
+    font-weight: 600;
+  }
+  #comparisonTable tbody tr.no-current-payroll td {
+    color: #dc3545 !important;
+    font-weight: 600;
+  }
+  #comparisonTable tbody tr.has-current-only td {
+    font-weight: 700;
+  }
+  #comparisonTable tbody tr.has-current-only td.curr-total-highlight {
+    background-color: #d1e7dd !important;
+  }
+`;
+    document.head.appendChild(style);
+  }
+
+  container.style.display = 'block';
+  renderComparisonPage(comparisonPage, reportType);
+  renderComparisonPagination(reportType);
+}
+
+function renderComparisonPage(page, reportType) {
+  const tbody = document.getElementById('comparisonTableBody');
+  tbody.innerHTML = '';
+
+  if (!allComparisonResults.length) {
+    tbody.innerHTML = `<tr><td colspan="12" class="text-center text-muted">No records found.</td></tr>`;
+    return;
+  }
+
+  const type = (reportType || '').toLowerCase().trim();
+  const start = (page - 1) * COMP_PAGE_SIZE;
+  const end = start + COMP_PAGE_SIZE;
+  const pageData = allComparisonResults.slice(start, end);
+
+  const fmt = (n) => (n > 0 ? n.toLocaleString('en-PH', { minimumFractionDigits: 2 }) : '');
+
+  // Render current page rows
+  pageData.forEach((row) => {
+    console.log('row row ', row);
+    const hasPrev = !!row.prev_payroll_date;
+    const hasCurr = !!row.curr_payroll_date;
+
+    let prevEE, prevER, currEE, currER;
+
+    if (type.includes('sss')) {
+      prevEE = hasPrev ? parseFloat(row.prev_ee) || 0 : 0;
+      prevER = hasPrev ? parseFloat(row.prev_er) || 0 : 0;
+      currEE = hasCurr ? parseFloat(row.curr_ee) || 0 : 0;
+      currER = hasCurr ? parseFloat(row.curr_er) || 0 : 0;
+    } else if (type.includes('pagibig')) {
+      prevEE = hasPrev ? parseFloat(row.prev_ee) || 0 : 0;
+      prevER = hasPrev ? 200 : 0;
+      currEE = hasCurr ? parseFloat(row.curr_ee) || 0 : 0;
+      currER = hasCurr ? 200 : 0;
+    } else {
+      prevEE = hasPrev ? parseFloat(row.prev_ee) || 0 : 0;
+      prevER = prevEE;
+      currEE = hasCurr ? parseFloat(row.curr_ee) || 0 : 0;
+      currER = currEE;
+    }
+
+    const prevLastname = (row.prev_lastname || '').trim().toUpperCase();
+    const currLastname = (row.curr_lastname || '').trim().toUpperCase();
+
+    const lastnameChanged = hasPrev && hasCurr && prevLastname !== currLastname;
+    const contribChanged = hasPrev && hasCurr && (prevEE !== currEE || prevER !== currER);
+
+    const noCurrClass = !hasCurr ? 'no-current-payroll' : '';
+    const currOnlyClass = hasCurr && !hasPrev ? 'has-current-only' : '';
+    const totalCellClass = contribChanged ? 'changed-cell' : '';
+
+    // In renderComparisonPage, update the row creation:
+tbody.innerHTML += `
+  <tr class="${noCurrClass} ${currOnlyClass}">
+    <td>${row.benefit_number || ''}</td>
+    <td>${row.idno || ''}</td>
+    <td class="last-name-column ${lastnameChanged ? 'lastname-changed' : ''}">
+      ${row.lastname || ''}
+    </td>
+    <td class="first-name-column">${row.firstname || ''}</td>
+    <td>${row.middlename || ''}</td>
+    <td>${fmt(currEE)}</td>
+    <td>${fmt(currER)}</td>
+    <td class="${totalCellClass} ${currOnlyClass ? 'curr-total-highlight' : ''}">${fmt(currEE + currER)}</td>
+    <td>${formatDate(row.curr_payroll_date)}</td>
+    <td>${formatDate(row.prev_payroll_date)}</td>
+    <td>${fmt(prevEE)}</td>
+    <td>${fmt(prevER)}</td>
+    <td>${fmt(prevEE + prevER)}</td>
+  </tr>
+`;
+  });
+
+  const end1 = Math.min(end, allComparisonResults.length);
+  document.getElementById('comp-pagination-info').textContent =
+    `Showing ${start + 1}–${end1} of ${allComparisonResults.length}`;
+
+  document.querySelectorAll('#comparisonTable tbody tr').forEach((row) => {
+    row.addEventListener('click', function () {
+      selectRow(this);
+    });
+  });
+}
+
+let selectedRow = null;
+
+function selectRow(row) {
+  // Remove previous selection
+  if (selectedRow) {
+    selectedRow.classList.remove('selected-row');
+  }
+
+  // Toggle off if same row clicked
+  if (selectedRow === row) {
+    selectedRow = null;
+    return;
+  }
+
+  row.classList.add('selected-row');
+  selectedRow = row;
+}
+
+function renderComparisonPagination(reportType) {
+  const totalPages = Math.ceil(allComparisonResults.length / COMP_PAGE_SIZE);
+  const controls = document.getElementById('comp-pagination-controls');
+  controls.innerHTML = '';
+
+  if (totalPages <= 1) return;
+
+  controls.innerHTML += `
+    <li class="page-item ${comparisonPage === 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" onclick="changeComparisonPage(${comparisonPage - 1}, '${reportType}'); return false;">&laquo;</a>
+    </li>`;
+
+  const winSize = 2;
+  const startPage = Math.max(1, comparisonPage - winSize);
+  const endPage = Math.min(totalPages, comparisonPage + winSize);
+
+  if (startPage > 1) {
+    controls.innerHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changeComparisonPage(1, '${reportType}'); return false;">1</a></li>`;
+    if (startPage > 2)
+      controls.innerHTML += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    controls.innerHTML += `
+      <li class="page-item ${i === comparisonPage ? 'active' : ''}">
+        <a class="page-link" href="#" onclick="changeComparisonPage(${i}, '${reportType}'); return false;">${i}</a>
+      </li>`;
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1)
+      controls.innerHTML += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+    controls.innerHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changeComparisonPage(${totalPages}, '${reportType}'); return false;">${totalPages}</a></li>`;
+  }
+
+  controls.innerHTML += `
+    <li class="page-item ${comparisonPage === totalPages ? 'disabled' : ''}">
+      <a class="page-link" href="#" onclick="changeComparisonPage(${comparisonPage + 1}, '${reportType}'); return false;">&raquo;</a>
+    </li>`;
+}
+
+function changeComparisonPage(page, reportType) {
+  const totalPages = Math.ceil(allComparisonResults.length / COMP_PAGE_SIZE);
+  if (page < 1 || page > totalPages) return;
+
+  comparisonPage = page;
+  renderComparisonPage(comparisonPage, reportType);
+  renderComparisonPagination(reportType);
+  document.querySelector('#comparison-results-container .table-responsive').scrollTop = 0;
+}
+
+function renderComparisonSummary(summary) {
+  let card = document.getElementById('comparison-summary');
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'comparison-summary';
+    card.className = 'card mt-3';
+    document.querySelector('#comparison-results-container').after(card);
+  }
+  const fmt = (v) => Number(v || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+  card.innerHTML = ` <div class="card-header"> Contribution Summary </div> <div class="card-body"> <div class="table-responsive"> <table class="table table-bordered"> <thead class="table-light"> <tr> <th>Month Year</th> <th>No. of Employees</th> <th>Employee Share</th> <th>Employer Share</th> <th>Total</th> </tr> </thead> <tbody> ${summary
+    .map(
+      (r) => ` <tr> <td>
+  ${new Date(r.month).toLocaleDateString('en-PH', {
+    month: 'long',
+    year: 'numeric',
+  })}
+</td> <td> ${r.employeeCount.toLocaleString()} </td> <td> ${fmt(r.employeeShare)} </td> <td> ${fmt(r.employerShare)} </td> <td> ${fmt(r.total)} </td> </tr> `,
+    )
+    .join('')} </tbody> </table> </div> </div> `;
+}
+
+let selectedCell = null;
+
+function selectCell(cell) {
+  // Remove previous selection
+  if (selectedCell) {
+    selectedCell.classList.remove('selected-cell');
+  }
+
+  // Toggle off if same cell clicked
+  if (selectedCell === cell) {
+    selectedCell = null;
+    return;
+  }
+
+  cell.classList.add('selected-cell');
+  selectedCell = cell;
+}
+</script>
+
+</body>
+</html>

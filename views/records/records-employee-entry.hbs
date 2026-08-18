@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    .nla-section {
+      border: 1px solid #E3E6EB;
+      border-radius: .65rem;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16,24,40,.04);
+      margin-bottom: 1.25rem;
+    }
+    .nla-section-header {
+      border-bottom: 1px solid #E3E6EB;
+      padding: .85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      border-radius: .65rem .65rem 0 0;
+    }
+    .nla-section-header i { color: #2E6F9E; }
+    .nla-section-header strong { color: #0F2233; font-weight: 600; font-size: .97rem; }
+    .nla-section-body { padding: 1.15rem; }
+
+    .nla-subsection-label {
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #2E6F9E;
+      margin: 0 0 .75rem;
+      padding-bottom: .4rem;
+      border-bottom: 1px solid #E3E6EB;
+    }
+
+    .nla-edu-divider {
+      border-top: 1px dashed #E3E6EB;
+      margin: 1.15rem 0;
+    }
+
+    .form-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #16304A;
+      margin-bottom: .35rem;
+    }
+    .form-control, .form-select {
+      border-color: #E3E6EB;
+      font-size: .9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12);
+    }
+    .form-control::placeholder {
+      font-style: italic;
+      color: #6B7686;
+    }
+    .uneditable {
+      background-color: #F6F7F9;
+      color: #6B7686;
+      cursor: not-allowed;
+      font-style: italic;
+      border-color: #E3E6EB !important;
+    }
+
+    /* Select2 match our input style */
+    .select2-container--default .select2-selection--single {
+      height: 38px;
+      border: 1px solid #E3E6EB;
+      border-radius: .375rem;
+      display: flex;
+      align-items: center;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: normal;
+      padding-left: .75rem;
+      color: #0F2233;
+      font-size: .9rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 100%;
+      right: 8px;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--single {
+      border-color: #2E6F9E;
+      box-shadow: 0 0 0 .2rem rgba(46,111,158,.12);
+      outline: none;
+    }
+    .select2-dropdown {
+      border: 1px solid #E3E6EB;
+      border-radius: .45rem;
+      font-size: .9rem;
+    }
+    .select2-container--default .select2-results__option--highlighted {
+      background-color: #2E6F9E !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  {{> header}}
+
+  <div class="main-content" style="font-family:'Inter',-apple-system,sans-serif; background:#F6F7F9;">
+    <div class="container-fluid px-4 py-4">
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <h1 style="font-size:1.65rem; font-weight:700; color:#0F2233; display:flex; align-items:center; gap:.6rem; margin:0;">
+            <i class="fas fa-user-plus" style="color:#2E6F9E;"></i> Employee Records Entry
+          </h1>
+          <p style="color:#6B7686; font-size:.92rem; margin:.35rem 0 0;">Fill in all required fields to create a new employee record.</p>
+        </div>
+        <a href="/records/employee-entry" class="btn btn-outline-secondary" style="font-size:.88rem;">
+          <i class="fas fa-arrow-left me-1"></i> Cancel
+        </a>
+      </div>
+
+      <form id="employeeEntryForm" method="POST" action="/records/employee-entry/save">
+        <input type="hidden" id="applicantId" name="applicant_id" value="{{applicantData.applicantid}}">
+        <input type="hidden" id="selectedOfficeValue" value="{{selectedOffice}}">
+        <input type="hidden" name="office" value="{{selectedOffice}}">
+        <input type="hidden" id="selectedGenderValue" value="{{applicantData.gender}}">
+        <input type="hidden" id="selectedCivilStatusValue" value="{{applicantData.civilstatus}}">
+        <input type="hidden" id="selectedBirthdateValue" value="{{applicantData.birthdate}}">
+
+        <!-- Employee Information -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-id-card"></i>
+            <strong>Employee Information</strong>
+          </div>
+          <div class="nla-section-body">
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-3">
+                <label class="form-label">Office</label>
+                <select class="form-select" id="officeSelect" name="office" required>
+                  <option value="" disabled selected>Select Office</option>
+                  {{#each offices}}
+                    <option value="{{this.office_name}}">{{this.office_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="employeelname" name="employeelname" value="{{applicantData.lastname}}" required>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" id="employeefname" name="employeefname" value="{{applicantData.firstname}}" required>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Middle Name</label>
+                <input type="text" class="form-control" id="employeemi" name="employeemi" value="{{applicantData.middlename}}">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Region / Division</label>
+                <select class="form-select" name="region" id="regionSelect" required>
+                  <option value="" disabled selected>Select Region / Division</option>
+                  {{#each regions}}
+                    <option value="{{this.regionid}}" data-manager="{{this.region_manager}}">
+                      {{this.region_name}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Region / Division Manager</label>
+                <input type="text" id="regionManagerInput" class="form-control uneditable" readonly>
+              </div>
+
+              <div class="col-md-4">
+  <label class="form-label">Designation</label>
+  <select class="form-select" name="designationId" id="designationSelect" required>
+    <option value="" disabled selected>Select Designation</option>
+    {{#each designations}}
+      <option value="{{this.designation_id}}" data-designation="{{this.designation}}">
+        {{this.designation}}
+      </option>
+    {{/each}}
+  </select>
+  <input type="hidden" id="designationText" name="designation">
+</div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Area / Department</label>
+                <select class="form-select" name="area" id="areaSelect" required>
+                  <option value="" disabled selected>Select Area / Department</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Area / Department Manager</label>
+                <input type="text" id="areaManagerInput" class="form-control uneditable" readonly>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Branch</label>
+                <select class="form-select" name="branch" id="branchSelect">
+                  <option value="" disabled selected>Select Branch</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Hired Date</label>
+                <input type="date" class="form-control" id="employeedateemp" name="employeedateemp" value="{{applicantData.employeedateemp}}" required>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Ranking</label>
+                <select class="form-select" name="rank" id="rankSelect" required>
+                  <option value="" disabled>Select Rank</option>
+                  {{#each ranking}}
+                    <option value="{{this.rankid}}">{{this.rankname}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Employment Status</label>
+                <select class="form-select" name="employmentStatus" id="employmentStatusSelect" required>
+                  <option value="" disabled>Select Employment Status</option>
+                  {{#each employmentStatuses}}
+                    <option value="{{this.status_id}}">{{this.status_name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Resigned Date</label>
+                <input type="date" class="form-control uneditable" id="resignedDate" name="resignedDate" disabled>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Mobile No.</label>
+                <input type="text" class="form-control" id="employeecontactno" name="employeecontactno" value="{{applicantData.contactno}}">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">ML Wallet No.</label>
+                <input type="text" class="form-control" id="walletno" name="walletno">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="employeeemail" name="employeeemail" value="{{applicantData.email}}">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-user"></i>
+            <strong>Personal Information</strong>
+          </div>
+          <div class="nla-section-body">
+            <div class="row g-3">
+
+              <div class="col-md-4">
+                <label class="form-label">Gender</label>
+                <select class="form-select" id="employeegender" name="employeegender" required>
+                  <option value="" disabled selected>Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Civil Status</label>
+                <select class="form-select" name="civilStatus" id="civilStatusSelect" required>
+                  <option value="" disabled selected>Select Civil Status</option>
+                  {{#each civilStatus}}
+                    <option value="{{this.civil_status}}">{{this.civil_status}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Birth Date</label>
+                <input type="date" class="form-control" id="employeebdate" name="employeebdate" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Birth Place</label>
+                <input type="text" class="form-control" id="employeebplace" name="employeebplace" value="{{applicantData.birthplace}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Religion</label>
+                <input type="text" class="form-control" id="employeereligion" name="employeereligion" value="{{applicantData.religion}}">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" id="employeeaddress" name="employeeaddress" value="{{applicantData.currentaddress}}">
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Information -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-people-roof"></i>
+            <strong>Family Information</strong>
+          </div>
+          <div class="nla-section-body">
+
+            <p class="nla-subsection-label">Spouse Information</p>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Spouse Name</label>
+                <input type="text" class="form-control" id="employeespouse" name="employeespouse" value="{{applicantData.spousename}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Spouse's Work</label>
+                <input type="text" class="form-control" id="employeespousework" name="employeespousework" value="{{applicantData.spousework}}">
+              </div>
+            </div>
+
+            <p class="nla-subsection-label">Father's Information</p>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Father's Name</label>
+                <input type="text" class="form-control" id="employeefathersname" name="employeefathersname" value="{{applicantData.fathersname}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Father's Work</label>
+                <input type="text" class="form-control" id="employeefatherswork" name="employeefatherswork" value="{{applicantData.fatherswork}}">
+              </div>
+            </div>
+
+            <p class="nla-subsection-label">Mother's Information</p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Mother's Name</label>
+                <input type="text" class="form-control" id="employeemothersname" name="employeemothersname" value="{{applicantData.mothersname}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Mother's Work</label>
+                <input type="text" class="form-control" id="employeemotherwork" name="employeemotherwork" value="{{applicantData.motherswork}}">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-graduation-cap"></i>
+            <strong>Education</strong>
+          </div>
+          <div class="nla-section-body">
+
+            <p class="nla-subsection-label">Grade School</p>
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label">School Name</label>
+                <input type="text" class="form-control" id="employeeschool1" name="employeeschool1" value="{{applicantData.employeeschool1}}">
+              </div>
+              <div class="col-md-5">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" id="employeeaddress1" name="employeeaddress1" value="{{applicantData.employeeaddress1}}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Year Graduated</label>
+                <input type="text" class="form-control" id="employeescyear1" name="employeescyear1" value="{{applicantData.employeescyear1}}">
+              </div>
+            </div>
+
+            <div class="nla-edu-divider"></div>
+
+            <p class="nla-subsection-label">High School</p>
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label">School Name</label>
+                <input type="text" class="form-control" id="employeeschool2" name="employeeschool2" value="{{applicantData.employeeschool2}}">
+              </div>
+              <div class="col-md-5">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" id="employeeaddress2" name="employeeaddress2" value="{{applicantData.employeeaddress2}}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Year Graduated</label>
+                <input type="text" class="form-control" id="employeescyear2" name="employeescyear2" value="{{applicantData.employeescyear2}}">
+              </div>
+            </div>
+
+            <div class="nla-edu-divider"></div>
+
+            <p class="nla-subsection-label">College</p>
+            <div class="row g-3 mb-3">
+              <div class="col-md-5">
+                <label class="form-label">School Name</label>
+                <input type="text" class="form-control" id="employeeschool3" name="employeeschool3" value="{{applicantData.college}}">
+              </div>
+              <div class="col-md-5">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" id="employeeaddress3" name="employeeaddress3" value="{{applicantData.collegeaddress}}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Year Graduated</label>
+                <input type="text" class="form-control" id="employeescyear3" name="employeescyear3" value="{{applicantData.yeargraduated}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Course</label>
+                <input type="text" class="form-control" id="employeeschool4" name="employeeschool4" value="{{applicantData.course}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Major</label>
+                <input type="text" class="form-control" id="employeeaddress4" name="employeeaddress4" value="{{applicantData.major}}">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Government IDs -->
+        <div class="nla-section">
+          <div class="nla-section-header">
+            <i class="fas fa-id-badge"></i>
+            <strong>Government ID Information</strong>
+          </div>
+          <div class="nla-section-body">
+            <div class="row g-3">
+
+              <div class="col-md-3">
+                <label class="form-label">SSS No.</label>
+                <input type="text" class="form-control" id="employeesss" name="employeesss" value="{{applicantData.sssno}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Pag-IBIG No.</label>
+                <input type="text" class="form-control" id="employeepagibig" name="employeepagibig" value="{{applicantData.pagibigid}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">PhilHealth No.</label>
+                <input type="text" class="form-control" id="employeephilhealth" name="employeephilhealth" value="{{applicantData.philhealth}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">TIN</label>
+                <input type="text" class="form-control" id="employeetin" name="employeetin" value="{{applicantData.tin}}">
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Action Bar -->
+        <div style="position:sticky; bottom:0; background:rgba(255,255,255,.97); border:1px solid #E3E6EB; border-radius:.65rem; padding:1rem 1.15rem; box-shadow:0 -4px 16px rgba(16,24,40,.06); display:flex; align-items:center; justify-content:flex-end; gap:.75rem; margin-top:.5rem;">
+          <a href="/records/employee-entry" class="btn btn-outline-secondary" style="font-size:.9rem;">
+            <i class="fas fa-times me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn" style="background:#1F7A6C; border-color:#1F7A6C; color:#fff; font-weight:500; font-size:.9rem; padding:.55rem 1.5rem;">
+            <i class="fas fa-save me-1"></i> Save New Employee
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form                   = document.getElementById("employeeEntryForm");
+  const officeSelect           = document.getElementById("officeSelect");
+  const regionSelect           = document.getElementById("regionSelect");
+  const areaSelect             = document.getElementById("areaSelect");
+  const branchSelect           = document.getElementById("branchSelect");
+  const regionManagerInput     = document.getElementById("regionManagerInput");
+  const areaManagerInput       = document.getElementById("areaManagerInput");
+  const employmentStatusSelect = document.getElementById("employmentStatusSelect");
+  const resignedDateInput      = document.getElementById("resignedDate");
+  const birthDateInput         = document.getElementById("employeebdate");
+  const selectedOffice         = "{{selectedOffice}}";
+$('#designationSelect').select2({ placeholder: "Select Designation", allowClear: true, width: '100%' });
+$('#regionSelect').select2({ placeholder: "Select Region / Division", allowClear: true, width: '100%' });
+
+// ADD THIS: keep the hidden text field in sync with the selected designation_id
+$('#designationSelect').on('change', function () {
+  const selectedOption = this.options[this.selectedIndex];
+  document.getElementById('designationText').value = selectedOption?.dataset.designation || '';
+});
+
+  function calculateAge(birthDateString) {
+    if (!birthDateString) return null;
+    const today     = new Date();
+    const birthDate = new Date(birthDateString);
+    let age         = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff   = today.getDate() - birthDate.getDate();
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
+    return age;
+  }
+
+  birthDateInput.addEventListener("change", function () {
+    const age = calculateAge(this.value);
+    if (age !== null && age < 18) {
+      Swal.fire({ icon: "warning", title: "Not Eligible", text: "Employee must be at least 18 years old." });
+      this.value = "";
+    }
+  });
+
+  function toggleResignedDate() {
+    if (!employmentStatusSelect || !resignedDateInput) return;
+    const selectedText = employmentStatusSelect.options[employmentStatusSelect.selectedIndex]?.text?.trim().toUpperCase();
+    if (selectedText === "ACTIVE") {
+      resignedDateInput.disabled = true;
+      resignedDateInput.value    = "";
+      resignedDateInput.classList.add("uneditable");
+    } else {
+      resignedDateInput.disabled = false;
+      resignedDateInput.classList.remove("uneditable");
+    }
+  }
+
+  async function loadRegions(office) {
+    regionSelect.innerHTML   = `<option value="">Loading regions...</option>`;
+    areaSelect.innerHTML     = `<option value="">Select Area / Department</option>`;
+    branchSelect.innerHTML   = `<option value="">Select Branch</option>`;
+    regionManagerInput.value = "";
+    areaManagerInput.value   = "";
+
+    const res  = await fetch(`/records/employee-entry/regions?office=${encodeURIComponent(office)}`);
+    const data = await res.json();
+    regionSelect.innerHTML   = `<option value="" disabled selected>Select Region / Division</option>`;
+
+    if (data.success && Array.isArray(data.regions)) {
+      data.regions.forEach((region) => {
+        const option           = document.createElement("option");
+        option.value           = region.regionid || region.region_id || region.region_name;
+        option.textContent     = region.regionname || region.region_name;
+        option.dataset.manager = region.region_manager || "";
+        regionSelect.appendChild(option);
+      });
+    }
+    $('#regionSelect').trigger('change.select2');
+  }
+
+  async function loadAreas(office, region) {
+    areaSelect.innerHTML   = `<option value="">Loading areas...</option>`;
+    branchSelect.innerHTML = `<option value="">Select Branch</option>`;
+    areaManagerInput.value = "";
+
+    const res  = await fetch(`/records/employee-entry/areas?office=${encodeURIComponent(office)}&region=${encodeURIComponent(region)}`);
+    const data = await res.json();
+    areaSelect.innerHTML   = `<option value="" disabled selected>Select Area / Department</option>`;
+
+    if (data.success && Array.isArray(data.areas)) {
+      data.areas.forEach((area) => {
+        const option           = document.createElement("option");
+        option.value           = area.areaid || area.id || area.area_id;
+        option.textContent     = area.area_name || area.areaname || area.name;
+        option.dataset.manager = area.area_manager || area.managerName || "";
+        areaSelect.appendChild(option);
+      });
+    }
+  }
+
+  async function loadBranches(office, region, area) {
+    branchSelect.innerHTML = `<option value="">Loading branches...</option>`;
+
+    const res  = await fetch(`/records/employee-entry/branches?office=${encodeURIComponent(office)}&region=${encodeURIComponent(region)}&area=${encodeURIComponent(area)}`);
+    const data = await res.json();
+    branchSelect.innerHTML = `<option value="" disabled selected>Select Branch</option>`;
+
+    if (data.success && Array.isArray(data.branches)) {
+      data.branches.forEach((branch) => {
+        const option       = document.createElement("option");
+        option.value       = branch.branchcode || branch.branchid || branch.id;
+        option.textContent = branch.branch_name || branch.branchname || branch.name;
+        branchSelect.appendChild(option);
+      });
+    }
+  }
+
+  officeSelect.addEventListener("change", function () {
+    if (this.value) loadRegions(this.value);
+  });
+
+  $('#regionSelect').on('change', function () {
+    const selectedOption     = this.options[this.selectedIndex];
+    regionManagerInput.value = selectedOption?.dataset.manager || "";
+    loadAreas(officeSelect.value, this.value);
+  });
+
+  areaSelect.addEventListener("change", function () {
+    areaManagerInput.value = this.options[this.selectedIndex].dataset.manager || "";
+    loadBranches(officeSelect.value, regionSelect.value, this.value);
+  });
+
+  if (employmentStatusSelect) {
+    employmentStatusSelect.addEventListener("change", toggleResignedDate);
+    toggleResignedDate();
+  }
+
+  if (selectedOffice) {
+    officeSelect.value    = selectedOffice;
+    officeSelect.disabled = true;
+    loadRegions(selectedOffice);
+  }
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const designationSelect = document.getElementById("designationSelect");
+    const validDesignations = Array.from(designationSelect.options).map(opt => opt.value).filter(v => v);
+    if (!validDesignations.includes(designationSelect.value)) {
+      Swal.fire({ icon: "error", title: "Invalid Designation", text: "Please select a valid designation from the list only." });
+      return;
+    }
+
+    const formData    = new FormData(form);
+    const payload     = Object.fromEntries(formData.entries());
+    const empStatus   = document.getElementById("employmentStatusSelect");
+    const statusOpt   = empStatus.options[empStatus.selectedIndex];
+    payload.employmentStatusText = statusOpt?.text?.trim();
+
+    const age = calculateAge(payload.employeebdate);
+    if (age !== null && age < 18) {
+      Swal.fire({ icon: "error", title: "Cannot Proceed", text: "Employee must be at least 18 years old." });
+      return;
+    }
+
+    if (selectedOffice) formData.set("office", selectedOffice);
+
+    try {
+      const response = await fetch("/records/employee-entry/save", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(payload),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        await Swal.fire({
+          icon: "success",
+          title: "Employee Saved Successfully",
+          html: `
+            <div class="text-start">
+              <p class="mb-2">The employee record has been successfully created.</p>
+              <hr>
+              <p class="mb-1"><strong>Employee ID:</strong> ${data.employeeId}</p>
+              <p class="mb-1"><strong>Name:</strong> ${data.lastName}, ${data.firstName} ${data.middleInitial || ""}</p>
+            </div>
+          `,
+          confirmButtonText: "OK",
+        });
+        window.location.href = "/records/employee-entry";
+        return;
+      }
+
+      Swal.fire({ icon: "error", title: "Save Failed", text: data.message || "Unable to save employee record." });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({ icon: "error", title: "Unexpected Error", text: "Something went wrong while saving the employee." });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
